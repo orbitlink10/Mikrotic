@@ -29,7 +29,8 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($admin)->post('/admin/products', [
             'name' => 'Admin Camera',
             'category_id' => $category->id,
-            'description' => 'Camera added by admin.',
+            'description' => '<p>Camera added by <strong>admin</strong>.</p><script>alert(1)</script>',
+            'meta_description' => 'Compact admin camera listing.',
             'price' => '499.99',
             'stock' => 8,
             'image_url' => 'https://example.com/camera.jpg',
@@ -48,11 +49,14 @@ class AdminProductManagementTest extends TestCase
         $this->assertNotNull($product);
         $this->assertSame($vendor->id, $product->vendor_id);
         $this->assertSame('active', $product->status);
+        $this->assertSame('Compact admin camera listing.', $product->meta_description);
+        $this->assertSame('<p>Camera added by <strong>admin</strong>.</p>', $product->description);
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'name' => 'Admin Camera',
             'category_id' => $category->id,
+            'meta_description' => 'Compact admin camera listing.',
         ]);
 
         $this->assertDatabaseHas('product_images', [

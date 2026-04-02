@@ -1,5 +1,15 @@
 @extends('layouts.app')
 
+@php
+    $descriptionHtml = \App\Support\ProductContent::sanitizeRichText($product->description)
+        ?: '<p>No description available.</p>';
+    $productMetaDescription = $product->meta_description
+        ?: \App\Support\ProductContent::excerpt($product->description, 160);
+@endphp
+
+@section('title', $product->name . ' | ' . config('app.name', 'Almar Market'))
+@section('meta_description', $productMetaDescription)
+
 @section('content')
 @php
     $image = optional($product->images->firstWhere('is_primary', true) ?? $product->images->first())->image_url
@@ -15,7 +25,7 @@
         <p class="vendor-name">Sold by {{ $product->vendor->shop_name }}</p>
         <p class="price large">KSh {{ number_format((float) $product->price, 2) }}</p>
         <p class="stock">{{ $product->stock > 0 ? 'In stock' : 'Out of stock' }}</p>
-        <p class="description">{{ $product->description ?: 'No description available.' }}</p>
+        <div class="description rich-content">{!! $descriptionHtml !!}</div>
         @auth
             <form class="inline-form" method="post" action="{{ route('cart.add', $product) }}">
                 @csrf

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Vendor;
+use App\Support\ProductContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -114,6 +115,7 @@ class VendorController extends Controller
             'name' => ['required', 'string', 'min:2', 'max:180'],
             'category_id' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'meta_description' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0.01'],
             'stock' => ['required', 'integer', 'min:0'],
             'image_url' => ['nullable', 'url', 'max:255'],
@@ -129,7 +131,8 @@ class VendorController extends Controller
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'slug' => $this->uniqueSlug('products', $data['name']),
-            'description' => $data['description'] ?? null,
+            'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
+            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
             'price' => $data['price'],
             'stock' => $data['stock'],
             'sku' => $sku,

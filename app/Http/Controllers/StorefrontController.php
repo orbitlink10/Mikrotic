@@ -26,7 +26,8 @@ class StorefrontController extends Controller
         if ($search !== '') {
             $productsQuery->where(function ($query) use ($search): void {
                 $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('meta_description', 'like', '%' . $search . '%');
             });
         }
 

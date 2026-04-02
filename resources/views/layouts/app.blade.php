@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Almar Market') }}</title>
+    <title>@yield('title', config('app.name', 'Almar Market'))</title>
+    <meta name="description" content="@yield('meta_description', 'Browse products from our multi-vendor marketplace.')">
     <link rel="stylesheet" href="{{ asset('assets/market.css') }}">
+    @stack('head')
 </head>
 <body>
 @php

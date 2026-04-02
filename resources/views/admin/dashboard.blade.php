@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('head')
+    <script src="{{ asset('assets/product-editor.js') }}" defer></script>
+@endpush
+
 @section('content')
 <section class="panel">
     <div class="dashboard-head">
@@ -76,9 +80,29 @@
                 <input type="url" name="image_url" value="{{ old('image_url') }}">
             </label>
             <label>
-                Description
-                <textarea name="description">{{ old('description') }}</textarea>
+                Meta Description
+                <textarea name="meta_description" rows="3">{{ old('meta_description') }}</textarea>
             </label>
+            <div class="rich-editor-field">
+                <span class="field-label">Description</span>
+                <div class="editor-shell" data-rich-editor>
+                    <div class="editor-toolbar">
+                        <button type="button" data-command="undo">Undo</button>
+                        <button type="button" data-command="redo">Redo</button>
+                        <button type="button" data-command="bold"><strong>B</strong></button>
+                        <button type="button" data-command="italic"><em>I</em></button>
+                        <button type="button" data-command="insertUnorderedList">Bullets</button>
+                        <button type="button" data-command="insertOrderedList">Numbers</button>
+                        <button type="button" data-command="justifyLeft">Left</button>
+                        <button type="button" data-command="justifyCenter">Center</button>
+                        <button type="button" data-command="justifyRight">Right</button>
+                        <button type="button" data-action="link">Link</button>
+                        <button type="button" data-action="clear">Clear</button>
+                    </div>
+                    <div class="editor-surface" data-editor-surface data-placeholder="Write the product description here..." contenteditable="true"></div>
+                    <textarea class="rich-editor-input" name="description" hidden>{{ old('description') }}</textarea>
+                </div>
+            </div>
             <button type="submit">Publish Product</button>
         </form>
     </div>

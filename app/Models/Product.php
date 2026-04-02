@@ -18,6 +18,7 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'meta_description',
         'price',
         'compare_at_price',
         'stock',

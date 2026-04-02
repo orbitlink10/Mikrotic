@@ -359,6 +359,75 @@ th {
     line-height: 1.5;
 }
 
+.field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.rich-editor-field {
+    display: grid;
+    gap: 8px;
+}
+
+.editor-shell {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    background: #f8fafc;
+}
+
+.editor-toolbar button {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--brand-dark);
+}
+
+.editor-toolbar button.is-active {
+    background: #fff4e6;
+    color: #ad5b00;
+}
+
+.editor-surface {
+    min-height: 280px;
+    padding: 16px;
+    outline: none;
+}
+
+.editor-surface:empty::before {
+    content: attr(data-placeholder);
+    color: var(--muted);
+}
+
+.rich-content > :first-child {
+    margin-top: 0;
+}
+
+.rich-content > :last-child {
+    margin-bottom: 0;
+}
+
+.rich-content ul,
+.rich-content ol {
+    padding-left: 20px;
+}
+
+.rich-content a {
+    color: #ad5b00;
+    text-decoration: underline;
+}
+
 .dashboard-head {
     display: flex;
     align-items: center;
@@ -482,5 +551,9 @@ th {
     .dashboard-head {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .editor-toolbar {
+        overflow-x: auto;
     }
 }
