@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
     Route::get('/vendors', [AdminController::class, 'pendingVendors'])->name('vendors.pending');
     Route::post('/vendors/{vendor}/approve', [AdminController::class, 'approveVendor'])->name('vendors.approve');
 });

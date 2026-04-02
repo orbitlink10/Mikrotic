@@ -90,6 +90,11 @@ button,
     display: inline-block;
 }
 
+.button-link.secondary {
+    background: #fff4e6;
+    color: #ad5b00;
+}
+
 button.danger {
     background: var(--danger);
 }
@@ -361,6 +366,13 @@ th {
     gap: 12px;
 }
 
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 .admin-stats-grid {
     display: grid;
     gap: 12px;
@@ -391,6 +403,12 @@ th {
 }
 
 .admin-panels {
+    margin-top: 16px;
+    display: grid;
+    gap: 16px;
+}
+
+.admin-workspace {
     margin-top: 16px;
     display: grid;
     gap: 16px;
@@ -459,5 +477,10 @@ th {
     .cart-summary {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .dashboard-head {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
