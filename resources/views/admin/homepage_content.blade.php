@@ -20,6 +20,12 @@
         <section class="panel admin-settings-panel">
             <div class="admin-settings-panel-bar">Homepage Content Management</div>
 
+            @unless($homepageContentStorageReady)
+                <div class="alert error">
+                    Homepage content storage is not ready yet. Run <code>php artisan migrate</code> to create the <code>homepage_contents</code> table before saving changes.
+                </div>
+            @endunless
+
             <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}" enctype="multipart/form-data">
                 @csrf
 
@@ -31,6 +37,7 @@
                         type="text"
                         name="hero_title"
                         value="{{ old('hero_title', $homepageContent->hero_title) }}"
+                        @disabled(! $homepageContentStorageReady)
                         required
                     >
                 </div>
@@ -42,6 +49,7 @@
                         id="hero_description"
                         name="hero_description"
                         rows="3"
+                        @disabled(! $homepageContentStorageReady)
                         required
                     >{{ old('hero_description', $homepageContent->hero_description) }}</textarea>
                 </div>
@@ -54,6 +62,7 @@
                         type="file"
                         name="hero_image"
                         accept=".jpg,.jpeg,.png,.webp,image/*"
+                        @disabled(! $homepageContentStorageReady)
                     >
 
                     @if($homepageContent->heroImageUrl())
@@ -65,7 +74,7 @@
                 </div>
 
                 <div class="admin-settings-actions">
-                    <button type="submit" class="admin-primary-pill">Update Homepage</button>
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Update Homepage</button>
                 </div>
             </form>
         </section>

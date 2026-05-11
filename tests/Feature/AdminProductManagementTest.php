@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class AdminProductManagementTest extends TestCase
@@ -256,5 +257,35 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertOk();
         $homeResponse->assertSee('Starlink Kenya for Homes and Business');
         $homeResponse->assertSee('Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.');
+    }
+
+    public function test_storefront_uses_default_homepage_content_when_table_is_missing(): void
+    {
+        Schema::drop('homepage_contents');
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('Starlink Kenya | High-Speed Satellite Internet Across Kenya');
+        $response->assertSee('Starlink Kenya offers high-speed satellite internet with affordable packages, hardware, and monthly plans. Stay connected anywhere in Kenya today.');
+    }
+
+    public function test_admin_homepage_update_shows_clear_error_when_table_is_missing(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Schema::drop('homepage_contents');
+
+        $response = $this->actingAs($admin)->post('/admin/pages-content', [
+            'hero_title' => 'Fallback title',
+            'hero_description' => 'Fallback description that should not be saved because the table is missing.',
+        ]);
+
+        $response->assertRedirect('/admin/pages-content');
+        $response->assertSessionHas('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
     }
 }

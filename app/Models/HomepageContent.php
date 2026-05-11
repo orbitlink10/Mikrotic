@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class HomepageContent extends Model
 {
@@ -20,12 +21,26 @@ class HomepageContent extends Model
 
     public static function current(): self
     {
+        if (!static::storageReady()) {
+            return static::defaultContent();
+        }
+
         return static::query()->where('site_key', static::DEFAULT_SITE_KEY)->first()
-            ?? new static([
-                'site_key' => static::DEFAULT_SITE_KEY,
-                'hero_title' => 'Starlink Kenya | High-Speed Satellite Internet Across Kenya',
-                'hero_description' => 'Starlink Kenya offers high-speed satellite internet with affordable packages, hardware, and monthly plans. Stay connected anywhere in Kenya today.',
-            ]);
+            ?? static::defaultContent();
+    }
+
+    public static function storageReady(): bool
+    {
+        return Schema::hasTable((new static())->getTable());
+    }
+
+    private static function defaultContent(): self
+    {
+        return new static([
+            'site_key' => static::DEFAULT_SITE_KEY,
+            'hero_title' => 'Starlink Kenya | High-Speed Satellite Internet Across Kenya',
+            'hero_description' => 'Starlink Kenya offers high-speed satellite internet with affordable packages, hardware, and monthly plans. Stay connected anywhere in Kenya today.',
+        ]);
     }
 
     public function heroImageUrl(): ?string

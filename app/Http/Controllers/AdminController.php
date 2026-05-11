@@ -280,11 +280,18 @@ class AdminController extends Controller
     {
         return view('admin.homepage_content', [
             'homepageContent' => HomepageContent::current(),
+            'homepageContentStorageReady' => HomepageContent::storageReady(),
         ]);
     }
 
     public function updateHomepageContent(Request $request): RedirectResponse
     {
+        if (!HomepageContent::storageReady()) {
+            return redirect()
+                ->route('admin.pages-content.edit')
+                ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
+        }
+
         $data = $request->validate([
             'hero_title' => ['required', 'string', 'min:4', 'max:180'],
             'hero_description' => ['required', 'string', 'min:12', 'max:500'],
