@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/products/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
 
+Route::redirect('/login', '/login.php');
+
 Route::middleware('guest')->group(function (): void {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::get('/login.php', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login.php', [AuthController::class, 'login'])->name('login.submit');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 });

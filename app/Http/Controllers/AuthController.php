@@ -38,7 +38,9 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-        return redirect()->route('home')->with('success', 'You are now logged in.');
+        return redirect()
+            ->intended($this->loginRedirectPath((string) $request->user()?->role))
+            ->with('success', 'You are now logged in.');
     }
 
     public function showRegister(): View
@@ -77,5 +79,14 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('home')->with('success', 'You have logged out.');
+    }
+
+    private function loginRedirectPath(string $role): string
+    {
+        return match ($role) {
+            'admin' => route('admin.dashboard'),
+            'vendor' => route('vendor.dashboard'),
+            default => route('home'),
+        };
     }
 }
