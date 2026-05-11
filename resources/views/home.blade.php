@@ -20,10 +20,15 @@
     </aside>
 
     <div class="home-main">
-        <div class="hero-banner">
+        <div
+            class="hero-banner"
+            @if($homepageContent->heroImageUrl())
+                style="background-image: linear-gradient(120deg, rgba(198, 31, 31, 0.82), rgba(234, 88, 12, 0.72)), url('{{ $homepageContent->heroImageUrl() }}'); background-size: cover; background-position: center;"
+            @endif
+        >
             <div>
-                <h1>Jumia-style Marketplace in Laravel</h1>
-                <p>Multi-vendor catalog, cart, checkout, vendor dashboard, and admin approvals.</p>
+                <h1>{{ $homepageContent->hero_title }}</h1>
+                <p>{{ $homepageContent->hero_description }}</p>
             </div>
         </div>
 

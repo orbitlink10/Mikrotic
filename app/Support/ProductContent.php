@@ -21,8 +21,11 @@ class ProductContent
         'ol',
         'li',
         'a',
+        'img',
         'h2',
         'h3',
+        'pre',
+        'code',
         'blockquote',
     ];
 
@@ -39,6 +42,7 @@ class ProductContent
      */
     private const ALLOWED_ATTRIBUTES = [
         'a' => ['href', 'target', 'rel'],
+        'img' => ['src', 'alt'],
     ];
 
     public static function sanitizeRichText(?string $html): ?string
@@ -49,7 +53,7 @@ class ProductContent
         }
 
         if (!class_exists(DOMDocument::class)) {
-            $fallback = strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><h2><h3><blockquote>');
+            $fallback = strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><img><h2><h3><pre><code><blockquote>');
             return trim($fallback) !== '' ? trim($fallback) : null;
         }
 
@@ -154,6 +158,14 @@ class ProductContent
             }
         }
 
+        if ($tag === 'img') {
+            $src = trim($element->getAttribute('src'));
+            if (!self::isSafeSrc($src)) {
+                $element->parentNode?->removeChild($element);
+                return;
+            }
+        }
+
         self::sanitizeChildren($element);
     }
 
@@ -182,5 +194,18 @@ class ProductContent
         }
 
         return preg_match('/^(https?:|mailto:|tel:)/i', $href) === 1;
+    }
+
+    private static function isSafeSrc(string $src): bool
+    {
+        if ($src === '') {
+            return false;
+        }
+
+        if (preg_match('/^(\/|https?:)/i', $src) === 1) {
+            return true;
+        }
+
+        return preg_match('/^data:image\//i', $src) === 1;
     }
 }

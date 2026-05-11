@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\HomepageContent;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -35,6 +36,7 @@ class StorefrontController extends Controller
 
         return view('home', [
             'categories' => $categories,
+            'homepageContent' => HomepageContent::current(),
             'products' => $products,
             'search' => $search,
             'selectedCategory' => $categoryId,

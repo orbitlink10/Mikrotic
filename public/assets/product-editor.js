@@ -6,6 +6,13 @@
         .replace(/&nbsp;/gi, ' ')
         .trim();
 
+    const escapeHtml = (value) => value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
     const updateButtonStates = (container) => {
         container.querySelectorAll('[data-command]').forEach((button) => {
             const command = button.dataset.command;
@@ -34,6 +41,12 @@
         const syncToInput = () => {
             input.value = normalize(surface.innerHTML);
             updateButtonStates(container);
+        };
+
+        const insertHtml = (html) => {
+            surface.focus();
+            document.execCommand('insertHTML', false, html);
+            syncToInput();
         };
 
         surface.innerHTML = input.value || '';
@@ -71,6 +84,50 @@
             button.addEventListener('click', () => {
                 surface.innerHTML = '';
                 syncToInput();
+            });
+        });
+
+        container.querySelectorAll('[data-action="image"]').forEach((button) => {
+            button.addEventListener('mousedown', (event) => event.preventDefault());
+            button.addEventListener('click', () => {
+                const src = window.prompt('Enter an image URL');
+                if (!src) {
+                    return;
+                }
+
+                const alt = window.prompt('Enter image alt text') || '';
+                insertHtml(`<p><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"></p>`);
+            });
+        });
+
+        container.querySelectorAll('[data-action="media"]').forEach((button) => {
+            button.addEventListener('mousedown', (event) => event.preventDefault());
+            button.addEventListener('click', () => {
+                const href = window.prompt('Enter a media URL');
+                if (!href) {
+                    return;
+                }
+
+                insertHtml(`<p><a href="${escapeHtml(href)}">Media link</a></p>`);
+            });
+        });
+
+        container.querySelectorAll('[data-action="code"]').forEach((button) => {
+            button.addEventListener('mousedown', (event) => event.preventDefault());
+            button.addEventListener('click', () => {
+                const selection = window.getSelection();
+                const selectedText = selection ? selection.toString() : '';
+                const content = selectedText || 'Code snippet';
+
+                insertHtml(`<pre><code>${escapeHtml(content)}</code></pre>`);
+            });
+        });
+
+        container.querySelectorAll('[data-action="fullscreen"]').forEach((button) => {
+            button.addEventListener('mousedown', (event) => event.preventDefault());
+            button.addEventListener('click', () => {
+                container.classList.toggle('is-fullscreen');
+                surface.focus();
             });
         });
 

@@ -42,7 +42,20 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::get('/pages-content', [AdminController::class, 'homepageContentForm'])->name('pages-content.edit');
+    Route::post('/pages-content', [AdminController::class, 'updateHomepageContent'])->name('pages-content.update');
+    Route::get('/categories', [AdminController::class, 'categoriesIndex'])->name('categories.index');
+    Route::get('/categories/create', [AdminController::class, 'createCategoryForm'])->name('categories.create');
+    Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
+    Route::get('/sub-categories', [AdminController::class, 'subcategoriesIndex'])->name('subcategories.index');
+    Route::get('/products', [AdminController::class, 'productsIndex'])->name('products.index');
+    Route::get('/products/create', [AdminController::class, 'createProductForm'])->name('products.create');
     Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
+    Route::get('/pages', [AdminController::class, 'pagesIndex'])->name('pages.index');
+    Route::get('/pages/create', [AdminController::class, 'createPageForm'])->name('pages.create');
+    Route::post('/pages', [AdminController::class, 'storePage'])->name('pages.store');
+    Route::get('/orders', [AdminController::class, 'ordersIndex'])->name('orders.index');
+    Route::get('/invoices', [AdminController::class, 'invoicesIndex'])->name('invoices.index');
     Route::get('/vendors', [AdminController::class, 'pendingVendors'])->name('vendors.pending');
     Route::post('/vendors/{vendor}/approve', [AdminController::class, 'approveVendor'])->name('vendors.approve');
 });

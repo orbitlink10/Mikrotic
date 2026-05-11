@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\HomepageContent;
 use App\Models\Order;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Support\ProductContent;
@@ -12,6 +14,7 @@ use App\Models\Vendor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -43,6 +46,27 @@ class AdminController extends Controller
         }
 
         return $sku;
+    }
+
+    private function resolveCategory(array $data): Category
+    {
+        if (!empty($data['category_id'])) {
+            return Category::query()->findOrFail($data['category_id']);
+        }
+
+        $name = trim((string) ($data['category_name'] ?? ''));
+        $existingCategory = Category::query()
+            ->whereRaw('LOWER(name) = ?', [Str::lower($name)])
+            ->first();
+
+        if ($existingCategory) {
+            return $existingCategory;
+        }
+
+        return Category::create([
+            'name' => $name,
+            'slug' => $this->uniqueSlug('categories', $name),
+        ]);
     }
 
     private function adminVendor(Request $request, bool $create = false): ?Vendor
@@ -82,6 +106,12 @@ class AdminController extends Controller
         $adminVendor = $this->adminVendor($request);
         $stats = [
             'total_users' => User::count(),
+            'new_users_30_days' => User::query()->where('created_at', '>=', now()->subDays(30))->count(),
+            'active_users_24_hours' => DB::table('sessions')
+                ->whereNotNull('user_id')
+                ->where('last_activity', '>=', now()->subDay()->getTimestamp())
+                ->distinct()
+                ->count('user_id'),
             'total_vendors' => Vendor::count(),
             'pending_vendors' => Vendor::where('is_approved', false)->count(),
             'approved_vendors' => Vendor::where('is_approved', true)->count(),
@@ -89,6 +119,7 @@ class AdminController extends Controller
             'active_products' => Product::where('status', 'active')->count(),
             'total_orders' => Order::count(),
             'pending_orders' => Order::where('status', 'pending')->count(),
+            'recent_orders_7_days' => Order::query()->where('created_at', '>=', now()->subDays(7))->count(),
             'gross_revenue' => (float) Order::sum('total_amount'),
         ];
 
@@ -113,8 +144,6 @@ class AdminController extends Controller
             'stats' => $stats,
             'recentOrders' => $recentOrders,
             'pendingVendors' => $pendingVendors,
-            'categories' => Category::query()->orderBy('name')->get(),
-            'adminVendor' => $adminVendor,
             'adminProducts' => $adminProducts,
         ]);
     }
@@ -130,11 +159,222 @@ class AdminController extends Controller
         ]);
     }
 
+    public function categoriesIndex(): View
+    {
+        return view('admin.categories_index', [
+            'categories' => Category::query()
+                ->whereNull('parent_id')
+                ->withCount('products')
+                ->latest()
+                ->get(),
+        ]);
+    }
+
+    public function subcategoriesIndex(): View
+    {
+        return view('admin.subcategories_index', [
+            'subcategories' => Category::query()
+                ->whereNotNull('parent_id')
+                ->with(['parent'])
+                ->withCount('products')
+                ->latest()
+                ->get(),
+        ]);
+    }
+
+    public function createCategoryForm(Request $request): View
+    {
+        $defaultParentId = $request->integer('parent_id');
+
+        return view('admin.category_create', [
+            'parents' => Category::query()
+                ->whereNull('parent_id')
+                ->orderBy('name')
+                ->get(),
+            'defaultParentId' => $defaultParentId > 0 ? $defaultParentId : null,
+        ]);
+    }
+
+    public function storeCategory(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'min:2', 'max:120', 'unique:categories,name'],
+            'parent_id' => ['nullable', 'exists:categories,id'],
+            'image_url' => ['nullable', 'url', 'max:255'],
+        ]);
+
+        $category = Category::create([
+            'name' => $data['name'],
+            'slug' => $this->uniqueSlug('categories', $data['name']),
+            'parent_id' => $data['parent_id'] ?? null,
+            'image_url' => $data['image_url'] ?? null,
+        ]);
+
+        $redirectRoute = $category->parent_id ? 'admin.subcategories.index' : 'admin.categories.index';
+
+        return redirect()->route($redirectRoute)->with('success', 'Category saved successfully.');
+    }
+
+    public function productsIndex(Request $request): View
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        $products = Product::query()
+            ->with([
+                'category',
+                'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order'),
+            ])
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($builder) use ($search): void {
+                    $builder->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('slug', 'like', '%' . $search . '%')
+                        ->orWhere('sku', 'like', '%' . $search . '%');
+                });
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.products_index', [
+            'products' => $products,
+            'search' => $search,
+        ]);
+    }
+
+    public function ordersIndex(Request $request): View
+    {
+        $search = trim((string) $request->query('search', ''));
+        $status = trim((string) $request->query('status', ''));
+
+        $orders = Order::query()
+            ->with('user')
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($builder) use ($search): void {
+                    $builder->where('order_number', 'like', '%' . $search . '%')
+                        ->orWhere('shipping_name', 'like', '%' . $search . '%')
+                        ->orWhere('shipping_email', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%' . $search . '%'));
+                });
+            })
+            ->when($status !== '', fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.orders_index', [
+            'orders' => $orders,
+            'search' => $search,
+            'status' => $status,
+            'statuses' => ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'],
+        ]);
+    }
+
+    public function pagesIndex(): View
+    {
+        return view('admin.pages_index', [
+            'pages' => Page::query()->latest()->paginate(20),
+        ]);
+    }
+
+    public function homepageContentForm(): View
+    {
+        return view('admin.homepage_content', [
+            'homepageContent' => HomepageContent::current(),
+        ]);
+    }
+
+    public function updateHomepageContent(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'hero_title' => ['required', 'string', 'min:4', 'max:180'],
+            'hero_description' => ['required', 'string', 'min:12', 'max:500'],
+            'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ]);
+
+        $homepageContent = HomepageContent::query()->firstOrNew([
+            'site_key' => HomepageContent::DEFAULT_SITE_KEY,
+        ]);
+
+        $homepageContent->hero_title = $data['hero_title'];
+        $homepageContent->hero_description = $data['hero_description'];
+
+        if ($request->hasFile('hero_image')) {
+            $directory = public_path('uploads/homepage-content');
+            File::ensureDirectoryExists($directory);
+
+            if ($homepageContent->hero_image_path && File::exists(public_path($homepageContent->hero_image_path))) {
+                File::delete(public_path($homepageContent->hero_image_path));
+            }
+
+            $image = $request->file('hero_image');
+            $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $image->getClientOriginalExtension();
+            $image->move($directory, $filename);
+
+            $homepageContent->hero_image_path = 'uploads/homepage-content/' . $filename;
+        }
+
+        $homepageContent->save();
+
+        return redirect()->route('admin.pages-content.edit')->with('success', 'Homepage content updated successfully.');
+    }
+
+    public function createPageForm(): View
+    {
+        return view('admin.page_create');
+    }
+
+    public function storePage(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'meta_title' => ['required', 'string', 'min:2', 'max:180'],
+            'meta_description' => ['required', 'string', 'min:10', 'max:255'],
+            'title' => ['required', 'string', 'min:2', 'max:180'],
+            'slug' => ['nullable', 'string', 'max:180', 'unique:pages,slug'],
+            'image_url' => ['nullable', 'url', 'max:255'],
+            'alt_text' => ['required', 'string', 'min:2', 'max:255'],
+            'heading_two' => ['required', 'string', 'min:2', 'max:180'],
+            'type' => ['required', 'in:page,post'],
+            'body' => ['required', 'string'],
+        ]);
+
+        Page::create([
+            'meta_title' => Str::limit(trim(strip_tags($data['meta_title'])), 180, ''),
+            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description']),
+            'title' => trim($data['title']),
+            'heading_two' => Str::limit(trim(strip_tags($data['heading_two'])), 180, ''),
+            'slug' => !empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title']),
+            'image_url' => $data['image_url'] ?? null,
+            'alt_text' => trim($data['alt_text']),
+            'type' => $data['type'],
+            'body' => ProductContent::sanitizeRichText($data['body']),
+        ]);
+
+        return redirect()->route('admin.pages.index')->with('success', 'Page saved successfully.');
+    }
+
+    public function invoicesIndex(): View
+    {
+        return view('admin.invoices_index', [
+            'orders' => Order::query()
+                ->with('user')
+                ->latest()
+                ->paginate(20),
+        ]);
+    }
+
+    public function createProductForm(): View
+    {
+        return view('admin.product_create', [
+            'categories' => Category::query()->orderBy('name')->get(),
+        ]);
+    }
+
     public function storeProduct(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:180'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
+            'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
             'description' => ['nullable', 'string', 'max:5000'],
             'meta_description' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0.01'],
@@ -147,9 +387,11 @@ class AdminController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Unable to initialize the admin store.');
         }
 
+        $category = $this->resolveCategory($data);
+
         $product = Product::create([
             'vendor_id' => $vendor->id,
-            'category_id' => $data['category_id'],
+            'category_id' => $category->id,
             'name' => $data['name'],
             'slug' => $this->uniqueSlug('products', $data['name']),
             'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
@@ -169,7 +411,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', 'Product added to the admin catalog.');
+        return redirect()->route('admin.products.index')->with('success', 'Product added to the admin catalog.');
     }
 
     public function approveVendor(Request $request, Vendor $vendor): RedirectResponse
