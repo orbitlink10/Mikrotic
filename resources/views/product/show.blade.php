@@ -19,9 +19,7 @@
         : null;
     $availabilityLabel = $product->stock > 0 ? 'IN STOCK' : 'OUT OF STOCK';
     $availabilityClass = $product->stock > 0 ? 'is-available' : 'is-unavailable';
-    $stockDetail = $product->stock > 0
-        ? $product->stock . ' unit' . ($product->stock === 1 ? '' : 's') . ' available'
-        : 'Currently unavailable';
+    $detailHeading = trim((string) ($product->meta_description ?: ($product->name . ' in Kenya')));
     $summary = trim((string) ($product->meta_description ?: \App\Support\ProductContent::excerpt($product->description, 280)));
     $vendorPhoneDigits = preg_replace('/\D+/', '', (string) $product->vendor->phone);
     if ($vendorPhoneDigits !== '') {
@@ -94,13 +92,6 @@
 
             <h1 class="product-page-title">{{ $product->name }}</h1>
 
-            <div class="product-review-row">
-                <span class="product-review-stars" aria-hidden="true">★★★★★</span>
-                <span class="product-review-count">0 Reviews</span>
-                <span class="product-review-separator">•</span>
-                <span class="product-vendor-line">Sold by {{ $product->vendor->shop_name }}</span>
-            </div>
-
             <div class="product-price-row">
                 <span class="product-current-price">KSh {{ number_format($currentPrice, 2) }}</span>
                 @if($hasDiscount)
@@ -110,24 +101,16 @@
             </div>
 
             @if($summary !== '')
-                <p class="product-summary-copy">{{ $summary }}</p>
+                <p class="product-summary-copy product-summary-copy--meta">{{ $summary }}</p>
             @endif
 
-            <div class="product-benefit-row">
-                <span class="product-benefit-chip">SKU: {{ $product->sku }}</span>
-                <span class="product-benefit-chip">{{ $product->category?->name ?? 'General' }}</span>
-                <span class="product-benefit-chip">{{ $stockDetail }}</span>
+            <div class="product-benefit-row product-benefit-row--services">
+                <span class="product-benefit-chip">Fast delivery</span>
+                <span class="product-benefit-chip">Warranty support</span>
+                <span class="product-benefit-chip">Expert help</span>
             </div>
 
-            <div class="product-spec-card">
-                <h2>Quick product information</h2>
-                <ul class="product-spec-list">
-                    <li><strong>Category:</strong> {{ $product->category?->name ?? 'General' }}</li>
-                    <li><strong>SKU:</strong> {{ $product->sku }}</li>
-                    <li><strong>Availability:</strong> {{ $stockDetail }}</li>
-                    <li><strong>Store:</strong> {{ $product->vendor->shop_name }}</li>
-                </ul>
-            </div>
+            <div class="product-summary-divider" aria-hidden="true"></div>
 
             <div class="product-purchase-card">
                 @if($product->stock > 0)
@@ -177,17 +160,21 @@
                 @endif
             </div>
 
-            <div class="product-store-note">
-                <ul>
-                    <li><strong>Vendor:</strong> {{ $product->vendor->shop_name }}</li>
-                    @if($product->vendor->phone)
-                        <li><strong>Phone:</strong> {{ $product->vendor->phone }}</li>
-                    @endif
-                    @if($product->vendor->address)
-                        <li><strong>Location:</strong> {{ $product->vendor->address }}</li>
-                    @endif
-                    <li><strong>Status:</strong> {{ $availabilityLabel }}</li>
-                </ul>
+            <div class="product-summary-divider" aria-hidden="true"></div>
+
+            <div class="product-availability-row">
+                <span class="product-availability-label">Availability:</span>
+                <span class="product-availability-pill {{ $availabilityClass }}">
+                    {{ $product->stock > 0 ? 'AVAILABLE IN STORE' : 'OUT OF STOCK' }}
+                </span>
+            </div>
+
+            <div class="product-store-meta">
+                <span><strong>Store:</strong> {{ $product->vendor->shop_name }}</span>
+                <span><strong>SKU:</strong> {{ $product->sku }}</span>
+                @if($product->vendor->address)
+                    <span><strong>Location:</strong> {{ $product->vendor->address }}</span>
+                @endif
             </div>
         </div>
     </section>
@@ -200,7 +187,7 @@
         </div>
 
         <div class="product-tab-panel is-active" data-tab-panel="details" role="tabpanel">
-            <h2>{{ $product->name }} in Kenya</h2>
+            <h2 class="product-detail-heading">{{ $detailHeading }}</h2>
             <div class="rich-content product-description-content">{!! $descriptionHtml !!}</div>
         </div>
 
@@ -230,7 +217,7 @@
                 @endif
                 <div class="product-info-item">
                     <span>Stock</span>
-                    <strong>{{ $stockDetail }}</strong>
+                    <strong>{{ $product->stock > 0 ? 'Available in store' : 'Out of stock' }}</strong>
                 </div>
                 <div class="product-info-item">
                     <span>Vendor</span>

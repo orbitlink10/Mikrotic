@@ -466,9 +466,10 @@ th {
 }
 
 .product-summary-topline,
-.product-review-row,
 .product-benefit-row,
-.product-cta-row {
+.product-cta-row,
+.product-availability-row,
+.product-store-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -517,18 +518,6 @@ th {
     letter-spacing: -0.04em;
 }
 
-.product-review-stars {
-    color: #c5ced8;
-    letter-spacing: 0.14em;
-    font-size: 18px;
-}
-
-.product-review-count,
-.product-vendor-line,
-.product-review-separator {
-    color: var(--muted);
-}
-
 .product-price-row {
     display: flex;
     flex-wrap: wrap;
@@ -567,17 +556,34 @@ th {
     color: #475569;
 }
 
+.product-summary-copy--meta {
+    max-width: 24ch;
+    font-size: 1.1rem;
+    line-height: 1.65;
+    color: #64748b;
+}
+
+.product-benefit-row--services {
+    gap: 14px;
+}
+
 .product-benefit-chip {
     display: inline-flex;
     align-items: center;
     min-height: 42px;
     padding: 0 16px;
     border-radius: 999px;
-    background: #fff;
+    background: #f5f7fb;
     border: 1px solid #e2e8f0;
-    color: #334155;
+    color: #475569;
     font-size: 0.95rem;
     font-weight: 600;
+}
+
+.product-summary-divider {
+    height: 1px;
+    background: #e5e7eb;
+    width: 100%;
 }
 
 .product-spec-card {
@@ -604,7 +610,7 @@ th {
 }
 
 .product-purchase-card {
-    padding-top: 8px;
+    padding-top: 4px;
 }
 
 .product-purchase-form {
@@ -718,6 +724,55 @@ th {
     color: #fff;
 }
 
+.product-availability-row {
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.product-availability-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.product-availability-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid #dbe4ef;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.product-availability-pill.is-available {
+    border-color: rgba(31, 157, 85, 0.35);
+    background: rgba(31, 157, 85, 0.08);
+    color: var(--success);
+}
+
+.product-availability-pill.is-unavailable {
+    border-color: rgba(220, 38, 38, 0.3);
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--danger);
+}
+
+.product-store-meta {
+    align-items: flex-start;
+    gap: 10px 18px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.product-store-meta span {
+    display: inline-flex;
+    align-items: center;
+}
+
 .product-store-note ul {
     margin: 0;
     padding-left: 22px;
@@ -760,6 +815,11 @@ th {
 
 .product-tab-panel.is-active {
     display: block;
+}
+
+.product-detail-heading {
+    max-width: 36ch;
+    line-height: 1.18;
 }
 
 .product-description-content {
@@ -2735,6 +2795,15 @@ textarea.admin-post-builder-input {
     .product-summary-card,
     .product-gallery-card {
         padding-inline: 22px;
+    }
+
+    .product-summary-copy--meta {
+        max-width: none;
+    }
+
+    .product-store-meta {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .product-info-grid {

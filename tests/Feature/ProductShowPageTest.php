@@ -33,6 +33,9 @@ class ProductShowPageTest extends TestCase
         $response->assertSee('Reviews (0)');
         $response->assertSee('Buy Now');
         $response->assertSee('Add to Cart');
+        $response->assertSee('Compact backup power station with dependable output.');
+        $response->assertSee('Availability:');
+        $response->assertSee('AVAILABLE IN STORE');
         $response->assertSee('https://example.com/product-main.jpg', false);
         $response->assertSee('https://example.com/product-side.jpg', false);
     }
