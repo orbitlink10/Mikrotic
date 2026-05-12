@@ -2495,3 +2495,311 @@ textarea.admin-post-builder-input {
         flex-direction: column;
     }
 }
+
+/* Spacelink-sized admin alignment */
+.admin-shell {
+    grid-template-columns: 332px minmax(0, 1fr);
+    gap: 22px;
+}
+
+.admin-sidebar {
+    top: 12px;
+    gap: 18px;
+    min-height: calc(100vh - 24px);
+    padding: 14px 12px 20px;
+    border-radius: 24px;
+    box-shadow: 12px 0 30px rgba(148, 163, 184, 0.14);
+}
+
+.admin-sidebar-panel {
+    gap: 18px;
+}
+
+.admin-brand-card {
+    padding: 20px 24px;
+    border-radius: 20px;
+}
+
+.admin-brand-card h2 {
+    font-size: 22px;
+    line-height: 1.18;
+    font-weight: 600;
+}
+
+.admin-sidebar-menu {
+    padding: 0 2px 4px;
+}
+
+.admin-sidebar-label {
+    margin: 4px 8px 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.18em;
+}
+
+.admin-sidebar-nav,
+.admin-sidebar-nav--menu {
+    gap: 12px;
+}
+
+.admin-nav-link {
+    min-height: 72px;
+    gap: 14px;
+    padding: 12px 18px;
+    border-radius: 18px;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+.admin-nav-link > span:last-child {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.admin-nav-badge {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 16px;
+    font-size: 12px;
+}
+
+.admin-nav-badge svg {
+    width: 21px;
+    height: 21px;
+}
+
+.admin-main {
+    gap: 18px;
+    padding: 8px 0 20px;
+}
+
+.admin-page-head,
+.admin-page-head--product-create {
+    padding: 0;
+    margin: 0 0 4px;
+}
+
+.admin-page-title,
+.admin-page-title--settings,
+.admin-page-title--post-builder {
+    font-size: clamp(34px, 3.1vw, 52px);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+}
+
+.admin-page-head--product-create .admin-page-title {
+    font-size: clamp(38px, 3.3vw, 56px);
+}
+
+.admin-page-copy,
+.admin-page-head--product-create .admin-page-copy,
+.admin-hero-copy {
+    margin-top: 10px;
+    max-width: 760px;
+    font-size: 17px;
+    line-height: 1.45;
+    color: #58739b;
+}
+
+.admin-primary-pill,
+.admin-secondary-pill,
+.dashboard-actions .button-link {
+    min-height: 44px;
+    padding: 0 22px;
+    font-size: 14px;
+}
+
+.admin-list-panel {
+    border-radius: 22px;
+}
+
+.admin-list-panel-head {
+    padding: 22px 28px;
+}
+
+.admin-list-panel-head h2,
+.admin-filter-row h2 {
+    font-size: 18px;
+}
+
+.admin-bulk-row {
+    gap: 12px;
+    padding: 20px 28px 12px;
+}
+
+.admin-bulk-row select {
+    min-width: 180px;
+    max-width: 180px;
+    min-height: 48px;
+    border-radius: 24px;
+    padding: 0 18px;
+    font-size: 15px;
+}
+
+.admin-filter-button,
+.admin-search-button,
+.admin-reset-button {
+    min-height: 48px;
+    font-size: 15px;
+}
+
+.admin-list-panel .table-wrap {
+    padding: 0 28px 28px;
+}
+
+.admin-data-table th,
+.admin-data-table td {
+    padding: 16px 18px;
+}
+
+.admin-data-table th {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+}
+
+.admin-data-table td {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.admin-thumb--page {
+    width: 140px;
+    height: 84px;
+}
+
+.admin-outline-action {
+    min-height: 38px;
+    padding: 0 20px;
+    font-size: 13px;
+}
+
+.admin-product-create-panel {
+    border-radius: 22px;
+}
+
+.admin-product-create-form {
+    gap: 22px;
+    padding: 28px 30px 32px;
+}
+
+.admin-product-field {
+    gap: 10px;
+}
+
+.admin-product-label {
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+.admin-product-input,
+.admin-product-select,
+.admin-product-textarea {
+    min-height: 56px;
+    padding: 0 18px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.admin-product-textarea {
+    min-height: 112px;
+    padding: 14px 18px;
+}
+
+.admin-product-inline-note-title {
+    font-size: 15px;
+}
+
+.admin-product-inline-note-copy,
+.admin-product-optional-copy,
+.admin-product-actions p {
+    font-size: 13px;
+}
+
+.admin-product-editor-menubar {
+    gap: 16px;
+    padding: 14px 18px 12px;
+}
+
+.admin-product-editor-menu-button {
+    font-size: 13px;
+}
+
+.admin-product-editor-toolbar {
+    gap: 4px;
+    padding: 12px 18px;
+}
+
+.admin-product-editor-icon {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.admin-product-editor-surface {
+    min-height: 260px;
+    padding: 16px 18px 20px;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.admin-product-optional-panel summary {
+    padding: 16px 18px;
+    font-size: 14px;
+}
+
+.admin-product-optional-body {
+    gap: 10px;
+    padding: 18px;
+}
+
+.admin-product-actions {
+    gap: 14px;
+}
+
+@media (max-width: 980px) {
+    .admin-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        top: 0;
+        min-height: auto;
+        padding: 14px;
+    }
+
+    .admin-page-title,
+    .admin-page-title--settings,
+    .admin-page-title--post-builder,
+    .admin-page-head--product-create .admin-page-title {
+        font-size: clamp(30px, 9vw, 42px);
+    }
+
+    .admin-page-copy,
+    .admin-page-head--product-create .admin-page-copy {
+        font-size: 16px;
+    }
+
+    .admin-list-panel-head,
+    .admin-bulk-row,
+    .admin-list-panel .table-wrap,
+    .admin-product-create-form {
+        padding-inline: 18px;
+    }
+
+    .admin-bulk-row select {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+    }
+
+    .admin-product-input,
+    .admin-product-select,
+    .admin-product-textarea {
+        font-size: 16px;
+    }
+}

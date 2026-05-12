@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin - ' . config('app.name', 'Almar Market'))</title>
     <meta name="description" content="@yield('meta_description', 'Admin management area.')">
-    <link rel="stylesheet" href="{{ asset('assets/market.css') }}">
+    @php
+        $marketCssVersion = @filemtime(public_path('assets/market.css')) ?: time();
+    @endphp
+    <link rel="stylesheet" href="{{ asset('assets/market.css') }}?v={{ $marketCssVersion }}">
     @stack('head')
 </head>
 <body class="admin-body">
