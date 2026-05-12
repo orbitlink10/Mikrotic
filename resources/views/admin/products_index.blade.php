@@ -55,8 +55,12 @@
                             <td>{{ $product->category?->name ?? 'General' }}</td>
                             <td>
                                 <div class="admin-action-stack">
-                                    <button type="button" class="admin-outline-action tone-primary">Update</button>
-                                    <button type="button" class="admin-outline-action tone-danger">Delete</button>
+                                    <a class="admin-outline-action tone-primary" href="{{ route('admin.products.edit', $product) }}">Update</a>
+                                    <form method="post" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Delete this product?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="admin-outline-action tone-danger">Delete</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

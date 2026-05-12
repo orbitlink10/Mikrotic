@@ -57,9 +57,14 @@
 
 @section('content')
 @php
-    $selectedCategoryId = old('category_id');
+    $productToEdit = $productToEdit ?? null;
+    $isEditingProduct = $productToEdit instanceof \App\Models\Product;
+    $productCategory = $productToEdit?->category;
+    $selectedCategoryId = old('category_id', $productCategory?->parent_id ?: $productCategory?->id);
+    $selectedSubcategoryId = old('subcategory_id', $productCategory?->parent_id ? $productCategory->id : null);
     $initialSubcategories = $categories->firstWhere('id', (int) $selectedCategoryId)?->children ?? collect();
-    $showInlineCategoryCreation = $categories->isEmpty();
+    $showInlineCategoryCreation = $categories->isEmpty() && ! $isEditingProduct;
+    $primaryImage = $productToEdit?->images?->firstWhere('is_primary', true) ?? $productToEdit?->images?->first();
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
@@ -67,14 +72,17 @@
     <div class="admin-main admin-management-main">
         <section class="admin-page-head admin-page-head--product-create">
             <div>
-                <h1 class="admin-page-title">Add Product</h1>
-                <p class="admin-page-copy">Fill in the product details below to add a new item</p>
+                <h1 class="admin-page-title">{{ $isEditingProduct ? 'Edit Product' : 'Add Product' }}</h1>
+                <p class="admin-page-copy">{{ $isEditingProduct ? 'Update the product details below to keep the catalog current' : 'Fill in the product details below to add a new item' }}</p>
             </div>
         </section>
 
         <section class="panel admin-product-create-panel">
-            <form class="admin-product-create-form" method="post" action="{{ route('admin.products.store') }}">
+            <form class="admin-product-create-form" method="post" action="{{ $isEditingProduct ? route('admin.products.update', $productToEdit) : route('admin.products.store') }}" enctype="multipart/form-data">
                 @csrf
+                @if($isEditingProduct)
+                    @method('PUT')
+                @endif
 
                 <div class="admin-product-field">
                     <label class="admin-product-label" for="name">Product Name</label>
@@ -83,7 +91,7 @@
                         id="name"
                         type="text"
                         name="name"
-                        value="{{ old('name') }}"
+                        value="{{ old('name', $productToEdit?->name) }}"
                         placeholder="Enter product name"
                         required
                     >
@@ -98,7 +106,7 @@
                         name="price"
                         min="0.01"
                         step="0.01"
-                        value="{{ old('price') }}"
+                        value="{{ old('price', $productToEdit?->price) }}"
                         placeholder="Enter product price"
                         required
                     >
@@ -113,7 +121,7 @@
                         name="compare_at_price"
                         min="0.01"
                         step="0.01"
-                        value="{{ old('compare_at_price') }}"
+                        value="{{ old('compare_at_price', $productToEdit?->compare_at_price) }}"
                         placeholder="Enter marked price"
                     >
                 </div>
@@ -127,7 +135,7 @@
                         name="stock"
                         min="0"
                         step="1"
-                        value="{{ old('stock', 0) }}"
+                        value="{{ old('stock', $productToEdit?->stock ?? 0) }}"
                         placeholder="Enter product quantity"
                         required
                     >
@@ -143,7 +151,7 @@
                     >
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}" @selected($selectedCategoryId == $category->id)>{{ $category->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -155,12 +163,12 @@
                         id="subcategory_id"
                         name="subcategory_id"
                         data-product-subcategory
-                        data-current-value="{{ old('subcategory_id') }}"
+                        data-current-value="{{ $selectedSubcategoryId }}"
                         @disabled($initialSubcategories->isEmpty())
                     >
                         <option value="">{{ $initialSubcategories->isNotEmpty() ? 'Select Subcategory' : 'No subcategories available' }}</option>
                         @foreach($initialSubcategories as $subcategory)
-                            <option value="{{ $subcategory->id }}" @selected(old('subcategory_id') == $subcategory->id)>{{ $subcategory->name }}</option>
+                            <option value="{{ $subcategory->id }}" @selected($selectedSubcategoryId == $subcategory->id)>{{ $subcategory->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -189,7 +197,7 @@
                         name="meta_description"
                         rows="4"
                         placeholder="Write a short search-friendly summary"
-                    >{{ old('meta_description') }}</textarea>
+                    >{{ old('meta_description', $productToEdit?->meta_description) }}</textarea>
                 </div>
 
                 <div class="admin-product-field">
@@ -255,29 +263,34 @@
                             contenteditable="true"
                         ></div>
 
-                        <textarea class="rich-editor-input" name="description" hidden>{{ old('description') }}</textarea>
+                        <textarea class="rich-editor-input" name="description" hidden>{{ old('description', $productToEdit?->description) }}</textarea>
                     </div>
                 </div>
 
                 <details class="admin-product-optional-panel">
-                    <summary>Optional Product Image</summary>
+                    <summary>Product Image</summary>
                     <div class="admin-product-optional-body">
-                        <label class="admin-product-label" for="image_url">Image URL</label>
+                        @if($primaryImage?->image_url)
+                            <div class="admin-settings-preview">
+                                <img src="{{ $primaryImage->image_url }}" alt="{{ $productToEdit?->name }}">
+                            </div>
+                        @endif
+
+                        <label class="admin-product-label" for="image">Upload Image</label>
                         <input
-                            class="admin-product-input"
-                            id="image_url"
-                            type="url"
-                            name="image_url"
-                            value="{{ old('image_url') }}"
-                            placeholder="Enter image URL"
+                            class="admin-product-file"
+                            id="image"
+                            type="file"
+                            name="image"
+                            accept=".jpg,.jpeg,.png,.webp"
                         >
-                        <p class="admin-product-optional-copy">Leave this empty if you want to add or change product images later.</p>
+                        <p class="admin-product-optional-copy">Upload a product image now, or leave it empty and add one later.</p>
                     </div>
                 </details>
 
                 <div class="admin-product-actions">
                     <p>Marked price is optional. If provided, it must be greater than or equal to the actual selling price.</p>
-                    <button type="submit" class="admin-primary-pill">Save Product</button>
+                    <button type="submit" class="admin-primary-pill">{{ $isEditingProduct ? 'Update Product' : 'Save Product' }}</button>
                 </div>
             </form>
         </section>

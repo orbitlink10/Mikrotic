@@ -65,6 +65,7 @@ class CartController extends Controller
 
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:1'],
+            'redirect' => ['nullable', 'in:back,cart,checkout'],
         ]);
 
         $cart = $this->getCartForUser($request->user());
@@ -88,6 +89,16 @@ class CartController extends Controller
                 'quantity' => $newQty,
                 'unit_price' => $product->price,
             ]);
+        }
+
+        $redirect = $validated['redirect'] ?? 'back';
+
+        if ($redirect === 'checkout') {
+            return redirect()->route('checkout.form')->with('success', 'Product added to cart.');
+        }
+
+        if ($redirect === 'cart') {
+            return redirect()->route('cart.index')->with('success', 'Product added to cart.');
         }
 
         return back()->with('success', 'Product added to cart.');

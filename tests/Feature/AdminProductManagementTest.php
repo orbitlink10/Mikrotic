@@ -7,6 +7,7 @@ use App\Models\HomepageContent;
 use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -174,6 +175,49 @@ class AdminProductManagementTest extends TestCase
         $response->assertSee('Description');
     }
 
+    public function test_admin_products_index_renders_working_update_and_delete_actions(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $category = Category::create([
+            'name' => 'Routers',
+            'slug' => 'routers',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $admin->id,
+            'shop_name' => 'Admin Store',
+            'slug' => 'admin-store',
+            'description' => 'Products managed by admin.',
+            'phone' => '0700000000',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        $product = Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $category->id,
+            'name' => 'RB5009',
+            'slug' => 'rb5009',
+            'description' => '<p>Managed switch router.</p>',
+            'meta_description' => 'RB5009 router listing.',
+            'price' => '56000.00',
+            'stock' => 3,
+            'sku' => 'SKU-RB5009',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/products');
+
+        $response->assertOk();
+        $response->assertSee(route('admin.products.edit', $product), false);
+        $response->assertSee(route('admin.products.destroy', $product), false);
+    }
+
     public function test_admin_page_create_page_displays_requested_post_fields(): void
     {
         $admin = User::factory()->create([
@@ -208,6 +252,8 @@ class AdminProductManagementTest extends TestCase
             'slug' => 'electronics',
         ]);
 
+        $image = UploadedFile::fake()->create('camera.jpg', 64, 'image/jpeg');
+
         $response = $this->actingAs($admin)->post('/admin/products', [
             'name' => 'Admin Camera',
             'category_id' => $category->id,
@@ -216,7 +262,7 @@ class AdminProductManagementTest extends TestCase
             'price' => '499.99',
             'compare_at_price' => '579.99',
             'stock' => 8,
-            'image_url' => 'https://example.com/camera.jpg',
+            'image' => $image,
         ]);
 
         $response->assertRedirect('/admin/products');
@@ -244,10 +290,15 @@ class AdminProductManagementTest extends TestCase
             'compare_at_price' => '579.99',
         ]);
 
-        $this->assertDatabaseHas('product_images', [
-            'product_id' => $product->id,
-            'image_url' => 'https://example.com/camera.jpg',
-        ]);
+        $productImage = ProductImage::query()->where('product_id', $product->id)->first();
+
+        $this->assertNotNull($productImage);
+        $this->assertStringStartsWith('/uploads/products/', (string) $productImage->image_url);
+
+        $uploadedPath = public_path(ltrim((string) $productImage->image_url, '/\\'));
+        $this->assertFileExists($uploadedPath);
+
+        File::delete($uploadedPath);
     }
 
     public function test_admin_can_create_a_new_category_while_posting_a_product(): void
@@ -321,6 +372,57 @@ class AdminProductManagementTest extends TestCase
         $this->assertNotNull($product);
         $this->assertSame($subcategory->id, $product->category_id);
         $this->assertSame('81999.00', $product->compare_at_price);
+    }
+
+    public function test_admin_can_delete_product_from_admin_products_index(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $category = Category::create([
+            'name' => 'Switches',
+            'slug' => 'switches',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $admin->id,
+            'shop_name' => 'Admin Store',
+            'slug' => 'admin-store',
+            'description' => 'Products managed by admin.',
+            'phone' => '0700000000',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        $product = Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $category->id,
+            'name' => 'CRS326',
+            'slug' => 'crs326',
+            'description' => '<p>Core switch.</p>',
+            'meta_description' => 'CRS326 switch listing.',
+            'price' => '31000.00',
+            'stock' => 5,
+            'sku' => 'SKU-CRS326',
+            'status' => 'active',
+        ]);
+
+        ProductImage::create([
+            'product_id' => $product->id,
+            'image_url' => '/uploads/products/crs326.jpg',
+            'is_primary' => true,
+            'sort_order' => 0,
+        ]);
+
+        $response = $this->actingAs($admin)->delete(route('admin.products.destroy', $product));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Product deleted successfully.');
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $this->assertDatabaseMissing('product_images', ['product_id' => $product->id]);
     }
 
     public function test_admin_can_create_content_page(): void

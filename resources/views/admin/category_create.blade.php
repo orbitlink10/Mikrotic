@@ -6,8 +6,13 @@
 
 @section('content')
 @php
+    $categoryToEdit = $categoryToEdit ?? null;
+    $isEditingCategory = $categoryToEdit instanceof \App\Models\Category;
     $selectedParentId = old('parent_id', $defaultParentId);
-    $showOptionalCategorySettings = filled($selectedParentId) || $errors->has('image');
+    if ($isEditingCategory) {
+        $selectedParentId = old('parent_id', $categoryToEdit->parent_id);
+    }
+    $showOptionalCategorySettings = filled($selectedParentId) || $errors->has('image') || filled($categoryToEdit?->image_url);
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'categories'])
@@ -21,13 +26,16 @@
 
         <section class="admin-page-head admin-page-head--product-create">
             <div>
-                <h1 class="admin-page-title">Create Category</h1>
+                <h1 class="admin-page-title">{{ $isEditingCategory ? 'Edit Category' : 'Create Category' }}</h1>
             </div>
         </section>
 
         <section class="panel admin-product-create-panel">
-            <form class="admin-product-create-form" method="post" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data">
+            <form class="admin-product-create-form" method="post" action="{{ $isEditingCategory ? route('admin.categories.update', $categoryToEdit) : route('admin.categories.store') }}" enctype="multipart/form-data">
                 @csrf
+                @if($isEditingCategory)
+                    @method('PUT')
+                @endif
 
                 <div class="admin-product-field">
                     <label class="admin-product-label" for="name">
@@ -38,7 +46,7 @@
                         id="name"
                         type="text"
                         name="name"
-                        value="{{ old('name') }}"
+                        value="{{ old('name', $categoryToEdit?->name) }}"
                         placeholder="Enter category name"
                         required
                     >
@@ -52,7 +60,7 @@
                         name="meta_description"
                         rows="4"
                         placeholder="Enter category meta description"
-                    >{{ old('meta_description') }}</textarea>
+                    >{{ old('meta_description', $categoryToEdit?->meta_description) }}</textarea>
                 </div>
 
                 <div class="admin-product-field">
@@ -117,7 +125,7 @@
                             contenteditable="true"
                         ></div>
 
-                        <textarea class="rich-editor-input" name="description" hidden>{{ old('description') }}</textarea>
+                        <textarea class="rich-editor-input" name="description" hidden>{{ old('description', $categoryToEdit?->description) }}</textarea>
                     </div>
                 </div>
 
@@ -131,6 +139,12 @@
                                 <option value="{{ $parent->id }}" @selected($selectedParentId == $parent->id)>{{ $parent->name }}</option>
                             @endforeach
                         </select>
+
+                        @if($categoryToEdit?->image_url)
+                            <div class="admin-settings-preview">
+                                <img src="{{ $categoryToEdit->image_url }}" alt="{{ $categoryToEdit->name }}">
+                            </div>
+                        @endif
 
                         <label class="admin-product-label" for="image">Upload Image</label>
                         <input
@@ -146,7 +160,7 @@
 
                 <div class="admin-product-actions">
                     <p>Descriptions are optional, but they help when categories need search-friendly and richer content later.</p>
-                    <button type="submit" class="admin-primary-pill">Save Category</button>
+                    <button type="submit" class="admin-primary-pill">{{ $isEditingCategory ? 'Update Category' : 'Save Category' }}</button>
                 </div>
             </form>
         </section>
