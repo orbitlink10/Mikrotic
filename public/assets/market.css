@@ -1698,13 +1698,14 @@ textarea.admin-post-builder-input {
 
 .admin-brand-card {
     border-radius: 24px;
-    padding: 20px 24px;
+    padding: 24px 28px;
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
 }
 
 .admin-brand-card h2 {
-    font-size: 18px;
-    line-height: 1.25;
+    font-size: 28px;
+    line-height: 1.18;
+    font-weight: 700;
 }
 
 .admin-sidebar-menu {
@@ -1714,8 +1715,8 @@ textarea.admin-post-builder-input {
 .admin-sidebar-label {
     display: block;
     margin: 6px 4px 14px;
-    font-size: 12px;
-    letter-spacing: 0.24em;
+    font-size: 13px;
+    letter-spacing: 0.22em;
 }
 
 .admin-sidebar-nav,
@@ -1724,10 +1725,10 @@ textarea.admin-post-builder-input {
 }
 
 .admin-nav-link {
-    min-height: 60px;
-    padding: 10px 14px;
+    min-height: 78px;
+    padding: 12px 18px;
     border-radius: 18px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     color: #475569;
     box-shadow: none;
@@ -1750,9 +1751,9 @@ textarea.admin-post-builder-input {
 }
 
 .admin-nav-badge {
-    width: 52px;
-    height: 52px;
-    flex: 0 0 52px;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
     border-radius: 16px;
     background: #eef2f7;
     color: #64748b;
@@ -1980,32 +1981,73 @@ textarea.admin-post-builder-input {
 }
 
 .admin-page-head--product-create {
-    margin-bottom: 2px;
+    margin-bottom: 8px;
+    padding: 10px 12px 4px;
+}
+
+.admin-page-head--product-create .admin-page-title {
+    font-size: 58px;
+    line-height: 1.02;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.admin-page-head--product-create .admin-page-copy {
+    margin-top: 18px;
+    font-size: 24px;
+    line-height: 1.35;
+    color: #58739b;
 }
 
 .admin-product-create-panel {
     padding: 0;
     overflow: hidden;
-    border: 1px solid #e2e8f0;
-    border-radius: 22px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+    border: 1px solid #dfe7f2;
+    border-radius: 28px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.05);
 }
 
 .admin-product-create-form {
     display: grid;
-    gap: 24px;
-    padding: 32px 34px;
+    gap: 26px;
+    padding: 34px 36px 38px;
 }
 
 .admin-product-field {
     display: grid;
+    gap: 14px;
+}
+
+.admin-product-inline-note {
+    display: grid;
     gap: 12px;
+    padding: 20px;
+    border: 1px dashed #c9d5e4;
+    border-radius: 18px;
+    background: #f8fbff;
+}
+
+.admin-product-inline-note-title,
+.admin-product-inline-note-copy {
+    margin: 0;
+}
+
+.admin-product-inline-note-title {
+    color: #162033;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-product-inline-note-copy {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.55;
 }
 
 .admin-product-label {
     display: block;
     color: #162033;
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.25;
     font-weight: 700;
 }
@@ -2019,14 +2061,14 @@ textarea.admin-post-builder-input {
     border-radius: 16px;
     background: #fff;
     color: #233246;
-    font-size: 16px;
-    line-height: 1.45;
-    padding: 0 18px;
+    font-size: 17px;
+    line-height: 1.4;
+    padding: 0 20px;
 }
 
 .admin-product-textarea {
     min-height: 128px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     resize: vertical;
 }
 
@@ -2055,7 +2097,7 @@ textarea.admin-post-builder-input {
 
 .admin-product-editor-shell {
     border: 1px solid #d8e0ec;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     background: #fff;
     box-shadow: none;
@@ -2079,7 +2121,7 @@ textarea.admin-post-builder-input {
 
 .admin-product-editor-menubar {
     gap: 18px;
-    padding: 16px 18px 14px;
+    padding: 18px 20px 15px;
     border-bottom: 1px solid #e5ebf4;
 }
 
@@ -2090,20 +2132,20 @@ textarea.admin-post-builder-input {
     color: #22324d;
     cursor: pointer;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.4;
     font-weight: 500;
 }
 
 .admin-product-editor-toolbar {
     gap: 6px;
-    padding: 14px 18px;
+    padding: 14px 20px;
     border-bottom: 1px solid #e5ebf4;
 }
 
 .admin-product-editor-icon {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 42px;
+    min-height: 42px;
     border: none;
     border-radius: 10px;
     background: transparent;
@@ -2143,9 +2185,9 @@ textarea.admin-post-builder-input {
 
 .admin-product-editor-surface {
     min-height: 320px;
-    padding: 18px 18px 22px;
+    padding: 18px 20px 24px;
     color: #162033;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.7;
 }
 
@@ -2153,6 +2195,43 @@ textarea.admin-post-builder-input {
     max-width: 100%;
     height: auto;
     border-radius: 14px;
+}
+
+.admin-product-optional-panel {
+    border: 1px solid #d8e0ec;
+    border-radius: 18px;
+    background: #fbfdff;
+    overflow: hidden;
+}
+
+.admin-product-optional-panel summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 20px;
+    color: #233246;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-product-optional-panel summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-product-optional-panel[open] summary {
+    border-bottom: 1px solid #d8e0ec;
+}
+
+.admin-product-optional-body {
+    display: grid;
+    gap: 12px;
+    padding: 20px;
+}
+
+.admin-product-optional-copy {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.55;
 }
 
 .admin-product-actions {
@@ -2166,7 +2245,7 @@ textarea.admin-post-builder-input {
 .admin-product-actions p {
     margin: 0;
     color: #64748b;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
 }
 
@@ -2379,10 +2458,27 @@ textarea.admin-post-builder-input {
         gap: 20px;
     }
 
+    .admin-page-head--product-create {
+        padding-inline: 0;
+    }
+
+    .admin-page-head--product-create .admin-page-title {
+        font-size: clamp(34px, 9vw, 46px);
+    }
+
+    .admin-page-head--product-create .admin-page-copy {
+        font-size: 18px;
+        line-height: 1.45;
+    }
+
+    .admin-product-label {
+        font-size: 16px;
+    }
+
     .admin-product-input,
     .admin-product-select,
     .admin-product-textarea {
-        font-size: 15px;
+        font-size: 16px;
     }
 
     .admin-product-editor-menubar,

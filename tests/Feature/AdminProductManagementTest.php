@@ -103,13 +103,13 @@ class AdminProductManagementTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Manage Pages');
-        $response->assertSee('Add New Post');
+        $response->assertSee('Fill in the page details below to publish new content');
         $response->assertSee('Meta Title');
         $response->assertSee('Meta Description');
         $response->assertSee('Page Title');
-        $response->assertSee('Image Alt Text');
         $response->assertSee('Heading 2');
-        $response->assertSee('Page Description:');
+        $response->assertSee('Page Description');
+        $response->assertSee('Optional Slug and Image');
     }
 
     public function test_admin_can_post_products_from_admin_create_page(): void

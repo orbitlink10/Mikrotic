@@ -59,6 +59,7 @@
 @php
     $selectedCategoryId = old('category_id');
     $initialSubcategories = $categories->firstWhere('id', (int) $selectedCategoryId)?->children ?? collect();
+    $showInlineCategoryCreation = $categories->isEmpty();
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
@@ -164,6 +165,22 @@
                     </select>
                 </div>
 
+                @if($showInlineCategoryCreation)
+                    <div class="admin-product-inline-note">
+                        <p class="admin-product-inline-note-title">No categories available yet</p>
+                        <p class="admin-product-inline-note-copy">Create the first category here so this product can be filed correctly.</p>
+                        <label class="admin-product-label" for="category_name">New Category</label>
+                        <input
+                            class="admin-product-input"
+                            id="category_name"
+                            type="text"
+                            name="category_name"
+                            value="{{ old('category_name') }}"
+                            placeholder="Create the first category here"
+                        >
+                    </div>
+                @endif
+
                 <div class="admin-product-field">
                     <label class="admin-product-label" for="meta_description">Meta Description</label>
                     <textarea
@@ -242,29 +259,21 @@
                     </div>
                 </div>
 
-                <div class="admin-product-field">
-                    <label class="admin-product-label" for="image_url">Product Image URL</label>
-                    <input
-                        class="admin-product-input"
-                        id="image_url"
-                        type="url"
-                        name="image_url"
-                        value="{{ old('image_url') }}"
-                        placeholder="Enter image URL"
-                    >
-                </div>
-
-                <div class="admin-product-field">
-                    <label class="admin-product-label" for="category_name">New Category (Optional)</label>
-                    <input
-                        class="admin-product-input"
-                        id="category_name"
-                        type="text"
-                        name="category_name"
-                        value="{{ old('category_name') }}"
-                        placeholder="{{ $categories->isEmpty() ? 'Create the first category here' : 'Leave blank to use the selected category' }}"
-                    >
-                </div>
+                <details class="admin-product-optional-panel">
+                    <summary>Optional Product Image</summary>
+                    <div class="admin-product-optional-body">
+                        <label class="admin-product-label" for="image_url">Image URL</label>
+                        <input
+                            class="admin-product-input"
+                            id="image_url"
+                            type="url"
+                            name="image_url"
+                            value="{{ old('image_url') }}"
+                            placeholder="Enter image URL"
+                        >
+                        <p class="admin-product-optional-copy">Leave this empty if you want to add or change product images later.</p>
+                    </div>
+                </details>
 
                 <div class="admin-product-actions">
                     <p>Marked price is optional. If provided, it must be greater than or equal to the actual selling price.</p>

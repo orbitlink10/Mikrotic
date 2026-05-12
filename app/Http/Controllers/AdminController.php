@@ -357,7 +357,7 @@ class AdminController extends Controller
             'title' => ['required', 'string', 'min:2', 'max:180'],
             'slug' => ['nullable', 'string', 'max:180', 'unique:pages,slug'],
             'image_url' => ['nullable', 'url', 'max:255'],
-            'alt_text' => ['required', 'string', 'min:2', 'max:255'],
+            'alt_text' => ['nullable', 'string', 'min:2', 'max:255', 'required_with:image_url'],
             'heading_two' => ['required', 'string', 'min:2', 'max:180'],
             'type' => ['required', 'in:page,post'],
             'body' => ['required', 'string'],
@@ -370,7 +370,7 @@ class AdminController extends Controller
             'heading_two' => Str::limit(trim(strip_tags($data['heading_two'])), 180, ''),
             'slug' => !empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title']),
             'image_url' => $data['image_url'] ?? null,
-            'alt_text' => trim($data['alt_text']),
+            'alt_text' => !empty($data['alt_text']) ? trim($data['alt_text']) : null,
             'type' => $data['type'],
             'body' => ProductContent::sanitizeRichText($data['body']),
         ]);
