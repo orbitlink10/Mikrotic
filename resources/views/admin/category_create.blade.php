@@ -13,6 +13,12 @@
     @include('admin.partials.sidebar', ['activeAdminNav' => 'categories'])
 
     <div class="admin-main admin-management-main">
+        @unless($categoryContentFieldsReady)
+            <div class="alert error">
+                Category content fields are not ready yet. Run <code>php artisan migrate</code> to save meta descriptions and category descriptions.
+            </div>
+        @endunless
+
         <section class="admin-page-head admin-page-head--product-create">
             <div>
                 <h1 class="admin-page-title">Create Category</h1>

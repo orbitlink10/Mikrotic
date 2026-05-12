@@ -198,18 +198,26 @@ class AdminController extends Controller
                 ->orderBy('name')
                 ->get(),
             'defaultParentId' => $defaultParentId > 0 ? $defaultParentId : null,
+            'categoryContentFieldsReady' => Category::contentFieldsReady(),
         ]);
     }
 
     public function storeCategory(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $categoryContentFieldsReady = Category::contentFieldsReady();
+
+        $rules = [
             'name' => ['required', 'string', 'min:2', 'max:120', 'unique:categories,name'],
-            'meta_description' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]);
+        ];
+
+        if ($categoryContentFieldsReady) {
+            $rules['meta_description'] = ['nullable', 'string', 'max:255'];
+            $rules['description'] = ['nullable', 'string'];
+        }
+
+        $data = $request->validate($rules);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -222,18 +230,26 @@ class AdminController extends Controller
             $imagePath = '/uploads/categories/' . $filename;
         }
 
-        $category = Category::create([
+        $payload = [
             'name' => $data['name'],
-            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
             'slug' => $this->uniqueSlug('categories', $data['name']),
             'parent_id' => $data['parent_id'] ?? null,
             'image_url' => $imagePath,
-            'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
-        ]);
+        ];
+
+        if ($categoryContentFieldsReady) {
+            $payload['meta_description'] = ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null);
+            $payload['description'] = ProductContent::sanitizeRichText($data['description'] ?? null);
+        }
+
+        $category = Category::create($payload);
 
         $redirectRoute = $category->parent_id ? 'admin.subcategories.index' : 'admin.categories.index';
+        $message = $categoryContentFieldsReady
+            ? 'Category saved successfully.'
+            : 'Category saved. Run php artisan migrate to enable category meta description and description storage.';
 
-        return redirect()->route($redirectRoute)->with('success', 'Category saved successfully.');
+        return redirect()->route($redirectRoute)->with('success', $message);
     }
 
     public function productsIndex(Request $request): View

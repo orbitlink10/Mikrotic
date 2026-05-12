@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Tests\TestCase;
 
 class AdminProductManagementTest extends TestCase
@@ -126,6 +127,33 @@ class AdminProductManagementTest extends TestCase
         $this->assertFileExists($uploadedPath);
 
         File::delete($uploadedPath);
+    }
+
+    public function test_admin_can_create_category_when_content_columns_are_missing(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Schema::table('categories', function (Blueprint $table): void {
+            $table->dropColumn(['meta_description', 'description']);
+        });
+
+        $response = $this->actingAs($admin)->post('/admin/categories', [
+            'name' => 'Switches',
+            'meta_description' => 'This should not crash when columns are missing.',
+            'description' => '<p>Still create the category.</p>',
+        ]);
+
+        $response->assertRedirect('/admin/categories');
+        $response->assertSessionHas('success', 'Category saved. Run php artisan migrate to enable category meta description and description storage.');
+
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Switches',
+            'slug' => 'switches',
+        ]);
     }
 
     public function test_admin_product_create_page_displays_form(): void
