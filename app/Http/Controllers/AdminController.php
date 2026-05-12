@@ -206,17 +206,28 @@ class AdminController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:120', 'unique:categories,name'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:5000'],
+            'description' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'exists:categories,id'],
-            'image_url' => ['nullable', 'url', 'max:255'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $directory = public_path('uploads/categories');
+            File::ensureDirectoryExists($directory);
+
+            $image = $request->file('image');
+            $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $image->getClientOriginalExtension();
+            $image->move($directory, $filename);
+            $imagePath = '/uploads/categories/' . $filename;
+        }
 
         $category = Category::create([
             'name' => $data['name'],
             'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
             'slug' => $this->uniqueSlug('categories', $data['name']),
             'parent_id' => $data['parent_id'] ?? null,
-            'image_url' => $data['image_url'] ?? null,
+            'image_url' => $imagePath,
             'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
         ]);
 

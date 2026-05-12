@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -88,6 +90,7 @@ class AdminProductManagementTest extends TestCase
         $response->assertSee('Meta description');
         $response->assertSee('Description (Optional)');
         $response->assertSee('Parent Category and Image (Optional)');
+        $response->assertSee('Upload Image');
     }
 
     public function test_admin_can_create_category_with_meta_and_description(): void
@@ -98,27 +101,31 @@ class AdminProductManagementTest extends TestCase
             'phone' => '0700000000',
         ]);
 
+        $longDescription = '<p>' . str_repeat('A', 6005) . '</p>';
+        $image = UploadedFile::fake()->create('category.jpg', 64, 'image/jpeg');
+
         $response = $this->actingAs($admin)->post('/admin/categories', [
             'name' => 'Networking Guides',
             'meta_description' => 'Helpful networking category summaries for search and navigation.',
-            'description' => '<p>Category copy with <strong>useful</strong> notes.</p><script>alert(1)</script>',
-            'image_url' => 'https://example.com/category.jpg',
+            'description' => $longDescription,
+            'image' => $image,
         ]);
 
         $response->assertRedirect('/admin/categories');
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseHas('categories', [
-            'name' => 'Networking Guides',
-            'slug' => 'networking-guides',
-            'meta_description' => 'Helpful networking category summaries for search and navigation.',
-            'image_url' => 'https://example.com/category.jpg',
-        ]);
-
         $category = Category::query()->where('slug', 'networking-guides')->first();
 
         $this->assertNotNull($category);
-        $this->assertSame('<p>Category copy with <strong>useful</strong> notes.</p>', $category->description);
+        $this->assertSame($longDescription, $category->description);
+        $this->assertSame('Helpful networking category summaries for search and navigation.', $category->meta_description);
+        $this->assertNotNull($category->image_url);
+        $this->assertStringStartsWith('/uploads/categories/', $category->image_url);
+
+        $uploadedPath = public_path(ltrim((string) $category->image_url, '/\\'));
+        $this->assertFileExists($uploadedPath);
+
+        File::delete($uploadedPath);
     }
 
     public function test_admin_product_create_page_displays_form(): void

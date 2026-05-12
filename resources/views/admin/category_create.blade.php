@@ -7,7 +7,7 @@
 @section('content')
 @php
     $selectedParentId = old('parent_id', $defaultParentId);
-    $showOptionalCategorySettings = filled($selectedParentId) || filled(old('image_url'));
+    $showOptionalCategorySettings = filled($selectedParentId) || $errors->has('image');
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'categories'])
@@ -20,7 +20,7 @@
         </section>
 
         <section class="panel admin-product-create-panel">
-            <form class="admin-product-create-form" method="post" action="{{ route('admin.categories.store') }}">
+            <form class="admin-product-create-form" method="post" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="admin-product-field">
@@ -126,14 +126,13 @@
                             @endforeach
                         </select>
 
-                        <label class="admin-product-label" for="image_url">Image URL</label>
+                        <label class="admin-product-label" for="image">Upload Image</label>
                         <input
-                            class="admin-product-input"
-                            id="image_url"
-                            type="url"
-                            name="image_url"
-                            value="{{ old('image_url') }}"
-                            placeholder="Enter category image URL"
+                            class="admin-product-file"
+                            id="image"
+                            type="file"
+                            name="image"
+                            accept=".jpg,.jpeg,.png,.webp"
                         >
                         <p class="admin-product-optional-copy">Use a parent category only when you are creating a sub category.</p>
                     </div>

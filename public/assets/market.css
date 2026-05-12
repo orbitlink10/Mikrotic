@@ -2715,6 +2715,29 @@ textarea.admin-post-builder-input {
     padding: 14px 18px;
 }
 
+.admin-product-file {
+    width: 100%;
+    border: 1px solid #d8e0ec;
+    border-radius: 14px;
+    background: #fff;
+    color: #233246;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 10px 12px;
+}
+
+.admin-product-file::file-selector-button {
+    margin-right: 14px;
+    border: 1px solid #c8d3e0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    color: #162033;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 .admin-product-inline-note-title {
     font-size: 15px;
 }
