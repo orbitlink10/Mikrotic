@@ -277,6 +277,37 @@ class AdminProductManagementTest extends TestCase
         $this->assertSame('<p>Support content</p><pre><code>safe code</code></pre>', $page->body);
     }
 
+    public function test_admin_page_preview_links_to_public_page_view(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $page = Page::create([
+            'meta_title' => 'Preview Meta Title',
+            'meta_description' => 'Preview page meta description.',
+            'title' => 'Preview Page',
+            'heading_two' => 'Preview Section',
+            'slug' => 'preview-page',
+            'type' => 'post',
+            'alt_text' => 'Preview page image',
+            'body' => '<p>Preview body content.</p>',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/admin/pages')
+            ->assertOk()
+            ->assertSee(route('pages.show', ['page' => $page->slug]), false);
+
+        $this->get('/pages/' . $page->slug)
+            ->assertOk()
+            ->assertSee('Preview Page')
+            ->assertSee('Preview Section')
+            ->assertSee('Preview body content.');
+    }
+
     public function test_admin_pages_index_shows_clear_error_when_table_is_missing(): void
     {
         $admin = User::factory()->create([

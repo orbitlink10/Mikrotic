@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/products/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
+Route::get('/pages/{page:slug}', [StorefrontController::class, 'showPage'])->name('pages.show');
 
 Route::redirect('/login', '/login.php');
 Route::redirect('/admin/register', '/admin/register.php');

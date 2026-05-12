@@ -65,7 +65,12 @@
                             <td>{{ ucfirst($page->type) }}</td>
                             <td>
                                 <div class="admin-action-stack">
-                                    <button type="button" class="admin-outline-action tone-info">Preview</button>
+                                    <a
+                                        class="admin-outline-action tone-info"
+                                        href="{{ route('pages.show', ['page' => $page->slug]) }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >Preview</a>
                                     <button type="button" class="admin-outline-action tone-warning">Update</button>
                                     <button type="button" class="admin-outline-action tone-danger">Delete</button>
                                 </div>

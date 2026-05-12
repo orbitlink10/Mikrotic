@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\HomepageContent;
+use App\Models\Page;
 use App\Models\Product;
+use App\Support\ProductContent;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -52,5 +54,14 @@ class StorefrontController extends Controller
         }
 
         return view('product.show', ['product' => $product]);
+    }
+
+    public function showPage(Page $page): View
+    {
+        return view('page.show', [
+            'page' => $page,
+            'pageBody' => ProductContent::sanitizeRichText($page->body) ?: '<p>No content available.</p>',
+            'pageMetaDescription' => $page->meta_description ?: ProductContent::excerpt($page->body, 160),
+        ]);
     }
 }

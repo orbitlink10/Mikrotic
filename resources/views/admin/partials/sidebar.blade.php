@@ -23,17 +23,19 @@
         </div>
     @endif
 
-    <a class="admin-nav-link admin-nav-link--hero @if($activeAdminNav === $heroItem['id']) is-active @endif" href="{{ $heroItem['href'] }}">
-        <span class="admin-nav-badge">{{ $heroItem['badge'] }}</span>
-        <span>{{ $heroItem['label'] }}</span>
-    </a>
+    <div class="admin-sidebar-panel">
+        <nav class="admin-sidebar-nav">
+            <a class="admin-nav-link @if($activeAdminNav === $heroItem['id']) is-active @endif" href="{{ $heroItem['href'] }}">
+                <span class="admin-nav-badge">{{ $heroItem['badge'] }}</span>
+                <span>{{ $heroItem['label'] }}</span>
+            </a>
+        </nav>
 
-    <div class="admin-sidebar-scroll">
         <div class="admin-sidebar-menu">
             <p class="admin-sidebar-label">Content Management</p>
             <nav class="admin-sidebar-nav admin-sidebar-nav--menu">
                 @foreach($menuItems as $item)
-                    <a class="admin-nav-link admin-nav-link--menu @if($activeAdminNav === $item['id']) is-active @endif" href="{{ $item['href'] }}">
+                    <a class="admin-nav-link @if($activeAdminNav === $item['id']) is-active @endif" href="{{ $item['href'] }}">
                         <span class="admin-nav-badge">{{ $item['badge'] }}</span>
                         <span>{{ $item['label'] }}</span>
                     </a>
