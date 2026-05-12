@@ -205,15 +205,19 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:120', 'unique:categories,name'],
+            'meta_description' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'image_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         $category = Category::create([
             'name' => $data['name'],
+            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
             'slug' => $this->uniqueSlug('categories', $data['name']),
             'parent_id' => $data['parent_id'] ?? null,
             'image_url' => $data['image_url'] ?? null,
+            'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
         ]);
 
         $redirectRoute = $category->parent_id ? 'admin.subcategories.index' : 'admin.categories.index';

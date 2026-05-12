@@ -2696,6 +2696,10 @@ textarea.admin-post-builder-input {
     line-height: 1.35;
 }
 
+.admin-field-required {
+    color: #e53946;
+}
+
 .admin-product-input,
 .admin-product-select,
 .admin-product-textarea {

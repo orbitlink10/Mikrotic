@@ -73,6 +73,54 @@ class AdminProductManagementTest extends TestCase
         $this->actingAs($admin)->get('/admin/pages-content')->assertOk()->assertSee('Update Homepage Content');
     }
 
+    public function test_admin_category_create_page_displays_requested_fields(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/categories/create');
+
+        $response->assertOk();
+        $response->assertSee('Create Category');
+        $response->assertSee('Meta description');
+        $response->assertSee('Description (Optional)');
+        $response->assertSee('Parent Category and Image (Optional)');
+    }
+
+    public function test_admin_can_create_category_with_meta_and_description(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $response = $this->actingAs($admin)->post('/admin/categories', [
+            'name' => 'Networking Guides',
+            'meta_description' => 'Helpful networking category summaries for search and navigation.',
+            'description' => '<p>Category copy with <strong>useful</strong> notes.</p><script>alert(1)</script>',
+            'image_url' => 'https://example.com/category.jpg',
+        ]);
+
+        $response->assertRedirect('/admin/categories');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Networking Guides',
+            'slug' => 'networking-guides',
+            'meta_description' => 'Helpful networking category summaries for search and navigation.',
+            'image_url' => 'https://example.com/category.jpg',
+        ]);
+
+        $category = Category::query()->where('slug', 'networking-guides')->first();
+
+        $this->assertNotNull($category);
+        $this->assertSame('<p>Category copy with <strong>useful</strong> notes.</p>', $category->description);
+    }
+
     public function test_admin_product_create_page_displays_form(): void
     {
         $admin = User::factory()->create([

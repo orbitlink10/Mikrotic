@@ -32,9 +32,9 @@
                             <td>{{ $category->slug }}</td>
                             <td>
                                 @if($category->image_url)
-                                    <img class="admin-thumb" src="{{ $category->image_url }}" alt="{{ $category->name }}">
+                                    <img class="admin-thumb admin-thumb--page" src="{{ $category->image_url }}" alt="{{ $category->name }}">
                                 @else
-                                    <div class="admin-thumb admin-thumb--placeholder">No Image</div>
+                                    <div class="admin-thumb admin-thumb--page admin-thumb--placeholder">No Image</div>
                                 @endif
                             </td>
                             <td>
