@@ -3,7 +3,6 @@
 @php
     $articleTitle = trim((string) ($page->meta_title ?: $page->title));
     $heroSummary = trim((string) $pageMetaDescription);
-    $pageDate = optional($page->updated_at ?: $page->created_at)?->format('M d, Y');
     $backUrl = url()->previous() !== request()->fullUrl()
         ? url()->previous()
         : route('home');
@@ -16,13 +15,6 @@
 <article class="page-story">
     <section class="page-story-hero">
         <div class="page-story-hero-copy">
-            <div class="page-story-meta-row">
-                @if($pageDate)
-                    <span class="page-story-date">{{ $pageDate }}</span>
-                @endif
-                <span class="page-story-type">{{ ucfirst($page->type) }}</span>
-            </div>
-
             <h1 class="page-story-title">{{ $page->title }}</h1>
 
             @if($heroSummary !== '')

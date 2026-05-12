@@ -27,8 +27,6 @@ class PageShowPageTest extends TestCase
         $response = $this->get(route('pages.show', ['page' => $page->slug]));
 
         $response->assertOk();
-        $response->assertSee($page->created_at->format('M d, Y'));
-        $response->assertSee('Post');
         $response->assertSee('Starlink in Kenya');
         $response->assertSee('Connectivity Guide');
         $response->assertSee('Discover the benefits of Starlink in Kenya and how satellite internet is improving connectivity for homes, schools, and businesses.');
