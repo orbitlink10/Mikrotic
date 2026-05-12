@@ -16,5 +16,6 @@
         <button type="submit">Login</button>
     </form>
     <p class="muted">No account? <a href="{{ route('register') }}">Create one</a>.</p>
+    <p class="muted">Need admin access? <a href="{{ route('admin.register') }}">Register as Admin</a>.</p>
 </section>
 @endsection

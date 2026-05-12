@@ -11,12 +11,15 @@ Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/products/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
 
 Route::redirect('/login', '/login.php');
+Route::redirect('/admin/register', '/admin/register.php');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login.php', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login.php', [AuthController::class, 'login'])->name('login.submit');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+    Route::get('/admin/register.php', [AuthController::class, 'showAdminRegister'])->name('admin.register');
+    Route::post('/admin/register.php', [AuthController::class, 'registerAdmin'])->name('admin.register.submit');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

@@ -45,10 +45,43 @@ class AuthController extends Controller
 
     public function showRegister(): View
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'pageTitle' => 'Create Account',
+            'submitLabel' => 'Register',
+            'formAction' => route('register.submit'),
+            'loginPrompt' => 'Already registered?',
+            'loginLinkLabel' => 'Login',
+            'secondaryPrompt' => 'Need an admin account?',
+            'secondaryLinkLabel' => 'Register as Admin',
+            'secondaryLinkUrl' => route('admin.register'),
+        ]);
     }
 
     public function register(Request $request): RedirectResponse
+    {
+        return $this->registerUser($request, 'customer');
+    }
+
+    public function showAdminRegister(): View
+    {
+        return view('auth.register', [
+            'pageTitle' => 'Admin Registration',
+            'submitLabel' => 'Create Admin Account',
+            'formAction' => route('admin.register.submit'),
+            'loginPrompt' => 'Already have admin access?',
+            'loginLinkLabel' => 'Login',
+            'secondaryPrompt' => 'Need a customer account instead?',
+            'secondaryLinkLabel' => 'Create one',
+            'secondaryLinkUrl' => route('register'),
+        ]);
+    }
+
+    public function registerAdmin(Request $request): RedirectResponse
+    {
+        return $this->registerUser($request, 'admin');
+    }
+
+    private function registerUser(Request $request, string $role): RedirectResponse
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:120'],
@@ -62,14 +95,16 @@ class AuthController extends Controller
             'email' => strtolower($data['email']),
             'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
-            'role' => 'customer',
+            'role' => $role,
             'status' => 'active',
         ]);
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')->with('success', 'Account created successfully.');
+        return redirect()
+            ->intended($this->loginRedirectPath($role))
+            ->with('success', 'Account created successfully.');
     }
 
     public function logout(Request $request): RedirectResponse

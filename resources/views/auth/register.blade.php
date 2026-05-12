@@ -2,8 +2,8 @@
 
 @section('content')
 <section class="panel auth-card">
-    <h1>Create Account</h1>
-    <form class="form-grid" action="{{ route('register.submit') }}" method="post">
+    <h1>{{ $pageTitle ?? 'Create Account' }}</h1>
+    <form class="form-grid" action="{{ $formAction ?? route('register.submit') }}" method="post">
         @csrf
         <label>
             Full Name
@@ -25,8 +25,11 @@
             Confirm Password
             <input type="password" name="password_confirmation" minlength="6" required>
         </label>
-        <button type="submit">Register</button>
+        <button type="submit">{{ $submitLabel ?? 'Register' }}</button>
     </form>
-    <p class="muted">Already registered? <a href="{{ route('login') }}">Login</a>.</p>
+    <p class="muted">{{ $loginPrompt ?? 'Already registered?' }} <a href="{{ route('login') }}">{{ $loginLinkLabel ?? 'Login' }}</a>.</p>
+    @if(!empty($secondaryLinkUrl))
+        <p class="muted">{{ $secondaryPrompt ?? '' }} <a href="{{ $secondaryLinkUrl }}">{{ $secondaryLinkLabel ?? 'Open' }}</a>.</p>
+    @endif
 </section>
 @endsection
