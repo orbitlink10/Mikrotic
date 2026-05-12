@@ -11,18 +11,20 @@ use App\Models\ProductImage;
 use App\Support\ProductContent;
 use App\Models\User;
 use App\Models\Vendor;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AdminController extends Controller
 {
-    private function uniqueSlug(string $table, string $text): string
+    private function uniqueSlug(string $table, string $text, ?int $ignoreId = null): string
     {
         $base = Str::slug($text);
         if ($base === '') {
@@ -31,7 +33,10 @@ class AdminController extends Controller
 
         $slug = $base;
         $counter = 1;
-        while (DB::table($table)->where('slug', $slug)->exists()) {
+        while (DB::table($table)
+            ->where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
             $slug = $base . '-' . $counter;
             $counter++;
         }
@@ -48,6 +53,62 @@ class AdminController extends Controller
         }
 
         return $sku;
+    }
+
+    private function storeUploadedPublicFile(UploadedFile $file, string $directory): string
+    {
+        $targetDirectory = public_path(trim($directory, '/'));
+        File::ensureDirectoryExists($targetDirectory);
+
+        $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $file->getClientOriginalExtension();
+        $file->move($targetDirectory, $filename);
+
+        return '/' . trim($directory, '/') . '/' . $filename;
+    }
+
+    private function deleteManagedUpload(?string $path, string $prefix): void
+    {
+        if (!$path) {
+            return;
+        }
+
+        $normalizedPath = '/' . ltrim($path, '/');
+        if (!Str::startsWith($normalizedPath, $prefix)) {
+            return;
+        }
+
+        $absolutePath = public_path(ltrim($normalizedPath, '/'));
+        if (File::exists($absolutePath)) {
+            File::delete($absolutePath);
+        }
+    }
+
+    private function syncPrimaryProductImage(Product $product, ?UploadedFile $image): void
+    {
+        if (!$image) {
+            return;
+        }
+
+        $imagePath = $this->storeUploadedPublicFile($image, 'uploads/products');
+        $primaryImage = $product->images()->orderByDesc('is_primary')->orderBy('sort_order')->first();
+
+        if ($primaryImage) {
+            $this->deleteManagedUpload($primaryImage->image_url, '/uploads/products/');
+            $primaryImage->update([
+                'image_url' => $imagePath,
+                'is_primary' => true,
+                'sort_order' => 0,
+            ]);
+
+            return;
+        }
+
+        ProductImage::create([
+            'product_id' => $product->id,
+            'image_url' => $imagePath,
+            'is_primary' => true,
+            'sort_order' => 0,
+        ]);
     }
 
     private function resolveCategory(array $data): Category
@@ -202,6 +263,20 @@ class AdminController extends Controller
         ]);
     }
 
+    public function editCategoryForm(Category $category): View
+    {
+        return view('admin.category_create', [
+            'parents' => Category::query()
+                ->whereNull('parent_id')
+                ->whereKeyNot($category->id)
+                ->orderBy('name')
+                ->get(),
+            'defaultParentId' => $category->parent_id,
+            'categoryContentFieldsReady' => Category::contentFieldsReady(),
+            'categoryToEdit' => $category,
+        ]);
+    }
+
     public function storeCategory(Request $request): RedirectResponse
     {
         $categoryContentFieldsReady = Category::contentFieldsReady();
@@ -221,13 +296,7 @@ class AdminController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $directory = public_path('uploads/categories');
-            File::ensureDirectoryExists($directory);
-
-            $image = $request->file('image');
-            $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $image->getClientOriginalExtension();
-            $image->move($directory, $filename);
-            $imagePath = '/uploads/categories/' . $filename;
+            $imagePath = $this->storeUploadedPublicFile($request->file('image'), 'uploads/categories');
         }
 
         $payload = [
@@ -250,6 +319,67 @@ class AdminController extends Controller
             : 'Category saved. Run php artisan migrate to enable category meta description and description storage.';
 
         return redirect()->route($redirectRoute)->with('success', $message);
+    }
+
+    public function updateCategory(Request $request, Category $category): RedirectResponse
+    {
+        $categoryContentFieldsReady = Category::contentFieldsReady();
+
+        $rules = [
+            'name' => ['required', 'string', 'min:2', 'max:120', Rule::unique('categories', 'name')->ignore($category->id)],
+            'parent_id' => ['nullable', 'exists:categories,id', Rule::notIn([$category->id])],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ];
+
+        if ($categoryContentFieldsReady) {
+            $rules['meta_description'] = ['nullable', 'string', 'max:255'];
+            $rules['description'] = ['nullable', 'string'];
+        }
+
+        $data = $request->validate($rules);
+
+        $imagePath = $category->image_url;
+        if ($request->hasFile('image')) {
+            $this->deleteManagedUpload($category->image_url, '/uploads/categories/');
+            $imagePath = $this->storeUploadedPublicFile($request->file('image'), 'uploads/categories');
+        }
+
+        $payload = [
+            'name' => $data['name'],
+            'slug' => $this->uniqueSlug('categories', $data['name'], $category->id),
+            'parent_id' => $data['parent_id'] ?? null,
+            'image_url' => $imagePath,
+        ];
+
+        if ($categoryContentFieldsReady) {
+            $payload['meta_description'] = ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null);
+            $payload['description'] = ProductContent::sanitizeRichText($data['description'] ?? null);
+        }
+
+        $category->update($payload);
+
+        $redirectRoute = $category->parent_id ? 'admin.subcategories.index' : 'admin.categories.index';
+        $message = $categoryContentFieldsReady
+            ? 'Category updated successfully.'
+            : 'Category updated. Run php artisan migrate to enable category meta description and description storage.';
+
+        return redirect()->route($redirectRoute)->with('success', $message);
+    }
+
+    public function destroyCategory(Category $category): RedirectResponse
+    {
+        if ($category->children()->exists()) {
+            return back()->with('error', 'Delete or move the sub categories in this category first.');
+        }
+
+        if ($category->products()->exists()) {
+            return back()->with('error', 'Delete or move the products assigned to this category first.');
+        }
+
+        $this->deleteManagedUpload($category->image_url, '/uploads/categories/');
+        $category->delete();
+
+        return back()->with('success', 'Category deleted successfully.');
     }
 
     public function productsIndex(Request $request): View
@@ -430,6 +560,20 @@ class AdminController extends Controller
         ]);
     }
 
+    public function editProductForm(Product $product): View
+    {
+        $product->load(['category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')]);
+
+        return view('admin.product_create', [
+            'categories' => Category::query()
+                ->whereNull('parent_id')
+                ->with(['children' => fn ($query) => $query->orderBy('name')])
+                ->orderBy('name')
+                ->get(),
+            'productToEdit' => $product,
+        ]);
+    }
+
     public function storeProduct(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -437,12 +581,12 @@ class AdminController extends Controller
             'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
             'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
             'subcategory_id' => ['nullable', 'exists:categories,id'],
-            'description' => ['nullable', 'string', 'max:5000'],
+            'description' => ['nullable', 'string'],
             'meta_description' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0.01'],
             'compare_at_price' => ['nullable', 'numeric', 'gte:price'],
             'stock' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'url', 'max:255'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
         if (!empty($data['subcategory_id'])) {
@@ -485,16 +629,74 @@ class AdminController extends Controller
             'status' => 'active',
         ]);
 
-        if (!empty($data['image_url'])) {
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_url' => $data['image_url'],
-                'is_primary' => true,
-                'sort_order' => 0,
-            ]);
-        }
+        $this->syncPrimaryProductImage($product, $request->file('image'));
 
         return redirect()->route('admin.products.index')->with('success', 'Product added to the admin catalog.');
+    }
+
+    public function updateProduct(Request $request, Product $product): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'min:2', 'max:180'],
+            'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
+            'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
+            'subcategory_id' => ['nullable', 'exists:categories,id'],
+            'description' => ['nullable', 'string'],
+            'meta_description' => ['nullable', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0.01'],
+            'compare_at_price' => ['nullable', 'numeric', 'gte:price'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ]);
+
+        if (!empty($data['subcategory_id'])) {
+            $subcategory = Category::query()
+                ->whereKey($data['subcategory_id'])
+                ->whereNotNull('parent_id')
+                ->first();
+
+            if (!$subcategory) {
+                throw ValidationException::withMessages([
+                    'subcategory_id' => 'Select a valid subcategory.',
+                ]);
+            }
+
+            if (!empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
+                throw ValidationException::withMessages([
+                    'subcategory_id' => 'Select a subcategory that belongs to the chosen category.',
+                ]);
+            }
+        }
+
+        $category = $this->resolveCategory($data);
+
+        $product->update([
+            'category_id' => $category->id,
+            'name' => $data['name'],
+            'slug' => $this->uniqueSlug('products', $data['name'], $product->id),
+            'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
+            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
+            'price' => $data['price'],
+            'compare_at_price' => $data['compare_at_price'] ?? null,
+            'stock' => $data['stock'],
+        ]);
+
+        $this->syncPrimaryProductImage($product, $request->file('image'));
+
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+    }
+
+    public function destroyProduct(Product $product): RedirectResponse
+    {
+        $product->load('images');
+
+        foreach ($product->images as $image) {
+            $this->deleteManagedUpload($image->image_url, '/uploads/products/');
+        }
+
+        $product->delete();
+
+        return back()->with('success', 'Product deleted successfully.');
     }
 
     public function approveVendor(Request $request, Vendor $vendor): RedirectResponse

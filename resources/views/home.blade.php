@@ -1,5 +1,16 @@
 @extends('layouts.app')
 
+@php
+    $catalogTitle = $currentCategory
+        ? $currentCategory->name . ' | ' . config('app.name', 'Almar Market')
+        : config('app.name', 'Almar Market');
+    $catalogMetaDescription = $currentCategory?->meta_description
+        ?: ($currentCategory ? \App\Support\ProductContent::excerpt($currentCategory->description, 160) : 'Browse products from our multi-vendor marketplace.');
+@endphp
+
+@section('title', $catalogTitle)
+@section('meta_description', $catalogMetaDescription)
+
 @section('content')
 <section class="home-layout">
     <aside class="category-sidebar">
@@ -11,7 +22,7 @@
             @foreach($categories as $category)
                 <li>
                     <a class="{{ $selectedCategory === $category->id ? 'active' : '' }}"
-                       href="{{ route('home', ['category' => $category->id]) }}">
+                       href="{{ route('category.show', $category) }}">
                         {{ $category->name }}
                     </a>
                 </li>

@@ -20,7 +20,13 @@
         <img src="{{ $image }}" alt="{{ $product->name }}">
     </div>
     <div class="product-detail-info">
-        <p class="product-category">{{ $product->category->name ?? 'General' }}</p>
+        <p class="product-category">
+            @if($product->category)
+                <a href="{{ route('category.show', $product->category) }}">{{ $product->category->name }}</a>
+            @else
+                General
+            @endif
+        </p>
         <h1>{{ $product->name }}</h1>
         <p class="vendor-name">Sold by {{ $product->vendor->shop_name }}</p>
         <p class="price large">KSh {{ number_format((float) $product->price, 2) }}</p>

@@ -5,10 +5,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\VendorController;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
-Route::get('/products/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
+Route::get('/category/{category:slug}', [StorefrontController::class, 'showCategory'])->name('category.show');
+Route::get('/product/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
+Route::get('/products/{product:slug}', fn (Product $product) => redirect()->route('product.show', $product, 301));
+Route::get('/categories/{category:slug}', fn (Category $category) => redirect()->route('category.show', $category, 301));
 Route::get('/pages/{page:slug}', [StorefrontController::class, 'showPage'])->name('pages.show');
 
 Route::redirect('/login', '/login.php');
@@ -53,10 +58,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/categories', [AdminController::class, 'categoriesIndex'])->name('categories.index');
     Route::get('/categories/create', [AdminController::class, 'createCategoryForm'])->name('categories.create');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminController::class, 'editCategoryForm'])->name('categories.edit');
+    Route::put('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminController::class, 'destroyCategory'])->name('categories.destroy');
     Route::get('/sub-categories', [AdminController::class, 'subcategoriesIndex'])->name('subcategories.index');
     Route::get('/products', [AdminController::class, 'productsIndex'])->name('products.index');
     Route::get('/products/create', [AdminController::class, 'createProductForm'])->name('products.create');
     Route::post('/products', [AdminController::class, 'storeProduct'])->name('products.store');
+    Route::get('/products/{product}/edit', [AdminController::class, 'editProductForm'])->name('products.edit');
+    Route::put('/products/{product}', [AdminController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/products/{product}', [AdminController::class, 'destroyProduct'])->name('products.destroy');
     Route::get('/pages', [AdminController::class, 'pagesIndex'])->name('pages.index');
     Route::get('/pages/create', [AdminController::class, 'createPageForm'])->name('pages.create');
     Route::post('/pages', [AdminController::class, 'storePage'])->name('pages.store');

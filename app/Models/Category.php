@@ -30,6 +30,11 @@ class Category extends Model
             && Schema::hasColumn($table, 'description');
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');

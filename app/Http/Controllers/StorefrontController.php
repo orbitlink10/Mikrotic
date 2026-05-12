@@ -14,35 +14,16 @@ class StorefrontController extends Controller
 {
     public function index(Request $request): View
     {
-        $categories = Category::query()->orderBy('name')->get();
-        $search = trim((string) $request->query('search', ''));
-        $categoryId = $request->integer('category') ?: null;
+        $category = $request->filled('category')
+            ? Category::query()->find($request->integer('category'))
+            : null;
 
-        $productsQuery = Product::query()
-            ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
-            ->active();
+        return $this->renderCatalog($request, $category);
+    }
 
-        if ($categoryId) {
-            $productsQuery->where('category_id', $categoryId);
-        }
-
-        if ($search !== '') {
-            $productsQuery->where(function ($query) use ($search): void {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('meta_description', 'like', '%' . $search . '%');
-            });
-        }
-
-        $products = $productsQuery->latest()->paginate(24)->withQueryString();
-
-        return view('home', [
-            'categories' => $categories,
-            'homepageContent' => HomepageContent::current(),
-            'products' => $products,
-            'search' => $search,
-            'selectedCategory' => $categoryId,
-        ]);
+    public function showCategory(Request $request, Category $category): View
+    {
+        return $this->renderCatalog($request, $category);
     }
 
     public function show(Product $product): View
@@ -62,6 +43,49 @@ class StorefrontController extends Controller
             'page' => $page,
             'pageBody' => ProductContent::sanitizeRichText($page->body) ?: '<p>No content available.</p>',
             'pageMetaDescription' => $page->meta_description ?: ProductContent::excerpt($page->body, 160),
+        ]);
+    }
+
+    private function renderCatalog(Request $request, ?Category $currentCategory = null): View
+    {
+        $categories = Category::query()
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+
+        $search = trim((string) $request->query('search', ''));
+        $productsQuery = Product::query()
+            ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
+            ->active();
+
+        $selectedCategory = null;
+        if ($currentCategory) {
+            $currentCategory->loadMissing('children', 'parent');
+            $selectedCategory = $currentCategory->parent_id ?: $currentCategory->id;
+            $categoryIds = $currentCategory->parent_id
+                ? [$currentCategory->id]
+                : array_merge([$currentCategory->id], $currentCategory->children->pluck('id')->all());
+
+            $productsQuery->whereIn('category_id', $categoryIds);
+        }
+
+        if ($search !== '') {
+            $productsQuery->where(function ($query) use ($search): void {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('meta_description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $products = $productsQuery->latest()->paginate(24)->withQueryString();
+
+        return view('home', [
+            'categories' => $categories,
+            'homepageContent' => HomepageContent::current(),
+            'products' => $products,
+            'search' => $search,
+            'selectedCategory' => $selectedCategory,
+            'currentCategory' => $currentCategory,
         ]);
     }
 }
