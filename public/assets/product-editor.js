@@ -1,5 +1,8 @@
 (() => {
     const editors = document.querySelectorAll('[data-rich-editor]');
+    const activeButtonClasses = ['bg-blue-50', 'text-blue-700', 'border-blue-200'];
+    const inactiveButtonClasses = ['bg-slate-50', 'text-slate-700', 'border-slate-200'];
+    const fullscreenClasses = ['fixed', 'inset-3', 'z-[999]', 'rounded-[1.75rem]', 'shadow-2xl'];
 
     const normalize = (html) => html
         .replace(/<div><br><\/div>/gi, '')
@@ -23,8 +26,16 @@
             try {
                 const isActive = document.queryCommandState(command);
                 button.classList.toggle('is-active', isActive);
+                button.classList.toggle(activeButtonClasses[0], isActive);
+                button.classList.toggle(activeButtonClasses[1], isActive);
+                button.classList.toggle(activeButtonClasses[2], isActive);
+                button.classList.toggle(inactiveButtonClasses[0], !isActive);
+                button.classList.toggle(inactiveButtonClasses[1], !isActive);
+                button.classList.toggle(inactiveButtonClasses[2], !isActive);
             } catch (error) {
                 button.classList.remove('is-active');
+                button.classList.remove(...activeButtonClasses);
+                button.classList.add(...inactiveButtonClasses);
             }
         });
     };
@@ -127,6 +138,8 @@
             button.addEventListener('mousedown', (event) => event.preventDefault());
             button.addEventListener('click', () => {
                 container.classList.toggle('is-fullscreen');
+                fullscreenClasses.forEach((className) => container.classList.toggle(className));
+                document.body.classList.toggle('overflow-hidden');
                 surface.focus();
             });
         });

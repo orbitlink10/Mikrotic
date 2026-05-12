@@ -954,6 +954,12 @@ th {
     line-height: 1.5;
 }
 
+textarea.admin-post-builder-input {
+    min-height: 150px;
+    padding: 18px;
+    resize: vertical;
+}
+
 .admin-post-builder-input::placeholder {
     color: #9aa7bb;
 }

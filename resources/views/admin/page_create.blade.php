@@ -18,6 +18,12 @@
         <section class="panel admin-post-builder-panel">
             <div class="admin-post-builder-bar">Add New Post</div>
 
+            @unless($pagesStorageReady)
+                <div class="alert error">
+                    Page storage is not ready yet. Run <code>php artisan migrate</code> to create the <code>pages</code> table before saving pages.
+                </div>
+            @endunless
+
             <form class="admin-post-builder-form" method="post" action="{{ route('admin.pages.store') }}">
                 @csrf
 
@@ -30,6 +36,7 @@
                         name="meta_title"
                         value="{{ old('meta_title') }}"
                         placeholder="Enter Meta Title"
+                        @disabled(! $pagesStorageReady)
                         required
                     >
                 </div>
@@ -43,6 +50,7 @@
                         name="meta_description"
                         value="{{ old('meta_description') }}"
                         placeholder="Enter Meta Description"
+                        @disabled(! $pagesStorageReady)
                         required
                     >
                 </div>
@@ -56,6 +64,7 @@
                         name="title"
                         value="{{ old('title') }}"
                         placeholder="Enter Keyword Title"
+                        @disabled(! $pagesStorageReady)
                         required
                     >
                 </div>
@@ -69,6 +78,7 @@
                         name="alt_text"
                         value="{{ old('alt_text') }}"
                         placeholder="Enter Image Alt Text"
+                        @disabled(! $pagesStorageReady)
                         required
                     >
                 </div>
@@ -82,13 +92,14 @@
                         name="heading_two"
                         value="{{ old('heading_two') }}"
                         placeholder="Enter Heading 2"
+                        @disabled(! $pagesStorageReady)
                         required
                     >
                 </div>
 
                 <div class="admin-post-builder-field">
                     <label class="admin-post-builder-label" for="type">Type</label>
-                    <select class="admin-post-builder-input admin-post-builder-select" id="type" name="type" required>
+                    <select class="admin-post-builder-input admin-post-builder-select" id="type" name="type" @disabled(! $pagesStorageReady) required>
                         <option value="post" @selected(old('type', 'post') === 'post')>Post</option>
                         <option value="page" @selected(old('type') === 'page')>Page</option>
                     </select>
@@ -129,15 +140,15 @@
                             class="admin-post-editor-surface editor-surface"
                             data-editor-surface
                             data-placeholder="Write the page description here..."
-                            contenteditable="true"
+                            contenteditable="{{ $pagesStorageReady ? 'true' : 'false' }}"
                         ></div>
 
-                        <textarea class="rich-editor-input" name="body" hidden>{{ old('body') }}</textarea>
+                        <textarea class="rich-editor-input" name="body" hidden @disabled(! $pagesStorageReady)>{{ old('body') }}</textarea>
                     </div>
                 </div>
 
                 <div class="admin-post-builder-actions">
-                    <button type="submit" class="admin-primary-pill">Save Post</button>
+                    <button type="submit" class="admin-primary-pill" @disabled(! $pagesStorageReady)>Save Post</button>
                 </div>
             </form>
         </section>

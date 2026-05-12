@@ -84,8 +84,10 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/products/create');
 
         $response->assertOk();
-        $response->assertSee('Post Product');
+        $response->assertSee('Add Product');
         $response->assertSee('Product Name');
+        $response->assertSee('Marked Price (KES)');
+        $response->assertSee('Subcategory');
         $response->assertSee('Description');
     }
 
@@ -129,6 +131,7 @@ class AdminProductManagementTest extends TestCase
             'description' => '<p>Camera added by <strong>admin</strong>.</p><script>alert(1)</script>',
             'meta_description' => 'Compact admin camera listing.',
             'price' => '499.99',
+            'compare_at_price' => '579.99',
             'stock' => 8,
             'image_url' => 'https://example.com/camera.jpg',
         ]);
@@ -148,12 +151,14 @@ class AdminProductManagementTest extends TestCase
         $this->assertSame('active', $product->status);
         $this->assertSame('Compact admin camera listing.', $product->meta_description);
         $this->assertSame('<p>Camera added by <strong>admin</strong>.</p>', $product->description);
+        $this->assertSame('579.99', $product->compare_at_price);
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'name' => 'Admin Camera',
             'category_id' => $category->id,
             'meta_description' => 'Compact admin camera listing.',
+            'compare_at_price' => '579.99',
         ]);
 
         $this->assertDatabaseHas('product_images', [
@@ -195,6 +200,46 @@ class AdminProductManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_assign_product_to_selected_subcategory(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $category = Category::create([
+            'name' => 'Networking',
+            'slug' => 'networking',
+        ]);
+
+        $subcategory = Category::create([
+            'name' => 'Routers',
+            'slug' => 'routers',
+            'parent_id' => $category->id,
+        ]);
+
+        $response = $this->actingAs($admin)->post('/admin/products', [
+            'name' => 'Core Router',
+            'category_id' => $category->id,
+            'subcategory_id' => $subcategory->id,
+            'description' => '<p>Enterprise router.</p>',
+            'meta_description' => 'Enterprise-grade router for branch and core networks.',
+            'price' => '74999.00',
+            'compare_at_price' => '81999.00',
+            'stock' => 2,
+        ]);
+
+        $response->assertRedirect('/admin/products');
+        $response->assertSessionHas('success');
+
+        $product = Product::query()->where('name', 'Core Router')->first();
+
+        $this->assertNotNull($product);
+        $this->assertSame($subcategory->id, $product->category_id);
+        $this->assertSame('81999.00', $product->compare_at_price);
+    }
+
     public function test_admin_can_create_content_page(): void
     {
         $admin = User::factory()->create([
@@ -230,6 +275,64 @@ class AdminProductManagementTest extends TestCase
 
         $this->assertNotNull($page);
         $this->assertSame('<p>Support content</p><pre><code>safe code</code></pre>', $page->body);
+    }
+
+    public function test_admin_pages_index_shows_clear_error_when_table_is_missing(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Schema::drop('pages');
+
+        $response = $this->actingAs($admin)->get('/admin/pages');
+
+        $response->assertOk();
+        $response->assertSee('Page storage is not ready yet.');
+        $response->assertSee('php artisan migrate');
+    }
+
+    public function test_admin_page_create_shows_clear_error_when_table_is_missing(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Schema::drop('pages');
+
+        $response = $this->actingAs($admin)->get('/admin/pages/create');
+
+        $response->assertOk();
+        $response->assertSee('Page storage is not ready yet.');
+        $response->assertSee('php artisan migrate');
+    }
+
+    public function test_admin_page_create_submit_shows_clear_error_when_table_is_missing(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Schema::drop('pages');
+
+        $response = $this->actingAs($admin)->post('/admin/pages', [
+            'meta_title' => 'Support Page Meta Title',
+            'meta_description' => 'Support page meta description for search and content previews.',
+            'title' => 'Support Page',
+            'heading_two' => 'Support Options',
+            'type' => 'page',
+            'alt_text' => 'Support page hero image',
+            'body' => '<p>Support content</p>',
+        ]);
+
+        $response->assertRedirect('/admin/pages');
+        $response->assertSessionHas('error', 'Page storage is not ready yet. Run php artisan migrate to create the pages table.');
     }
 
     public function test_admin_can_update_homepage_content(): void

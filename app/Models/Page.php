@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Page extends Model
 {
@@ -20,4 +21,9 @@ class Page extends Model
         'type',
         'body',
     ];
+
+    public static function storageReady(): bool
+    {
+        return Schema::hasTable((new static())->getTable());
+    }
 }

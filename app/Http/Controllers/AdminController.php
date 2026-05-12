@@ -11,11 +11,13 @@ use App\Models\ProductImage;
 use App\Support\ProductContent;
 use App\Models\User;
 use App\Models\Vendor;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -50,6 +52,10 @@ class AdminController extends Controller
 
     private function resolveCategory(array $data): Category
     {
+        if (!empty($data['subcategory_id'])) {
+            return Category::query()->findOrFail($data['subcategory_id']);
+        }
+
         if (!empty($data['category_id'])) {
             return Category::query()->findOrFail($data['category_id']);
         }
@@ -271,8 +277,13 @@ class AdminController extends Controller
 
     public function pagesIndex(): View
     {
+        $pagesStorageReady = Page::storageReady();
+
         return view('admin.pages_index', [
-            'pages' => Page::query()->latest()->paginate(20),
+            'pages' => $pagesStorageReady
+                ? Page::query()->latest()->paginate(20)
+                : new LengthAwarePaginator([], 0, 20),
+            'pagesStorageReady' => $pagesStorageReady,
         ]);
     }
 
@@ -327,11 +338,19 @@ class AdminController extends Controller
 
     public function createPageForm(): View
     {
-        return view('admin.page_create');
+        return view('admin.page_create', [
+            'pagesStorageReady' => Page::storageReady(),
+        ]);
     }
 
     public function storePage(Request $request): RedirectResponse
     {
+        if (!Page::storageReady()) {
+            return redirect()
+                ->route('admin.pages.index')
+                ->with('error', 'Page storage is not ready yet. Run php artisan migrate to create the pages table.');
+        }
+
         $data = $request->validate([
             'meta_title' => ['required', 'string', 'min:2', 'max:180'],
             'meta_description' => ['required', 'string', 'min:10', 'max:255'],
@@ -372,7 +391,11 @@ class AdminController extends Controller
     public function createProductForm(): View
     {
         return view('admin.product_create', [
-            'categories' => Category::query()->orderBy('name')->get(),
+            'categories' => Category::query()
+                ->whereNull('parent_id')
+                ->with(['children' => fn ($query) => $query->orderBy('name')])
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -382,12 +405,33 @@ class AdminController extends Controller
             'name' => ['required', 'string', 'min:2', 'max:180'],
             'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
             'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
+            'subcategory_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string', 'max:5000'],
             'meta_description' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0.01'],
+            'compare_at_price' => ['nullable', 'numeric', 'gte:price'],
             'stock' => ['required', 'integer', 'min:0'],
             'image_url' => ['nullable', 'url', 'max:255'],
         ]);
+
+        if (!empty($data['subcategory_id'])) {
+            $subcategory = Category::query()
+                ->whereKey($data['subcategory_id'])
+                ->whereNotNull('parent_id')
+                ->first();
+
+            if (!$subcategory) {
+                throw ValidationException::withMessages([
+                    'subcategory_id' => 'Select a valid subcategory.',
+                ]);
+            }
+
+            if (!empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
+                throw ValidationException::withMessages([
+                    'subcategory_id' => 'Select a subcategory that belongs to the chosen category.',
+                ]);
+            }
+        }
 
         $vendor = $this->adminVendor($request, true);
         if (!$vendor) {
@@ -404,6 +448,7 @@ class AdminController extends Controller
             'description' => ProductContent::sanitizeRichText($data['description'] ?? null),
             'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null),
             'price' => $data['price'],
+            'compare_at_price' => $data['compare_at_price'] ?? null,
             'stock' => $data['stock'],
             'sku' => $this->nextSku(),
             'status' => 'active',

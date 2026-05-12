@@ -15,8 +15,18 @@
         <section class="panel admin-list-panel">
             <div class="admin-list-panel-head">
                 <h2>Post List</h2>
-                <a class="admin-secondary-pill" href="{{ route('admin.pages.create') }}">+ Add Page</a>
+                <a
+                    class="admin-secondary-pill @unless($pagesStorageReady) is-disabled @endunless"
+                    href="{{ $pagesStorageReady ? route('admin.pages.create') : '#' }}"
+                    @unless($pagesStorageReady) aria-disabled="true" @endunless
+                >+ Add Page</a>
             </div>
+
+            @unless($pagesStorageReady)
+                <div class="alert error">
+                    Page storage is not ready yet. Run <code>php artisan migrate</code> to create the <code>pages</code> table before managing pages.
+                </div>
+            @endunless
 
             <div class="admin-bulk-row">
                 <select>
