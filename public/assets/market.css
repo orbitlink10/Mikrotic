@@ -21,6 +21,10 @@ body {
     color: var(--brand-dark);
 }
 
+.overflow-hidden {
+    overflow: hidden;
+}
+
 .admin-body {
     --admin-primary: #1677ff;
     --admin-primary-deep: #2f61e6;
@@ -1738,10 +1742,10 @@ textarea.admin-post-builder-input {
 }
 
 .admin-nav-link.is-active {
-    background: #eef3fb;
-    color: #243245;
-    border-color: #dce6f2;
-    box-shadow: none;
+    background: linear-gradient(135deg, #3b6df1, #2f61e6);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 16px 30px rgba(47, 97, 230, 0.26);
     transform: none;
 }
 
@@ -1756,10 +1760,24 @@ textarea.admin-post-builder-input {
     letter-spacing: 0.08em;
 }
 
-.admin-nav-link:hover .admin-nav-badge,
-.admin-nav-link.is-active .admin-nav-badge {
+.admin-nav-badge svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.admin-nav-link:hover .admin-nav-badge {
     background: #dfe8f4;
     color: #405063;
+}
+
+.admin-nav-link.is-active .admin-nav-badge {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
 }
 
 .admin-main {
@@ -1959,6 +1977,197 @@ textarea.admin-post-builder-input {
     max-width: 100%;
     height: auto;
     border-radius: 14px;
+}
+
+.admin-page-head--product-create {
+    margin-bottom: 2px;
+}
+
+.admin-product-create-panel {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+}
+
+.admin-product-create-form {
+    display: grid;
+    gap: 24px;
+    padding: 32px 34px;
+}
+
+.admin-product-field {
+    display: grid;
+    gap: 12px;
+}
+
+.admin-product-label {
+    display: block;
+    color: #162033;
+    font-size: 14px;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+.admin-product-input,
+.admin-product-select,
+.admin-product-textarea {
+    width: 100%;
+    min-height: 56px;
+    border: 1px solid #d8e0ec;
+    border-radius: 16px;
+    background: #fff;
+    color: #233246;
+    font-size: 16px;
+    line-height: 1.45;
+    padding: 0 18px;
+}
+
+.admin-product-textarea {
+    min-height: 128px;
+    padding: 16px 18px;
+    resize: vertical;
+}
+
+.admin-product-input::placeholder,
+.admin-product-textarea::placeholder {
+    color: #9aa8ba;
+}
+
+.admin-product-select {
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #64748b 50%),
+        linear-gradient(135deg, #64748b 50%, transparent 50%);
+    background-position:
+        calc(100% - 26px) calc(50% - 4px),
+        calc(100% - 18px) calc(50% - 4px);
+    background-size: 8px 8px, 8px 8px;
+    background-repeat: no-repeat;
+    padding-right: 48px;
+}
+
+.admin-product-select:disabled {
+    color: #94a3b8;
+    background-color: #f8fafc;
+}
+
+.admin-product-editor-shell {
+    border: 1px solid #d8e0ec;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: none;
+}
+
+.admin-product-editor-shell.is-fullscreen {
+    position: fixed;
+    inset: 20px;
+    z-index: 999;
+    border-radius: 24px;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
+}
+
+.admin-product-editor-menubar,
+.admin-product-editor-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background: #fff;
+}
+
+.admin-product-editor-menubar {
+    gap: 18px;
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #e5ebf4;
+}
+
+.admin-product-editor-menu-button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: #22324d;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.admin-product-editor-toolbar {
+    gap: 6px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5ebf4;
+}
+
+.admin-product-editor-icon {
+    min-width: 40px;
+    min-height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #334155;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.admin-product-editor-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.admin-product-editor-icon--text {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.admin-product-editor-icon--italic {
+    font-style: italic;
+}
+
+.admin-product-editor-icon:hover,
+.admin-product-editor-icon.is-active {
+    background: rgba(22, 119, 255, 0.08);
+    color: var(--admin-primary);
+}
+
+.admin-product-editor-surface {
+    min-height: 320px;
+    padding: 18px 18px 22px;
+    color: #162033;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.admin-product-editor-surface img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 14px;
+}
+
+.admin-product-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 2px;
+}
+
+.admin-product-actions p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 .muted {
@@ -2163,5 +2372,30 @@ textarea.admin-post-builder-input {
 
     .content-page-panel {
         padding: 22px;
+    }
+
+    .admin-product-create-form {
+        padding: 24px 18px;
+        gap: 20px;
+    }
+
+    .admin-product-input,
+    .admin-product-select,
+    .admin-product-textarea {
+        font-size: 15px;
+    }
+
+    .admin-product-editor-menubar,
+    .admin-product-editor-toolbar {
+        padding-inline: 14px;
+    }
+
+    .admin-product-editor-shell.is-fullscreen {
+        inset: 10px;
+    }
+
+    .admin-product-actions {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }

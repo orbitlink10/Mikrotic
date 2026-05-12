@@ -1,9 +1,6 @@
 @extends('admin.layout')
 
 @push('head')
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
     <script src="{{ asset('assets/product-editor.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -67,230 +64,213 @@
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
 
     <div class="admin-main admin-management-main">
-        <section class="space-y-6">
-            <div class="relative overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-linear-to-br from-white via-slate-50 to-blue-50/70 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.07)] sm:p-8">
-                <div class="absolute inset-y-0 right-0 hidden w-56 bg-linear-to-bl from-blue-100/50 via-cyan-100/20 to-transparent lg:block"></div>
-                <div class="relative max-w-3xl space-y-2">
-                    <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-[11px] font-semibold tracking-[0.22em] text-blue-700 uppercase">
-                        Product Builder
-                    </span>
-                    <div class="space-y-2">
-                        <h1 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Add Product</h1>
-                        <p class="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                            Fill in the product details below to add a new item.
-                        </p>
-                    </div>
-                </div>
+        <section class="admin-page-head admin-page-head--product-create">
+            <div>
+                <h1 class="admin-page-title">Add Product</h1>
+                <p class="admin-page-copy">Fill in the product details below to add a new item</p>
             </div>
+        </section>
 
-            <section class="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
-                <div class="border-b border-slate-200/80 bg-slate-950 px-6 py-5 text-white sm:px-8">
-                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h2 class="text-xl font-bold tracking-tight">Product Details</h2>
-                            <p class="mt-1 text-sm text-slate-300">Use a clean product title, accurate pricing, and a strong description.</p>
+        <section class="panel admin-product-create-panel">
+            <form class="admin-product-create-form" method="post" action="{{ route('admin.products.store') }}">
+                @csrf
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="name">Product Name</label>
+                    <input
+                        class="admin-product-input"
+                        id="name"
+                        type="text"
+                        name="name"
+                        value="{{ old('name') }}"
+                        placeholder="Enter product name"
+                        required
+                    >
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="price">Price (KES)</label>
+                    <input
+                        class="admin-product-input"
+                        id="price"
+                        type="number"
+                        name="price"
+                        min="0.01"
+                        step="0.01"
+                        value="{{ old('price') }}"
+                        placeholder="Enter product price"
+                        required
+                    >
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="compare_at_price">Marked Price (KES)</label>
+                    <input
+                        class="admin-product-input"
+                        id="compare_at_price"
+                        type="number"
+                        name="compare_at_price"
+                        min="0.01"
+                        step="0.01"
+                        value="{{ old('compare_at_price') }}"
+                        placeholder="Enter marked price"
+                    >
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="stock">Quantity</label>
+                    <input
+                        class="admin-product-input"
+                        id="stock"
+                        type="number"
+                        name="stock"
+                        min="0"
+                        step="1"
+                        value="{{ old('stock', 0) }}"
+                        placeholder="Enter product quantity"
+                        required
+                    >
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="category_id">Category</label>
+                    <select
+                        class="admin-product-input admin-product-select"
+                        id="category_id"
+                        name="category_id"
+                        data-product-category
+                    >
+                        <option value="">Select Category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="subcategory_id">Subcategory</label>
+                    <select
+                        class="admin-product-input admin-product-select"
+                        id="subcategory_id"
+                        name="subcategory_id"
+                        data-product-subcategory
+                        data-current-value="{{ old('subcategory_id') }}"
+                        @disabled($initialSubcategories->isEmpty())
+                    >
+                        <option value="">{{ $initialSubcategories->isNotEmpty() ? 'Select Subcategory' : 'No subcategories available' }}</option>
+                        @foreach($initialSubcategories as $subcategory)
+                            <option value="{{ $subcategory->id }}" @selected(old('subcategory_id') == $subcategory->id)>{{ $subcategory->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="meta_description">Meta Description</label>
+                    <textarea
+                        class="admin-product-input admin-product-textarea"
+                        id="meta_description"
+                        name="meta_description"
+                        rows="4"
+                        placeholder="Write a short search-friendly summary"
+                    >{{ old('meta_description') }}</textarea>
+                </div>
+
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="description">Description</label>
+
+                    <div class="admin-product-editor-shell admin-post-editor-shell" data-rich-editor>
+                        <div class="admin-product-editor-menubar">
+                            <button type="button" class="admin-product-editor-menu-button">File</button>
+                            <button type="button" class="admin-product-editor-menu-button">Edit</button>
+                            <button type="button" class="admin-product-editor-menu-button">View</button>
+                            <button type="button" class="admin-product-editor-menu-button">Insert</button>
+                            <button type="button" class="admin-product-editor-menu-button">Format</button>
+                            <button type="button" class="admin-product-editor-menu-button">Tools</button>
+                            <button type="button" class="admin-product-editor-menu-button">Table</button>
                         </div>
-                        <a
-                            href="{{ route('admin.products.index') }}"
-                            class="inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
-                        >
-                            Back to Products
-                        </a>
+
+                        <div class="admin-product-editor-toolbar editor-toolbar">
+                            <button type="button" class="admin-product-editor-icon" data-command="undo" aria-label="Undo">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M20 20a8 8 0 0 0-8-8H4"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-command="redo" aria-label="Redo">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"></path><path d="M4 20a8 8 0 0 1 8-8h8"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon admin-product-editor-icon--text" data-command="bold" aria-label="Bold">B</button>
+                            <button type="button" class="admin-product-editor-icon admin-product-editor-icon--text admin-product-editor-icon--italic" data-command="italic" aria-label="Italic">I</button>
+                            <button type="button" class="admin-product-editor-icon" data-command="justifyLeft" aria-label="Align left">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h14"></path><path d="M4 10h10"></path><path d="M4 14h14"></path><path d="M4 18h10"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-command="justifyCenter" aria-label="Align center">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14"></path><path d="M7 10h10"></path><path d="M5 14h14"></path><path d="M7 18h10"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-command="justifyRight" aria-label="Align right">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h14"></path><path d="M10 10h10"></path><path d="M6 14h14"></path><path d="M10 18h10"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-command="outdent" aria-label="Outdent">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 8H20"></path><path d="M10 12h10"></path><path d="M10 16H20"></path><path d="m4 12 4-4v8l-4-4Z"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-command="indent" aria-label="Indent">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h10"></path><path d="M4 12h10"></path><path d="M4 16h10"></path><path d="m20 12-4 4V8l4 4Z"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-action="link" aria-label="Insert link">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13"></path><path d="M14 11a5 5 0 0 1 0 7l-1.5 1.5a5 5 0 0 1-7-7L7 11"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-action="image" aria-label="Insert image">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="m8 15 3-3 3 3 2-2 4 4"></path><path d="M9 10h.01"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-action="media" aria-label="Insert media">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="m10 9 5 3-5 3V9Z"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-action="code" aria-label="Insert code">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 8-4 4 4 4"></path><path d="m15 8 4 4-4 4"></path></svg>
+                            </button>
+                            <button type="button" class="admin-product-editor-icon" data-action="fullscreen" aria-label="Fullscreen">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4"></path><path d="M16 4h4v4"></path><path d="M20 16v4h-4"></path><path d="M4 16v4h4"></path><path d="m9 9-5-5"></path><path d="m15 9 5-5"></path><path d="m15 15 5 5"></path><path d="m9 15-5 5"></path></svg>
+                            </button>
+                        </div>
+
+                        <div
+                            id="description"
+                            class="admin-product-editor-surface editor-surface"
+                            data-editor-surface
+                            data-placeholder="Write the product description here..."
+                            contenteditable="true"
+                        ></div>
+
+                        <textarea class="rich-editor-input" name="description" hidden>{{ old('description') }}</textarea>
                     </div>
                 </div>
 
-                <form class="space-y-6 px-6 py-6 sm:px-8 sm:py-8" method="post" action="{{ route('admin.products.store') }}">
-                    @csrf
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="image_url">Product Image URL</label>
+                    <input
+                        class="admin-product-input"
+                        id="image_url"
+                        type="url"
+                        name="image_url"
+                        value="{{ old('image_url') }}"
+                        placeholder="Enter image URL"
+                    >
+                </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="name">Product Name</label>
-                        <input
-                            class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                            id="name"
-                            type="text"
-                            name="name"
-                            value="{{ old('name') }}"
-                            placeholder="Enter product name"
-                            required
-                        >
-                    </div>
+                <div class="admin-product-field">
+                    <label class="admin-product-label" for="category_name">New Category (Optional)</label>
+                    <input
+                        class="admin-product-input"
+                        id="category_name"
+                        type="text"
+                        name="category_name"
+                        value="{{ old('category_name') }}"
+                        placeholder="{{ $categories->isEmpty() ? 'Create the first category here' : 'Leave blank to use the selected category' }}"
+                    >
+                </div>
 
-                    <div class="grid gap-6 xl:grid-cols-2">
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="price">Price (KES)</label>
-                            <input
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="price"
-                                type="number"
-                                name="price"
-                                min="0.01"
-                                step="0.01"
-                                value="{{ old('price') }}"
-                                placeholder="Enter product price"
-                                required
-                            >
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="compare_at_price">Marked Price (KES)</label>
-                            <input
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="compare_at_price"
-                                type="number"
-                                name="compare_at_price"
-                                min="0.01"
-                                step="0.01"
-                                value="{{ old('compare_at_price') }}"
-                                placeholder="Enter marked price"
-                            >
-                        </div>
-                    </div>
-
-                    <div class="grid gap-6 xl:grid-cols-2">
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="stock">Quantity</label>
-                            <input
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="stock"
-                                type="number"
-                                name="stock"
-                                min="0"
-                                step="1"
-                                value="{{ old('stock', 0) }}"
-                                placeholder="Enter product quantity"
-                                required
-                            >
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="image_url">Product Image URL</label>
-                            <input
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="image_url"
-                                type="url"
-                                name="image_url"
-                                value="{{ old('image_url') }}"
-                                placeholder="Enter image URL"
-                            >
-                        </div>
-                    </div>
-
-                    <div class="grid gap-6 xl:grid-cols-2">
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="category_id">Category</label>
-                            <select
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="category_id"
-                                name="category_id"
-                                data-product-category
-                            >
-                                <option value="">Select Category</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="subcategory_id">Subcategory</label>
-                            <select
-                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                id="subcategory_id"
-                                name="subcategory_id"
-                                data-product-subcategory
-                                data-current-value="{{ old('subcategory_id') }}"
-                                @disabled($initialSubcategories->isEmpty())
-                            >
-                                <option value="">{{ $initialSubcategories->isNotEmpty() ? 'Select Subcategory' : 'No subcategories available' }}</option>
-                                @foreach($initialSubcategories as $subcategory)
-                                    <option value="{{ $subcategory->id }}" @selected(old('subcategory_id') == $subcategory->id)>{{ $subcategory->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50/80 p-5">
-                        <div class="grid gap-6 xl:grid-cols-2">
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="category_name">New Category (Optional)</label>
-                                <input
-                                    class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                    id="category_name"
-                                    type="text"
-                                    name="category_name"
-                                    value="{{ old('category_name') }}"
-                                    placeholder="{{ $categories->isEmpty() ? 'Create the first category here' : 'Leave blank to use the selected category' }}"
-                                >
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="meta_description">Meta Description</label>
-                                <textarea
-                                    class="block min-h-32 w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base leading-7 text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                                    id="meta_description"
-                                    name="meta_description"
-                                    rows="4"
-                                    placeholder="Write a short search-friendly summary"
-                                >{{ old('meta_description') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <span class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase">Description</span>
-
-                        <div data-rich-editor class="overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                            <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-medium text-slate-500">
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">File</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Edit</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">View</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Insert</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Format</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Tools</button>
-                                <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Table</button>
-                            </div>
-
-                            <div class="editor-toolbar flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-3">
-                                <button type="button" data-command="undo" aria-label="Undo" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8630;</button>
-                                <button type="button" data-command="redo" aria-label="Redo" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8631;</button>
-                                <button type="button" data-command="bold" aria-label="Bold" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-lg font-black text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">B</button>
-                                <button type="button" data-command="italic" aria-label="Italic" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-lg italic text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">I</button>
-                                <button type="button" data-command="justifyLeft" aria-label="Align left" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Left</button>
-                                <button type="button" data-command="justifyCenter" aria-label="Align center" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Center</button>
-                                <button type="button" data-command="justifyRight" aria-label="Align right" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Right</button>
-                                <button type="button" data-command="outdent" aria-label="Outdent" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Out</button>
-                                <button type="button" data-command="indent" aria-label="Indent" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">In</button>
-                                <button type="button" data-action="link" aria-label="Insert link" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Link</button>
-                                <button type="button" data-action="image" aria-label="Insert image" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Image</button>
-                                <button type="button" data-action="media" aria-label="Insert media" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Media</button>
-                                <button type="button" data-action="code" aria-label="Insert code" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Code</button>
-                                <button type="button" data-action="fullscreen" aria-label="Fullscreen" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Full</button>
-                            </div>
-
-                            <div
-                                class="editor-surface min-h-[18rem] bg-white px-5 py-5 text-base leading-7 text-slate-800 outline-none"
-                                data-editor-surface
-                                data-placeholder="Write the product description here..."
-                                contenteditable="true"
-                            ></div>
-
-                            <textarea class="rich-editor-input" name="description" hidden>{{ old('description') }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="text-sm leading-6 text-slate-500">
-                            Marked price is optional. If provided, it must be greater than or equal to the actual selling price.
-                        </p>
-                        <button
-                            type="submit"
-                            class="inline-flex items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
-                        >
-                            Save Product
-                        </button>
-                    </div>
-                </form>
-            </section>
+                <div class="admin-product-actions">
+                    <p>Marked price is optional. If provided, it must be greater than or equal to the actual selling price.</p>
+                    <button type="submit" class="admin-primary-pill">Save Product</button>
+                </div>
+            </form>
         </section>
     </div>
 </div>
