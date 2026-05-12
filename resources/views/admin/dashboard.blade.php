@@ -79,28 +79,9 @@
 @endphp
 
 <div class="admin-shell">
-    <aside class="admin-sidebar">
-        <a class="admin-nav-link admin-nav-link--hero is-active" href="#admin-overview">
-            <span class="admin-nav-badge">DB</span>
-            <span>Dashboard</span>
-        </a>
+    @include('admin.partials.sidebar', ['activeAdminNav' => 'dashboard'])
 
-        <div class="admin-sidebar-scroll">
-            <div class="admin-sidebar-menu">
-                <p class="admin-sidebar-label">Content Management</p>
-                <nav class="admin-sidebar-nav admin-sidebar-nav--menu">
-                    @foreach($contentNavigation as $item)
-                        <a class="admin-nav-link admin-nav-link--menu" href="{{ $item['href'] }}">
-                            <span class="admin-nav-badge">{{ $item['badge'] }}</span>
-                            <span>{{ $item['label'] }}</span>
-                        </a>
-                    @endforeach
-                </nav>
-            </div>
-        </div>
-    </aside>
-
-    <div class="admin-main">
+    <div class="admin-main admin-management-main">
         <section class="admin-hero" id="admin-overview">
             <div>
                 <span class="admin-pill">Admin Overview</span>

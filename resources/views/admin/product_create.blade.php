@@ -67,45 +67,45 @@
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
 
     <div class="admin-main admin-management-main">
-        <section class="space-y-8">
-            <div class="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-linear-to-br from-white via-slate-50 to-blue-50/70 p-8 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10">
+        <section class="space-y-6">
+            <div class="relative overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-linear-to-br from-white via-slate-50 to-blue-50/70 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.07)] sm:p-8">
                 <div class="absolute inset-y-0 right-0 hidden w-56 bg-linear-to-bl from-blue-100/50 via-cyan-100/20 to-transparent lg:block"></div>
-                <div class="relative max-w-3xl space-y-3">
-                    <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-sm font-semibold tracking-[0.24em] text-blue-700 uppercase">
+                <div class="relative max-w-3xl space-y-2">
+                    <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-[11px] font-semibold tracking-[0.22em] text-blue-700 uppercase">
                         Product Builder
                     </span>
                     <div class="space-y-2">
-                        <h1 class="text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">Add Product</h1>
-                        <p class="max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+                        <h1 class="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Add Product</h1>
+                        <p class="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
                             Fill in the product details below to add a new item.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
-                <div class="border-b border-slate-200/80 bg-slate-950 px-8 py-6 text-white sm:px-10">
+            <section class="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.07)]">
+                <div class="border-b border-slate-200/80 bg-slate-950 px-6 py-5 text-white sm:px-8">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 class="text-2xl font-bold tracking-tight">Product Details</h2>
+                            <h2 class="text-xl font-bold tracking-tight">Product Details</h2>
                             <p class="mt-1 text-sm text-slate-300">Use a clean product title, accurate pricing, and a strong description.</p>
                         </div>
                         <a
                             href="{{ route('admin.products.index') }}"
-                            class="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
+                            class="inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
                         >
                             Back to Products
                         </a>
                     </div>
                 </div>
 
-                <form class="space-y-7 px-8 py-8 sm:px-10 sm:py-10" method="post" action="{{ route('admin.products.store') }}">
+                <form class="space-y-6 px-6 py-6 sm:px-8 sm:py-8" method="post" action="{{ route('admin.products.store') }}">
                     @csrf
 
-                    <div class="space-y-3">
-                        <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="name">Product Name</label>
+                    <div class="space-y-2">
+                        <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="name">Product Name</label>
                         <input
-                            class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                             id="name"
                             type="text"
                             name="name"
@@ -115,11 +115,11 @@
                         >
                     </div>
 
-                    <div class="grid gap-7 xl:grid-cols-2">
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="price">Price (KES)</label>
+                    <div class="grid gap-6 xl:grid-cols-2">
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="price">Price (KES)</label>
                             <input
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="price"
                                 type="number"
                                 name="price"
@@ -131,10 +131,10 @@
                             >
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="compare_at_price">Marked Price (KES)</label>
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="compare_at_price">Marked Price (KES)</label>
                             <input
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="compare_at_price"
                                 type="number"
                                 name="compare_at_price"
@@ -146,11 +146,11 @@
                         </div>
                     </div>
 
-                    <div class="grid gap-7 xl:grid-cols-2">
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="stock">Quantity</label>
+                    <div class="grid gap-6 xl:grid-cols-2">
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="stock">Quantity</label>
                             <input
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="stock"
                                 type="number"
                                 name="stock"
@@ -162,10 +162,10 @@
                             >
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="image_url">Product Image URL</label>
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="image_url">Product Image URL</label>
                             <input
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="image_url"
                                 type="url"
                                 name="image_url"
@@ -175,11 +175,11 @@
                         </div>
                     </div>
 
-                    <div class="grid gap-7 xl:grid-cols-2">
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="category_id">Category</label>
+                    <div class="grid gap-6 xl:grid-cols-2">
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="category_id">Category</label>
                             <select
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="category_id"
                                 name="category_id"
                                 data-product-category
@@ -191,10 +191,10 @@
                             </select>
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="subcategory_id">Subcategory</label>
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="subcategory_id">Subcategory</label>
                             <select
-                                class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 id="subcategory_id"
                                 name="subcategory_id"
                                 data-product-subcategory
@@ -209,12 +209,12 @@
                         </div>
                     </div>
 
-                    <div class="rounded-[1.6rem] border border-dashed border-slate-300 bg-slate-50/80 p-6">
-                        <div class="grid gap-7 xl:grid-cols-2">
-                            <div class="space-y-3">
-                                <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="category_name">New Category (Optional)</label>
+                    <div class="rounded-[1.4rem] border border-dashed border-slate-300 bg-slate-50/80 p-5">
+                        <div class="grid gap-6 xl:grid-cols-2">
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="category_name">New Category (Optional)</label>
                                 <input
-                                    class="block w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                    class="block w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                     id="category_name"
                                     type="text"
                                     name="category_name"
@@ -223,10 +223,10 @@
                                 >
                             </div>
 
-                            <div class="space-y-3">
-                                <label class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase" for="meta_description">Meta Description</label>
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase" for="meta_description">Meta Description</label>
                                 <textarea
-                                    class="block min-h-36 w-full rounded-[1.4rem] border border-slate-200 bg-white px-5 py-4 text-lg leading-8 text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                    class="block min-h-32 w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base leading-7 text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                     id="meta_description"
                                     name="meta_description"
                                     rows="4"
@@ -236,11 +236,11 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3">
-                        <span class="block text-sm font-bold tracking-[0.2em] text-slate-500 uppercase">Description</span>
+                    <div class="space-y-2">
+                        <span class="block text-[11px] font-bold tracking-[0.18em] text-slate-500 uppercase">Description</span>
 
-                        <div data-rich-editor class="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
-                            <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-500">
+                        <div data-rich-editor class="overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                            <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-medium text-slate-500">
                                 <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">File</button>
                                 <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Edit</button>
                                 <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">View</button>
@@ -250,25 +250,25 @@
                                 <button type="button" class="rounded-full px-3 py-1.5 transition hover:bg-white hover:text-slate-900">Table</button>
                             </div>
 
-                            <div class="editor-toolbar flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white px-5 py-4">
-                                <button type="button" data-command="undo" aria-label="Undo" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-base font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8630;</button>
-                                <button type="button" data-command="redo" aria-label="Redo" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-base font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8631;</button>
-                                <button type="button" data-command="bold" aria-label="Bold" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">B</button>
-                                <button type="button" data-command="italic" aria-label="Italic" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl italic text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">I</button>
-                                <button type="button" data-command="justifyLeft" aria-label="Align left" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Left</button>
-                                <button type="button" data-command="justifyCenter" aria-label="Align center" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Center</button>
-                                <button type="button" data-command="justifyRight" aria-label="Align right" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Right</button>
-                                <button type="button" data-command="outdent" aria-label="Outdent" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Out</button>
-                                <button type="button" data-command="indent" aria-label="Indent" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">In</button>
-                                <button type="button" data-action="link" aria-label="Insert link" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Link</button>
-                                <button type="button" data-action="image" aria-label="Insert image" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Image</button>
-                                <button type="button" data-action="media" aria-label="Insert media" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Media</button>
-                                <button type="button" data-action="code" aria-label="Insert code" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Code</button>
-                                <button type="button" data-action="fullscreen" aria-label="Fullscreen" class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Full</button>
+                            <div class="editor-toolbar flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-3">
+                                <button type="button" data-command="undo" aria-label="Undo" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8630;</button>
+                                <button type="button" data-command="redo" aria-label="Redo" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">&#8631;</button>
+                                <button type="button" data-command="bold" aria-label="Bold" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-lg font-black text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">B</button>
+                                <button type="button" data-command="italic" aria-label="Italic" class="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-lg italic text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">I</button>
+                                <button type="button" data-command="justifyLeft" aria-label="Align left" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Left</button>
+                                <button type="button" data-command="justifyCenter" aria-label="Align center" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Center</button>
+                                <button type="button" data-command="justifyRight" aria-label="Align right" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Right</button>
+                                <button type="button" data-command="outdent" aria-label="Outdent" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Out</button>
+                                <button type="button" data-command="indent" aria-label="Indent" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">In</button>
+                                <button type="button" data-action="link" aria-label="Insert link" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Link</button>
+                                <button type="button" data-action="image" aria-label="Insert image" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Image</button>
+                                <button type="button" data-action="media" aria-label="Insert media" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Media</button>
+                                <button type="button" data-action="code" aria-label="Insert code" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Code</button>
+                                <button type="button" data-action="fullscreen" aria-label="Fullscreen" class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700">Full</button>
                             </div>
 
                             <div
-                                class="editor-surface min-h-[22rem] bg-white px-6 py-6 text-lg leading-8 text-slate-800 outline-none"
+                                class="editor-surface min-h-[18rem] bg-white px-5 py-5 text-base leading-7 text-slate-800 outline-none"
                                 data-editor-surface
                                 data-placeholder="Write the product description here..."
                                 contenteditable="true"
@@ -278,13 +278,13 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-4 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
                         <p class="text-sm leading-6 text-slate-500">
                             Marked price is optional. If provided, it must be greater than or equal to the actual selling price.
                         </p>
                         <button
                             type="submit"
-                            class="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                            class="inline-flex items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
                         >
                             Save Product
                         </button>
