@@ -143,7 +143,7 @@
                         </form>
                     @else
                         <div class="product-cta-row">
-                            <a class="product-primary-cta" href="{{ route('login') }}">Login to Buy</a>
+                            <a class="product-primary-cta" href="{{ route('login') }}">Add to Cart</a>
                             @if($whatsAppUrl)
                                 <a class="product-whatsapp-cta" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
                             @endif
@@ -166,14 +166,6 @@
                 <span class="product-availability-pill {{ $availabilityClass }}">
                     {{ $product->stock > 0 ? 'AVAILABLE IN STORE' : 'OUT OF STOCK' }}
                 </span>
-            </div>
-
-            <div class="product-store-meta">
-                <span><strong>Store:</strong> {{ $product->vendor->shop_name }}</span>
-                <span><strong>SKU:</strong> {{ $product->sku }}</span>
-                @if($product->vendor->address)
-                    <span><strong>Location:</strong> {{ $product->vendor->address }}</span>
-                @endif
             </div>
         </div>
     </section>

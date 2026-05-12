@@ -63,7 +63,7 @@ class ProductShowPageTest extends TestCase
         $response = $this->get(route('product.show', $product));
 
         $response->assertOk();
-        $response->assertSee('Login to Buy');
+        $response->assertSee('Add to Cart');
         $response->assertDontSee('name="redirect" value="checkout"', false);
     }
 
