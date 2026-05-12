@@ -63,10 +63,19 @@ a {
     align-items: center;
 }
 
+.logo {
+    display: inline-flex;
+    align-items: center;
+}
+
 .logo-main {
     font-size: 30px;
     font-weight: 800;
     letter-spacing: 1px;
+}
+
+.logo-main--single {
+    letter-spacing: 0;
 }
 
 .logo-sub {
@@ -223,6 +232,32 @@ button.danger {
 .hero-banner p {
     margin: 0;
     max-width: 560px;
+}
+
+.catalog-search-summary {
+    display: grid;
+    gap: 8px;
+    background: linear-gradient(135deg, #fff7ed, #ffffff);
+    border-color: #fed7aa;
+}
+
+.catalog-search-summary h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 2.2vw, 2.3rem);
+    line-height: 1.15;
+}
+
+.catalog-search-summary p {
+    margin: 0;
+    color: #475569;
+}
+
+.catalog-search-eyebrow {
+    color: #b45309;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
 }
 
 .product-grid {
@@ -513,8 +548,8 @@ th {
 
 .product-page-title {
     margin: 0;
-    font-size: clamp(2.1rem, 3vw, 3.45rem);
-    line-height: 1.08;
+    font-size: clamp(1.7rem, 2.4vw, 2.8rem);
+    line-height: 1.12;
     letter-spacing: -0.04em;
 }
 
@@ -596,7 +631,7 @@ th {
 .product-spec-card h2,
 .product-tab-panel h2 {
     margin: 0 0 18px;
-    font-size: 2rem;
+    font-size: clamp(1.45rem, 1.8vw, 1.85rem);
     letter-spacing: -0.03em;
 }
 
@@ -798,7 +833,7 @@ th {
     background: #fff;
     color: #0f172a;
     border: 1px solid #e2e8f0;
-    font-size: 1.05rem;
+    font-size: 0.92rem;
 }
 
 .product-tab-button.is-active {
@@ -817,20 +852,15 @@ th {
     display: block;
 }
 
-.product-detail-heading {
-    max-width: 36ch;
-    line-height: 1.18;
-}
-
 .product-description-content {
-    font-size: 1.08rem;
-    line-height: 1.9;
+    font-size: 1rem;
+    line-height: 1.8;
 }
 
 .product-description-content p,
 .product-description-content li,
 .product-reviews-empty {
-    font-size: 1.08rem;
+    font-size: 1rem;
 }
 
 .product-info-grid {
@@ -854,7 +884,7 @@ th {
 }
 
 .product-info-item strong {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: #0f172a;
 }
 
@@ -3342,7 +3372,7 @@ textarea.admin-post-builder-input {
 
 @media (max-width: 640px) {
     .product-page-title {
-        font-size: 2.2rem;
+        font-size: 1.85rem;
     }
 
     .product-gallery-card,

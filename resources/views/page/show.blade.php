@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($page->meta_title ?: $page->title) . ' | ' . config('app.name', 'Almar Market'))
+@section('title', ($page->meta_title ?: $page->title) . ' | ' . config('app.name', 'Mikrotik Kenya'))
 @section('meta_description', $pageMetaDescription)
 
 @section('content')

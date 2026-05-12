@@ -7,12 +7,14 @@ use App\Models\HomepageContent;
 use App\Models\Page;
 use App\Models\Product;
 use App\Support\ProductContent;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class StorefrontController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         $category = $request->filled('category')
             ? Category::query()->find($request->integer('category'))
@@ -21,7 +23,7 @@ class StorefrontController extends Controller
         return $this->renderCatalog($request, $category);
     }
 
-    public function showCategory(Request $request, Category $category): View
+    public function showCategory(Request $request, Category $category): View|RedirectResponse
     {
         return $this->renderCatalog($request, $category);
     }
@@ -46,7 +48,7 @@ class StorefrontController extends Controller
         ]);
     }
 
-    private function renderCatalog(Request $request, ?Category $currentCategory = null): View
+    private function renderCatalog(Request $request, ?Category $currentCategory = null): View|RedirectResponse
     {
         $categories = Category::query()
             ->whereNull('parent_id')
@@ -54,6 +56,8 @@ class StorefrontController extends Controller
             ->get();
 
         $search = trim((string) $request->query('search', ''));
+        $searchSlug = Str::slug($search);
+        $normalizedSearch = Str::lower($search);
         $productsQuery = Product::query()
             ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
             ->active();
@@ -69,11 +73,36 @@ class StorefrontController extends Controller
             $productsQuery->whereIn('category_id', $categoryIds);
         }
 
+        if ($search !== '' && !$currentCategory) {
+            $exactProduct = Product::query()
+                ->active()
+                ->where(function ($query) use ($normalizedSearch, $searchSlug): void {
+                    $query->whereRaw('LOWER(name) = ?', [$normalizedSearch])
+                        ->orWhereRaw('LOWER(sku) = ?', [$normalizedSearch]);
+
+                    if ($searchSlug !== '') {
+                        $query->orWhere('slug', $searchSlug);
+                    }
+                })
+                ->first();
+
+            if ($exactProduct) {
+                return redirect()->route('product.show', $exactProduct);
+            }
+        }
+
         if ($search !== '') {
-            $productsQuery->where(function ($query) use ($search): void {
+            $productsQuery->where(function ($query) use ($search, $searchSlug): void {
                 $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('sku', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('meta_description', 'like', '%' . $search . '%');
+                    ->orWhere('meta_description', 'like', '%' . $search . '%')
+                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery->where('name', 'like', '%' . $search . '%'))
+                    ->orWhereHas('vendor', fn ($vendorQuery) => $vendorQuery->where('shop_name', 'like', '%' . $search . '%'));
+
+                if ($searchSlug !== '') {
+                    $query->orWhere('slug', 'like', '%' . $searchSlug . '%');
+                }
             });
         }
 

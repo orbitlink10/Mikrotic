@@ -19,7 +19,6 @@
         : null;
     $availabilityLabel = $product->stock > 0 ? 'IN STOCK' : 'OUT OF STOCK';
     $availabilityClass = $product->stock > 0 ? 'is-available' : 'is-unavailable';
-    $detailHeading = trim((string) ($product->meta_description ?: ($product->name . ' in Kenya')));
     $summary = trim((string) ($product->meta_description ?: \App\Support\ProductContent::excerpt($product->description, 280)));
     $vendorPhoneDigits = preg_replace('/\D+/', '', (string) $product->vendor->phone);
     if ($vendorPhoneDigits !== '') {
@@ -35,7 +34,7 @@
         : null;
 @endphp
 
-@section('title', $product->name . ' | ' . config('app.name', 'Almar Market'))
+@section('title', $product->name . ' | ' . config('app.name', 'Mikrotik Kenya'))
 @section('meta_description', $productMetaDescription)
 
 @section('content')
@@ -187,7 +186,6 @@
         </div>
 
         <div class="product-tab-panel is-active" data-tab-panel="details" role="tabpanel">
-            <h2 class="product-detail-heading">{{ $detailHeading }}</h2>
             <div class="rich-content product-description-content">{!! $descriptionHtml !!}</div>
         </div>
 

@@ -159,8 +159,8 @@ class AdminController extends Controller
 
         return Vendor::create([
             'user_id' => $user->id,
-            'shop_name' => config('app.name', 'Almar Market') . ' Official Store',
-            'slug' => $this->uniqueSlug('vendors', config('app.name', 'Almar Market') . ' Official Store'),
+            'shop_name' => config('app.name', 'Mikrotik Kenya') . ' Official Store',
+            'slug' => $this->uniqueSlug('vendors', config('app.name', 'Mikrotik Kenya') . ' Official Store'),
             'description' => 'Products managed by the marketplace admin.',
             'phone' => $user->phone ?: 'Admin desk',
             'address' => 'Platform managed catalog',

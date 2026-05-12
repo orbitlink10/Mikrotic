@@ -85,7 +85,7 @@ SVG,
 <aside class="admin-sidebar">
     @if($showSidebarBrand)
         <div class="admin-brand-card">
-            <h2>{{ config('app.name', 'Almar Market') }}</h2>
+            <h2>{{ config('app.name', 'Mikrotik Kenya') }}</h2>
         </div>
     @endif
 
