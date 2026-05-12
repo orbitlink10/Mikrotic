@@ -592,10 +592,15 @@ th {
 
 .product-summary-copy--meta {
     max-width: none;
+    min-width: 0;
     width: 100%;
+    display: block;
+    justify-self: stretch;
     font-size: 1.1rem;
     line-height: 1.65;
     color: #64748b;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 .product-benefit-row--services {
