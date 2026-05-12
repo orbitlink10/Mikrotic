@@ -71,6 +71,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pages', [AdminController::class, 'pagesIndex'])->name('pages.index');
     Route::get('/pages/create', [AdminController::class, 'createPageForm'])->name('pages.create');
     Route::post('/pages', [AdminController::class, 'storePage'])->name('pages.store');
+    Route::get('/pages/{page}/edit', [AdminController::class, 'editPageForm'])->name('pages.edit');
+    Route::put('/pages/{page}', [AdminController::class, 'updatePage'])->name('pages.update');
+    Route::delete('/pages/{page}', [AdminController::class, 'destroyPage'])->name('pages.destroy');
     Route::get('/orders', [AdminController::class, 'ordersIndex'])->name('orders.index');
     Route::get('/invoices', [AdminController::class, 'invoicesIndex'])->name('invoices.index');
     Route::get('/vendors', [AdminController::class, 'pendingVendors'])->name('vendors.pending');

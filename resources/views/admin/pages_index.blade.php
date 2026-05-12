@@ -71,8 +71,15 @@
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >Preview</a>
-                                    <button type="button" class="admin-outline-action tone-warning">Update</button>
-                                    <button type="button" class="admin-outline-action tone-danger">Delete</button>
+                                    <a
+                                        class="admin-outline-action tone-warning"
+                                        href="{{ route('admin.pages.edit', $page) }}"
+                                    >Update</a>
+                                    <form method="post" action="{{ route('admin.pages.destroy', $page) }}" onsubmit="return confirm('Delete this page?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="admin-outline-action tone-danger">Delete</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

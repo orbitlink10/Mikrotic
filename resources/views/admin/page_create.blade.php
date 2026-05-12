@@ -5,14 +5,18 @@
 @endpush
 
 @section('content')
+@php
+    $pageToEdit = $pageToEdit ?? null;
+    $isEditingPage = $pageToEdit instanceof \App\Models\Page;
+@endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'pages'])
 
     <div class="admin-main admin-management-main">
         <section class="admin-page-head admin-page-head--product-create">
             <div>
-                <h1 class="admin-page-title">Manage Pages</h1>
-                <p class="admin-page-copy">Fill in the page details below to publish new content</p>
+                <h1 class="admin-page-title">{{ $isEditingPage ? 'Edit Page' : 'Manage Pages' }}</h1>
+                <p class="admin-page-copy">{{ $isEditingPage ? 'Update the page content below and preview it when ready' : 'Fill in the page details below to publish new content' }}</p>
             </div>
         </section>
 
@@ -23,8 +27,11 @@
                 </div>
             @endunless
 
-            <form class="admin-product-create-form" method="post" action="{{ route('admin.pages.store') }}">
+            <form class="admin-product-create-form" method="post" action="{{ $isEditingPage ? route('admin.pages.update', $pageToEdit) : route('admin.pages.store') }}">
                 @csrf
+                @if($isEditingPage)
+                    @method('PUT')
+                @endif
 
                 <div class="admin-product-field">
                     <label class="admin-product-label" for="meta_title">Meta Title</label>
@@ -33,7 +40,7 @@
                         id="meta_title"
                         type="text"
                         name="meta_title"
-                        value="{{ old('meta_title') }}"
+                        value="{{ old('meta_title', $pageToEdit?->meta_title) }}"
                         placeholder="Enter Meta Title"
                         @disabled(! $pagesStorageReady)
                         required
@@ -47,7 +54,7 @@
                         id="title"
                         type="text"
                         name="title"
-                        value="{{ old('title') }}"
+                        value="{{ old('title', $pageToEdit?->title) }}"
                         placeholder="Enter Keyword Title"
                         @disabled(! $pagesStorageReady)
                         required
@@ -61,7 +68,7 @@
                         id="heading_two"
                         type="text"
                         name="heading_two"
-                        value="{{ old('heading_two') }}"
+                        value="{{ old('heading_two', $pageToEdit?->heading_two) }}"
                         placeholder="Enter Heading 2"
                         @disabled(! $pagesStorageReady)
                         required
@@ -71,8 +78,8 @@
                 <div class="admin-product-field">
                     <label class="admin-product-label" for="type">Type</label>
                     <select class="admin-product-input admin-product-select" id="type" name="type" @disabled(! $pagesStorageReady) required>
-                        <option value="post" @selected(old('type', 'post') === 'post')>Post</option>
-                        <option value="page" @selected(old('type') === 'page')>Page</option>
+                        <option value="post" @selected(old('type', $pageToEdit?->type ?? 'post') === 'post')>Post</option>
+                        <option value="page" @selected(old('type', $pageToEdit?->type) === 'page')>Page</option>
                     </select>
                 </div>
 
@@ -86,7 +93,7 @@
                         placeholder="Write a short search-friendly summary"
                         @disabled(! $pagesStorageReady)
                         required
-                    >{{ old('meta_description') }}</textarea>
+                    >{{ old('meta_description', $pageToEdit?->meta_description) }}</textarea>
                 </div>
 
                 <div class="admin-product-field">
@@ -216,7 +223,7 @@
                             contenteditable="{{ $pagesStorageReady ? 'true' : 'false' }}"
                         ></div>
 
-                        <textarea class="rich-editor-input" name="body" hidden @disabled(! $pagesStorageReady)>{{ old('body') }}</textarea>
+                        <textarea class="rich-editor-input" name="body" hidden @disabled(! $pagesStorageReady)>{{ old('body', $pageToEdit?->body) }}</textarea>
                     </div>
                 </div>
 
@@ -229,7 +236,7 @@
                             id="slug"
                             type="text"
                             name="slug"
-                            value="{{ old('slug') }}"
+                            value="{{ old('slug', $pageToEdit?->slug) }}"
                             placeholder="leave blank to generate automatically"
                             @disabled(! $pagesStorageReady)
                         >
@@ -240,7 +247,7 @@
                             id="image_url"
                             type="url"
                             name="image_url"
-                            value="{{ old('image_url') }}"
+                            value="{{ old('image_url', $pageToEdit?->image_url) }}"
                             placeholder="Enter image URL"
                             @disabled(! $pagesStorageReady)
                         >
@@ -251,7 +258,7 @@
                             id="alt_text"
                             type="text"
                             name="alt_text"
-                            value="{{ old('alt_text') }}"
+                            value="{{ old('alt_text', $pageToEdit?->alt_text) }}"
                             placeholder="Describe the image for accessibility"
                             @disabled(! $pagesStorageReady)
                         >
@@ -261,7 +268,17 @@
 
                 <div class="admin-product-actions">
                     <p>Choose <strong>Post</strong> for blog-style content or <strong>Page</strong> for evergreen site content.</p>
-                    <button type="submit" class="admin-primary-pill" @disabled(! $pagesStorageReady)>Save Page</button>
+                    <div class="admin-actions-inline">
+                        @if($isEditingPage)
+                            <a
+                                class="admin-secondary-pill"
+                                href="{{ route('pages.show', ['page' => $pageToEdit->slug]) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Preview</a>
+                        @endif
+                        <button type="submit" class="admin-primary-pill" @disabled(! $pagesStorageReady)>{{ $isEditingPage ? 'Update Page' : 'Save Page' }}</button>
+                    </div>
                 </div>
             </form>
         </section>

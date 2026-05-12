@@ -501,6 +501,47 @@ class AdminController extends Controller
     {
         return view('admin.page_create', [
             'pagesStorageReady' => Page::storageReady(),
+            'pageToEdit' => null,
+        ]);
+    }
+
+    private function validatePageData(Request $request, ?Page $page = null): array
+    {
+        return $request->validate([
+            'meta_title' => ['required', 'string', 'min:2', 'max:180'],
+            'meta_description' => ['required', 'string', 'min:10', 'max:255'],
+            'title' => ['required', 'string', 'min:2', 'max:180'],
+            'slug' => ['nullable', 'string', 'max:180', Rule::unique('pages', 'slug')->ignore($page?->id)],
+            'image_url' => ['nullable', 'url', 'max:255'],
+            'alt_text' => ['nullable', 'string', 'min:2', 'max:255', 'required_with:image_url'],
+            'heading_two' => ['required', 'string', 'min:2', 'max:180'],
+            'type' => ['required', 'in:page,post'],
+            'body' => ['required', 'string'],
+        ]);
+    }
+
+    private function persistPage(Page $page, array $data): void
+    {
+        $page->fill([
+            'meta_title' => Str::limit(trim(strip_tags($data['meta_title'])), 180, ''),
+            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description']),
+            'title' => trim($data['title']),
+            'heading_two' => Str::limit(trim(strip_tags($data['heading_two'])), 180, ''),
+            'slug' => !empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title'], $page->id),
+            'image_url' => $data['image_url'] ?? null,
+            'alt_text' => !empty($data['alt_text']) ? trim($data['alt_text']) : null,
+            'type' => $data['type'],
+            'body' => ProductContent::sanitizeRichText($data['body']),
+        ]);
+
+        $page->save();
+    }
+
+    public function editPageForm(Page $page): View
+    {
+        return view('admin.page_create', [
+            'pagesStorageReady' => Page::storageReady(),
+            'pageToEdit' => $page,
         ]);
     }
 
@@ -512,31 +553,27 @@ class AdminController extends Controller
                 ->with('error', 'Page storage is not ready yet. Run php artisan migrate to create the pages table.');
         }
 
-        $data = $request->validate([
-            'meta_title' => ['required', 'string', 'min:2', 'max:180'],
-            'meta_description' => ['required', 'string', 'min:10', 'max:255'],
-            'title' => ['required', 'string', 'min:2', 'max:180'],
-            'slug' => ['nullable', 'string', 'max:180', 'unique:pages,slug'],
-            'image_url' => ['nullable', 'url', 'max:255'],
-            'alt_text' => ['nullable', 'string', 'min:2', 'max:255', 'required_with:image_url'],
-            'heading_two' => ['required', 'string', 'min:2', 'max:180'],
-            'type' => ['required', 'in:page,post'],
-            'body' => ['required', 'string'],
-        ]);
+        $data = $this->validatePageData($request);
 
-        Page::create([
-            'meta_title' => Str::limit(trim(strip_tags($data['meta_title'])), 180, ''),
-            'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description']),
-            'title' => trim($data['title']),
-            'heading_two' => Str::limit(trim(strip_tags($data['heading_two'])), 180, ''),
-            'slug' => !empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title']),
-            'image_url' => $data['image_url'] ?? null,
-            'alt_text' => !empty($data['alt_text']) ? trim($data['alt_text']) : null,
-            'type' => $data['type'],
-            'body' => ProductContent::sanitizeRichText($data['body']),
-        ]);
+        $this->persistPage(new Page(), $data);
 
         return redirect()->route('admin.pages.index')->with('success', 'Page saved successfully.');
+    }
+
+    public function updatePage(Request $request, Page $page): RedirectResponse
+    {
+        $data = $this->validatePageData($request, $page);
+
+        $this->persistPage($page, $data);
+
+        return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
+    }
+
+    public function destroyPage(Page $page): RedirectResponse
+    {
+        $page->delete();
+
+        return back()->with('success', 'Page deleted successfully.');
     }
 
     public function invoicesIndex(): View

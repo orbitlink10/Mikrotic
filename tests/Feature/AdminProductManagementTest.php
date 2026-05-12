@@ -468,6 +468,108 @@ class AdminProductManagementTest extends TestCase
         $this->assertSame('<p>Support content</p><pre><code>safe code</code></pre>', $page->body);
     }
 
+    public function test_admin_pages_index_renders_working_preview_update_and_delete_actions(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $page = Page::create([
+            'meta_title' => 'Preview Meta Title',
+            'meta_description' => 'Preview page meta description.',
+            'title' => 'Preview Page',
+            'heading_two' => 'Preview Section',
+            'slug' => 'preview-page',
+            'type' => 'post',
+            'alt_text' => 'Preview page image',
+            'body' => '<p>Preview body content.</p>',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/pages');
+
+        $response->assertOk();
+        $response->assertSee(route('pages.show', ['page' => $page->slug]), false);
+        $response->assertSee(route('admin.pages.edit', $page), false);
+        $response->assertSee(route('admin.pages.destroy', $page), false);
+    }
+
+    public function test_admin_can_update_page_from_admin_editor(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $page = Page::create([
+            'meta_title' => 'Original Meta Title',
+            'meta_description' => 'Original page meta description.',
+            'title' => 'Original Page',
+            'heading_two' => 'Original Section',
+            'slug' => 'original-page',
+            'type' => 'post',
+            'image_url' => 'https://example.com/original.jpg',
+            'alt_text' => 'Original image',
+            'body' => '<p>Original body content.</p>',
+        ]);
+
+        $response = $this->actingAs($admin)->put(route('admin.pages.update', $page), [
+            'meta_title' => 'Updated Meta Title',
+            'meta_description' => 'Updated page meta description for search.',
+            'title' => 'Updated Support Page',
+            'heading_two' => 'Updated Section',
+            'slug' => '',
+            'type' => 'page',
+            'image_url' => 'https://example.com/updated.jpg',
+            'alt_text' => 'Updated image',
+            'body' => '<p>Updated body content.</p><script>alert(1)</script>',
+        ]);
+
+        $response->assertRedirect('/admin/pages');
+        $response->assertSessionHas('success', 'Page updated successfully.');
+
+        $page->refresh();
+
+        $this->assertSame('Updated Meta Title', $page->meta_title);
+        $this->assertSame('Updated page meta description for search.', $page->meta_description);
+        $this->assertSame('Updated Support Page', $page->title);
+        $this->assertSame('Updated Section', $page->heading_two);
+        $this->assertSame('updated-support-page', $page->slug);
+        $this->assertSame('page', $page->type);
+        $this->assertSame('https://example.com/updated.jpg', $page->image_url);
+        $this->assertSame('Updated image', $page->alt_text);
+        $this->assertSame('<p>Updated body content.</p>', $page->body);
+    }
+
+    public function test_admin_can_delete_page_from_admin_pages_index(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $page = Page::create([
+            'meta_title' => 'Delete Meta Title',
+            'meta_description' => 'Delete page meta description.',
+            'title' => 'Delete Page',
+            'heading_two' => 'Delete Section',
+            'slug' => 'delete-page',
+            'type' => 'post',
+            'body' => '<p>Delete body content.</p>',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from('/admin/pages')
+            ->delete(route('admin.pages.destroy', $page));
+
+        $response->assertRedirect('/admin/pages');
+        $response->assertSessionHas('success', 'Page deleted successfully.');
+        $this->assertDatabaseMissing('pages', ['id' => $page->id]);
+    }
+
     public function test_admin_page_preview_links_to_public_page_view(): void
     {
         $admin = User::factory()->create([
