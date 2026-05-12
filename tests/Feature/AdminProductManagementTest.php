@@ -173,9 +173,13 @@ class AdminProductManagementTest extends TestCase
         $response->assertSee('Marked Price (KES)');
         $response->assertSee('Subcategory');
         $response->assertSee('Description');
+        $response->assertSee('Heading 1');
+        $response->assertSee('Heading 6');
+        $response->assertSee('Strikethrough');
+        $response->assertSee('Align center');
     }
 
-    public function test_admin_products_index_renders_working_update_and_delete_actions(): void
+    public function test_admin_products_index_renders_working_preview_update_and_delete_actions(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
@@ -214,8 +218,10 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/products');
 
         $response->assertOk();
+        $response->assertSee(route('product.show', $product), false);
         $response->assertSee(route('admin.products.edit', $product), false);
         $response->assertSee(route('admin.products.destroy', $product), false);
+        $response->assertDontSee('Slug');
     }
 
     public function test_admin_page_create_page_displays_requested_post_fields(): void

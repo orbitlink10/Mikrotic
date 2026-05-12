@@ -98,7 +98,72 @@
                             <button type="button" class="admin-product-editor-menu-button">Edit</button>
                             <button type="button" class="admin-product-editor-menu-button">View</button>
                             <button type="button" class="admin-product-editor-menu-button">Insert</button>
-                            <button type="button" class="admin-product-editor-menu-button">Format</button>
+                            <div class="admin-product-editor-menu-group" data-editor-menu>
+                                <button
+                                    type="button"
+                                    class="admin-product-editor-menu-button"
+                                    data-menu-trigger
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                >Format</button>
+                                <div class="admin-product-editor-dropdown" data-menu-panel hidden>
+                                    <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="bold">
+                                        <span>Bold</span>
+                                        <span class="admin-product-editor-shortcut">Ctrl+B</span>
+                                    </button>
+                                    <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="italic">
+                                        <span>Italic</span>
+                                        <span class="admin-product-editor-shortcut">Ctrl+I</span>
+                                    </button>
+                                    <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="underline">
+                                        <span>Underline</span>
+                                        <span class="admin-product-editor-shortcut">Ctrl+U</span>
+                                    </button>
+                                    <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="strikeThrough">
+                                        <span>Strikethrough</span>
+                                    </button>
+                                    <div class="admin-product-editor-dropdown-divider"></div>
+                                    <div class="admin-product-editor-menu-group admin-product-editor-menu-group--submenu" data-editor-submenu>
+                                        <button
+                                            type="button"
+                                            class="admin-product-editor-dropdown-item"
+                                            data-submenu-trigger
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                        >
+                                            <span>Headings</span>
+                                            <span class="admin-product-editor-caret">›</span>
+                                        </button>
+                                        <div class="admin-product-editor-dropdown admin-product-editor-dropdown--submenu" data-submenu-panel hidden>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H1">Heading 1</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H2">Heading 2</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H3">Heading 3</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H4">Heading 4</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H5">Heading 5</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="H6">Heading 6</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-format-block="P">Paragraph</button>
+                                        </div>
+                                    </div>
+                                    <div class="admin-product-editor-menu-group admin-product-editor-menu-group--submenu" data-editor-submenu>
+                                        <button
+                                            type="button"
+                                            class="admin-product-editor-dropdown-item"
+                                            data-submenu-trigger
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                        >
+                                            <span>Align</span>
+                                            <span class="admin-product-editor-caret">›</span>
+                                        </button>
+                                        <div class="admin-product-editor-dropdown admin-product-editor-dropdown--submenu" data-submenu-panel hidden>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="justifyLeft">Align left</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="justifyCenter">Align center</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="justifyRight">Align right</button>
+                                            <button type="button" class="admin-product-editor-dropdown-item" data-menu-command="justifyFull">Justify</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <button type="button" class="admin-product-editor-menu-button">Tools</button>
                             <button type="button" class="admin-product-editor-menu-button">Table</button>
                         </div>

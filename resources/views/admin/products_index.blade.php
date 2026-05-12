@@ -29,7 +29,6 @@
                         <th>#</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Slug</th>
                         <th>Price (KES)</th>
                         <th>Google Merchant</th>
                         <th>Category</th>
@@ -49,12 +48,17 @@
                                 @endif
                             </td>
                             <td>{{ $product->name }}</td>
-                            <td>{{ $product->slug }}</td>
                             <td>{{ number_format((float) $product->price, 2) }}</td>
                             <td>No</td>
                             <td>{{ $product->category?->name ?? 'General' }}</td>
                             <td>
                                 <div class="admin-action-stack">
+                                    <a
+                                        class="admin-outline-action tone-info"
+                                        href="{{ route('product.show', $product) }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >Preview</a>
                                     <a class="admin-outline-action tone-primary" href="{{ route('admin.products.edit', $product) }}">Update</a>
                                     <form method="post" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Delete this product?');">
                                         @csrf
@@ -66,7 +70,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="admin-empty-cell">No products found.</td>
+                            <td colspan="7" class="admin-empty-cell">No products found.</td>
                         </tr>
                     @endforelse
                     </tbody>
