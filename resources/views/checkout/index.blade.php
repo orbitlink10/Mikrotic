@@ -23,7 +23,7 @@
             Address
             <textarea name="shipping_address" required>{{ old('shipping_address') }}</textarea>
         </label>
-        <button type="submit">Place Order</button>
+        <button type="submit" class="checkout-submit-button">Place Order</button>
     </form>
 </section>
 @endsection
