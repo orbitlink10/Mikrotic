@@ -136,28 +136,32 @@ SVG,
                     </div>
                 </section>
 
-                <section class="home-section home-section--testimonials">
-                    <div class="home-section-head">
-                        @if($homepageContent->testimonialsBadge())
-                            <p class="home-section-kicker">{{ $homepageContent->testimonialsBadge() }}</p>
-                        @endif
-                        <h2>{{ $homepageContent->testimonialsTitle() }}</h2>
-                        @if($homepageContent->testimonialsIntro())
-                            <p>{{ $homepageContent->testimonialsIntro() }}</p>
-                        @endif
-                    </div>
+                @if($testimonials->isNotEmpty())
+                    <section class="home-section home-section--testimonials">
+                        <div class="home-section-head">
+                            @if($homepageContent->testimonialsBadge())
+                                <p class="home-section-kicker">{{ $homepageContent->testimonialsBadge() }}</p>
+                            @endif
+                            <h2>{{ $homepageContent->testimonialsTitle() }}</h2>
+                            @if($homepageContent->testimonialsIntro())
+                                <p>{{ $homepageContent->testimonialsIntro() }}</p>
+                            @endif
+                        </div>
 
-                    <div class="testimonial-grid">
-                        @foreach($homepageContent->testimonialItems() as $item)
-                            <article class="testimonial-card">
-                                <span class="testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
-                                <p class="testimonial-quote">{{ $item['quote'] }}</p>
-                                <h3>{{ $item['name'] }}</h3>
-                                <p class="testimonial-role">{{ $item['role'] }}</p>
-                            </article>
-                        @endforeach
-                    </div>
-                </section>
+                        <div class="testimonial-grid">
+                            @foreach($testimonials as $testimonial)
+                                @php($rating = max(1, min(5, (int) $testimonial->rating)))
+                                <article class="testimonial-card">
+                                    <span class="testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
+                                    <div class="testimonial-stars" aria-label="{{ $rating }} out of 5 stars">{{ str_repeat('★', $rating) }}</div>
+                                    <p class="testimonial-quote">{{ $testimonial->quote }}</p>
+                                    <h3>{{ $testimonial->name }}</h3>
+                                    <p class="testimonial-role">{{ $testimonial->role }}</p>
+                                </article>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
 
                 <section class="home-section home-section--faq">
                     <div class="home-section-head">

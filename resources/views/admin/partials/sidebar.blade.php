@@ -4,6 +4,7 @@
     $adminNavItems = [
         ['id' => 'dashboard', 'label' => 'Dashboard', 'badge' => 'DB', 'href' => route('admin.dashboard')],
         ['id' => 'pages-content', 'label' => 'Homepage Content', 'badge' => 'HC', 'href' => route('admin.pages-content.edit')],
+        ['id' => 'testimonials', 'label' => 'Testimonials', 'badge' => 'TS', 'href' => route('admin.testimonials.index')],
         ['id' => 'categories', 'label' => 'Categories', 'badge' => 'CT', 'href' => route('admin.categories.index')],
         ['id' => 'subcategories', 'label' => 'Sub Categories', 'badge' => 'SC', 'href' => route('admin.subcategories.index')],
         ['id' => 'products', 'label' => 'Products', 'badge' => 'PR', 'href' => route('admin.products.index')],
@@ -27,6 +28,12 @@ SVG,
     <path d="M8 9h8"></path>
     <path d="M8 13h8"></path>
     <path d="M8 17h5"></path>
+</svg>
+SVG,
+        'testimonials' => <<<'SVG'
+<svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M9 11H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4"></path>
+    <path d="M19 11h-4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3a4 4 0 0 1-4 4"></path>
 </svg>
 SVG,
         'categories' => <<<'SVG'

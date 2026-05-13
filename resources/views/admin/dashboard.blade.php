@@ -92,6 +92,7 @@
                 <a class="button-link" href="{{ route('admin.products.create') }}">+ New Product</a>
                 <a class="button-link secondary" href="#users-insights">Manage Users</a>
                 <a class="button-link secondary" href="{{ route('admin.products.index') }}">Manage Products</a>
+                <a class="button-link secondary" href="{{ route('admin.testimonials.index') }}">Manage Testimonials</a>
             </div>
         </section>
 

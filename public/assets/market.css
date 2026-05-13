@@ -405,6 +405,13 @@ button.danger {
     font-style: italic;
 }
 
+.testimonial-stars {
+    color: #f59e0b;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
 .testimonial-role {
     margin: 0;
     color: #64748b;
@@ -3027,6 +3034,19 @@ textarea.admin-post-builder-input {
     padding: 34px 36px 38px;
 }
 
+.admin-form-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-form-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-form-grid--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .admin-product-field {
     display: grid;
     gap: 14px;
@@ -3332,6 +3352,72 @@ textarea.admin-post-builder-input {
     line-height: 1.6;
 }
 
+.admin-detail-card {
+    display: grid;
+    gap: 28px;
+}
+
+.admin-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.admin-detail-label {
+    margin: 0 0 8px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.admin-detail-title {
+    margin: 0;
+    color: #162033;
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    line-height: 1.12;
+}
+
+.admin-detail-copy {
+    margin: 0;
+    color: #233246;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.admin-rating-pill {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: #fff7ed;
+    color: #d97706;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.admin-rating-pill span {
+    letter-spacing: normal;
+}
+
+.admin-testimonial-quote {
+    margin: 0;
+    padding: 24px 26px;
+    border: 1px solid #dbe5f1;
+    border-radius: 22px;
+    background: #f8fbff;
+    color: #233246;
+    font-size: 1.06rem;
+    line-height: 1.85;
+    font-style: italic;
+}
+
 .muted {
     color: var(--muted);
 }
@@ -3494,7 +3580,10 @@ textarea.admin-post-builder-input {
     .admin-settings-subgrid,
     .admin-settings-card-grid,
     .admin-settings-card-grid--two,
-    .admin-settings-card-grid--three {
+    .admin-settings-card-grid--three,
+    .admin-form-grid--two,
+    .admin-form-grid--three,
+    .admin-detail-grid {
         grid-template-columns: 1fr;
     }
 

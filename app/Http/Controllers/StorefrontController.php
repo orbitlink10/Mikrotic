@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\HomepageContent;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\Testimonial;
 use App\Support\ProductContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -114,6 +115,7 @@ class StorefrontController extends Controller
             'products' => $products,
             'search' => $search,
             'selectedCategory' => $selectedCategory,
+            'testimonials' => Testimonial::homepageItems(),
             'currentCategory' => $currentCategory,
         ]);
     }

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -75,6 +76,7 @@ class AdminProductManagementTest extends TestCase
         $this->actingAs($admin)->get('/admin/orders')->assertOk()->assertSee('Orders');
         $this->actingAs($admin)->get('/admin/pages')->assertOk()->assertSee('Pages');
         $this->actingAs($admin)->get('/admin/pages-content')->assertOk()->assertSee('Update Homepage Content');
+        $this->actingAs($admin)->get('/admin/testimonials')->assertOk()->assertSee('Testimonials');
     }
 
     public function test_admin_category_create_page_displays_requested_fields(): void
@@ -671,10 +673,12 @@ class AdminProductManagementTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Why Choose Section');
-        $response->assertSee('Testimonials Section');
+        $response->assertDontSee('Testimonials Section');
         $response->assertSee('FAQ Section');
         $response->assertSee('Homepage Guide Content');
         $response->assertSee('Homepage Guide Title');
+        $response->assertSee('Home Page Content');
+        $response->assertSee('Format');
     }
 
     public function test_admin_can_update_homepage_content(): void
@@ -721,13 +725,6 @@ class AdminProductManagementTest extends TestCase
                 ['title' => 'Official Reseller', 'description' => 'Authentic hardware and guided setup.'],
                 ['title' => 'Nairobi Delivery', 'description' => 'Fast dispatch for urgent installations.'],
             ],
-            'testimonials_badge' => 'Testimonials',
-            'testimonials_title' => 'What Clients Say About Us',
-            'testimonials_intro' => 'Stories from homes and businesses already using the service.',
-            'testimonial_items' => [
-                ['quote' => 'Our branch office is finally stable online.', 'name' => 'Mercy W.', 'role' => 'Operations Lead'],
-                ['quote' => 'Streaming and uploads are much faster now.', 'name' => 'David M.', 'role' => 'Creator'],
-            ],
             'faq_badge' => 'FAQ',
             'faq_title' => 'Questions Before You Buy',
             'faq_intro' => 'The common things customers ask before installation.',
@@ -748,14 +745,122 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertOk();
         $homeResponse->assertSee('Why Choose Our Starlink Team?');
         $homeResponse->assertSee('Authentic hardware and guided setup.');
-        $homeResponse->assertSee('What Clients Say About Us');
-        $homeResponse->assertSee('Mercy W.');
         $homeResponse->assertSee('Questions Before You Buy');
         $homeResponse->assertSee('Do you install outside Nairobi?');
         $homeResponse->assertSee('Starlink Kenya Buying and Installation Guide');
         $homeResponse->assertSee('Installation Planning');
         $homeResponse->assertSee('Check power, roof access, and indoor Wi-Fi coverage before installation.');
         $homeResponse->assertDontSee('alert(1)');
+    }
+
+    public function test_admin_testimonials_index_displays_settings_and_list_management(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Testimonial::create([
+            'name' => 'Mary K., Nyeri',
+            'role' => 'Customer',
+            'quote' => 'We live in a rural area where internet access was inconsistent until we installed Starlink.',
+            'rating' => 5,
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/testimonials');
+
+        $response->assertOk();
+        $response->assertSee('Homepage Testimonial Settings');
+        $response->assertSee('Testimonial List');
+        $response->assertSee('+ Add Testimonial');
+        $response->assertSee('Mary K., Nyeri');
+    }
+
+    public function test_admin_can_create_update_and_delete_testimonial(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $createResponse = $this->actingAs($admin)->post('/admin/testimonials', [
+            'name' => 'James M., Techpreneur, Nairobi',
+            'role' => 'Customer',
+            'quote' => 'Our startup needed high-speed internet that would not slow the team down.',
+            'rating' => 5,
+            'sort_order' => 2,
+            'is_active' => '1',
+        ]);
+
+        $createResponse->assertRedirect('/admin/testimonials');
+        $createResponse->assertSessionHas('success', 'Testimonial added successfully.');
+
+        $testimonial = Testimonial::query()->where('name', 'James M., Techpreneur, Nairobi')->first();
+        $this->assertNotNull($testimonial);
+
+        $showResponse = $this->actingAs($admin)->get(route('admin.testimonials.show', $testimonial));
+        $showResponse->assertOk();
+        $showResponse->assertSee('Testimonial Details');
+        $showResponse->assertSee('Our startup needed high-speed internet');
+
+        $updateResponse = $this->actingAs($admin)->put(route('admin.testimonials.update', $testimonial), [
+            'name' => 'James M., Techpreneur, Nairobi',
+            'role' => 'Verified Customer',
+            'quote' => 'Our startup now runs meetings, demos, and uploads without the old delays.',
+            'rating' => 4,
+            'sort_order' => 1,
+            'is_active' => '1',
+        ]);
+
+        $updateResponse->assertRedirect('/admin/testimonials');
+        $updateResponse->assertSessionHas('success', 'Testimonial updated successfully.');
+
+        $testimonial->refresh();
+        $this->assertSame('Verified Customer', $testimonial->role);
+        $this->assertSame(4, $testimonial->rating);
+
+        $deleteResponse = $this->actingAs($admin)->delete(route('admin.testimonials.destroy', $testimonial));
+        $deleteResponse->assertRedirect();
+        $deleteResponse->assertSessionHas('success', 'Testimonial deleted successfully.');
+        $this->assertDatabaseMissing('testimonials', ['id' => $testimonial->id]);
+    }
+
+    public function test_admin_can_update_testimonial_settings_and_homepage_renders_testimonials_from_table(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        Testimonial::create([
+            'name' => 'Peter N., Turkana',
+            'role' => 'Customer',
+            'quote' => 'As an NGO operating in remote areas, communication is much easier with a stable connection.',
+            'rating' => 5,
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->post('/admin/testimonials/settings', [
+            'testimonials_badge' => 'Testimonials',
+            'testimonials_title' => 'What Clients Say About Us',
+            'testimonials_intro' => 'Stories from homes and businesses already using the service.',
+        ]);
+
+        $response->assertRedirect('/admin/testimonials');
+        $response->assertSessionHas('success', 'Testimonial section settings updated successfully.');
+
+        $homeResponse = $this->get('/');
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('What Clients Say About Us');
+        $homeResponse->assertSee('Peter N., Turkana');
+        $homeResponse->assertSee('Stories from homes and businesses already using the service.');
+        $homeResponse->assertSee('stable connection');
     }
 
     public function test_storefront_uses_default_homepage_content_when_table_is_missing(): void

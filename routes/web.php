@@ -55,6 +55,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/pages-content', [AdminController::class, 'homepageContentForm'])->name('pages-content.edit');
     Route::post('/pages-content', [AdminController::class, 'updateHomepageContent'])->name('pages-content.update');
+    Route::get('/testimonials', [AdminController::class, 'testimonialsIndex'])->name('testimonials.index');
+    Route::post('/testimonials/settings', [AdminController::class, 'updateTestimonialSettings'])->name('testimonials.settings.update');
+    Route::get('/testimonials/create', [AdminController::class, 'createTestimonialForm'])->name('testimonials.create');
+    Route::post('/testimonials', [AdminController::class, 'storeTestimonial'])->name('testimonials.store');
+    Route::get('/testimonials/{testimonial}', [AdminController::class, 'showTestimonial'])->name('testimonials.show');
+    Route::get('/testimonials/{testimonial}/edit', [AdminController::class, 'editTestimonialForm'])->name('testimonials.edit');
+    Route::put('/testimonials/{testimonial}', [AdminController::class, 'updateTestimonial'])->name('testimonials.update');
+    Route::delete('/testimonials/{testimonial}', [AdminController::class, 'destroyTestimonial'])->name('testimonials.destroy');
     Route::get('/categories', [AdminController::class, 'categoriesIndex'])->name('categories.index');
     Route::get('/categories/create', [AdminController::class, 'createCategoryForm'])->name('categories.create');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');

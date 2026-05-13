@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Testimonial;
 use App\Support\ProductContent;
 use App\Models\User;
 use App\Models\Vendor;
@@ -123,6 +124,18 @@ class AdminController extends Controller
         }
 
         return $normalized;
+    }
+
+    private function validateTestimonialData(Request $request): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'min:2', 'max:180'],
+            'role' => ['required', 'string', 'min:2', 'max:180'],
+            'quote' => ['required', 'string', 'min:12', 'max:1200'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
     }
 
     private function syncPrimaryProductImage(Product $product, ?UploadedFile $image): void
@@ -498,6 +511,50 @@ class AdminController extends Controller
         ]);
     }
 
+    public function testimonialsIndex(): View
+    {
+        $testimonialsStorageReady = Testimonial::storageReady();
+
+        return view('admin.testimonials_index', [
+            'testimonials' => $testimonialsStorageReady
+                ? Testimonial::query()->ordered()->paginate(20)
+                : new LengthAwarePaginator([], 0, 20),
+            'testimonialsStorageReady' => $testimonialsStorageReady,
+            'homepageContent' => HomepageContent::current(),
+            'homepageContentStorageReady' => HomepageContent::storageReady(),
+        ]);
+    }
+
+    public function updateTestimonialSettings(Request $request): RedirectResponse
+    {
+        if (!HomepageContent::storageReady()) {
+            return redirect()
+                ->route('admin.testimonials.index')
+                ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
+        }
+
+        $data = $request->validate([
+            'testimonials_badge' => ['nullable', 'string', 'max:120'],
+            'testimonials_title' => ['required', 'string', 'min:4', 'max:180'],
+            'testimonials_intro' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $homepageContent = HomepageContent::query()->firstOrNew([
+            'site_key' => HomepageContent::DEFAULT_SITE_KEY,
+        ]);
+        $baseline = HomepageContent::current();
+
+        $homepageContent->hero_title = $homepageContent->hero_title ?: $baseline->hero_title;
+        $homepageContent->hero_description = $homepageContent->hero_description ?: $baseline->hero_description;
+        $homepageContent->testimonials_badge = $this->normalizeHomepageText($data['testimonials_badge'] ?? null, 120);
+        $homepageContent->testimonials_title = $this->normalizeHomepageText($data['testimonials_title'] ?? null, 180)
+            ?: $baseline->testimonialsTitle();
+        $homepageContent->testimonials_intro = $this->normalizeHomepageText($data['testimonials_intro'] ?? null, 500);
+        $homepageContent->save();
+
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial section settings updated successfully.');
+    }
+
     public function updateHomepageContent(Request $request): RedirectResponse
     {
         if (!HomepageContent::storageReady()) {
@@ -605,6 +662,74 @@ class AdminController extends Controller
         $homepageContent->save();
 
         return redirect()->route('admin.pages-content.edit')->with('success', 'Homepage content updated successfully.');
+    }
+
+    public function createTestimonialForm(): View
+    {
+        return view('admin.testimonial_create', [
+            'testimonialsStorageReady' => Testimonial::storageReady(),
+            'testimonialToEdit' => null,
+        ]);
+    }
+
+    public function storeTestimonial(Request $request): RedirectResponse
+    {
+        if (!Testimonial::storageReady()) {
+            return redirect()
+                ->route('admin.testimonials.index')
+                ->with('error', 'Testimonial storage is not ready yet. Run php artisan migrate to create the testimonials table.');
+        }
+
+        $data = $this->validateTestimonialData($request);
+
+        Testimonial::create([
+            'name' => trim($data['name']),
+            'role' => trim($data['role']),
+            'quote' => trim($data['quote']),
+            'rating' => (int) $data['rating'],
+            'sort_order' => (int) ($data['sort_order'] ?? 0),
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial added successfully.');
+    }
+
+    public function showTestimonial(Testimonial $testimonial): View
+    {
+        return view('admin.testimonial_show', [
+            'testimonial' => $testimonial,
+        ]);
+    }
+
+    public function editTestimonialForm(Testimonial $testimonial): View
+    {
+        return view('admin.testimonial_create', [
+            'testimonialsStorageReady' => Testimonial::storageReady(),
+            'testimonialToEdit' => $testimonial,
+        ]);
+    }
+
+    public function updateTestimonial(Request $request, Testimonial $testimonial): RedirectResponse
+    {
+        $data = $this->validateTestimonialData($request);
+
+        $testimonial->update([
+            'name' => trim($data['name']),
+            'role' => trim($data['role']),
+            'quote' => trim($data['quote']),
+            'rating' => (int) $data['rating'],
+            'sort_order' => (int) ($data['sort_order'] ?? 0),
+            'is_active' => $request->boolean('is_active', false),
+        ]);
+
+        return redirect()->route('admin.testimonials.index')->with('success', 'Testimonial updated successfully.');
+    }
+
+    public function destroyTestimonial(Testimonial $testimonial): RedirectResponse
+    {
+        $testimonial->delete();
+
+        return back()->with('success', 'Testimonial deleted successfully.');
     }
 
     public function createPageForm(): View

@@ -1,8 +1,11 @@
 @extends('admin.layout')
 
+@push('head')
+    <script src="{{ asset('assets/product-editor.js') }}" defer></script>
+@endpush
+
 @php
     $whyChooseItems = old('why_choose_items', $homepageContent->whyChooseItems());
-    $testimonialItems = old('testimonial_items', $homepageContent->testimonialItems());
     $faqItems = old('faq_items', $homepageContent->faqItems());
 @endphp
 
@@ -149,95 +152,8 @@
 
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
-                        <h2 class="admin-settings-group-title">Testimonials Section</h2>
-                        <p class="admin-settings-help">Customer quotes shown after the Why Choose section.</p>
-                    </div>
-
-                    <div class="admin-settings-subgrid">
-                        <div class="admin-settings-field">
-                            <label class="admin-settings-label" for="testimonials_badge">Testimonials Badge</label>
-                            <input
-                                class="admin-settings-input"
-                                id="testimonials_badge"
-                                type="text"
-                                name="testimonials_badge"
-                                value="{{ old('testimonials_badge', $homepageContent->testimonialsBadge()) }}"
-                                @disabled(! $homepageContentStorageReady)
-                            >
-                        </div>
-
-                        <div class="admin-settings-field">
-                            <label class="admin-settings-label" for="testimonials_title">Testimonials Title</label>
-                            <input
-                                class="admin-settings-input"
-                                id="testimonials_title"
-                                type="text"
-                                name="testimonials_title"
-                                value="{{ old('testimonials_title', $homepageContent->testimonialsTitle()) }}"
-                                @disabled(! $homepageContentStorageReady)
-                            >
-                        </div>
-                    </div>
-
-                    <div class="admin-settings-field">
-                        <label class="admin-settings-label" for="testimonials_intro">Testimonials Intro</label>
-                        <textarea
-                            class="admin-settings-textarea"
-                            id="testimonials_intro"
-                            name="testimonials_intro"
-                            rows="3"
-                            @disabled(! $homepageContentStorageReady)
-                        >{{ old('testimonials_intro', $homepageContent->testimonialsIntro()) }}</textarea>
-                    </div>
-
-                    <div class="admin-settings-card-grid admin-settings-card-grid--three">
-                        @foreach($testimonialItems as $index => $item)
-                            <div class="admin-settings-repeater-card">
-                                <h3 class="admin-settings-repeater-title">Testimonial {{ $index + 1 }}</h3>
-
-                                <div class="admin-settings-field">
-                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_quote">Quote</label>
-                                    <textarea
-                                        class="admin-settings-textarea"
-                                        id="testimonial_items_{{ $index }}_quote"
-                                        name="testimonial_items[{{ $index }}][quote]"
-                                        rows="5"
-                                        @disabled(! $homepageContentStorageReady)
-                                    >{{ $item['quote'] ?? '' }}</textarea>
-                                </div>
-
-                                <div class="admin-settings-field">
-                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_name">Customer Name</label>
-                                    <input
-                                        class="admin-settings-input"
-                                        id="testimonial_items_{{ $index }}_name"
-                                        type="text"
-                                        name="testimonial_items[{{ $index }}][name]"
-                                        value="{{ $item['name'] ?? '' }}"
-                                        @disabled(! $homepageContentStorageReady)
-                                    >
-                                </div>
-
-                                <div class="admin-settings-field">
-                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_role">Customer Role</label>
-                                    <input
-                                        class="admin-settings-input"
-                                        id="testimonial_items_{{ $index }}_role"
-                                        type="text"
-                                        name="testimonial_items[{{ $index }}][role]"
-                                        value="{{ $item['role'] ?? '' }}"
-                                        @disabled(! $homepageContentStorageReady)
-                                    >
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-
-                <section class="admin-settings-group">
-                    <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">FAQ Section</h2>
-                        <p class="admin-settings-help">Frequently asked questions that appear below testimonials.</p>
+                        <p class="admin-settings-help">Frequently asked questions that appear below the testimonial section.</p>
                     </div>
 
                     <div class="admin-settings-subgrid">
@@ -353,15 +269,14 @@
                     </div>
 
                     <div class="admin-settings-field">
-                        <label class="admin-settings-label" for="content_body">Guide Body</label>
-                        <textarea
-                            class="admin-settings-textarea admin-settings-textarea--large"
-                            id="content_body"
-                            name="content_body"
-                            rows="12"
-                            @disabled(! $homepageContentStorageReady)
-                        >{{ old('content_body', $homepageContent->contentBody()) }}</textarea>
-                        <p class="admin-settings-help">Supported HTML tags include <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, and <code>&lt;li&gt;</code>.</p>
+                        <span class="admin-settings-label">Home Page Content</span>
+                        @include('admin.partials.rich_editor', [
+                            'name' => 'content_body',
+                            'value' => old('content_body', $homepageContent->contentBody()),
+                            'placeholder' => 'Write the homepage content here...',
+                            'disabled' => ! $homepageContentStorageReady,
+                        ])
+                        <p class="admin-settings-help">Use headings, paragraphs, lists, links, images, and formatting tools directly in the editor.</p>
                     </div>
                 </section>
 
