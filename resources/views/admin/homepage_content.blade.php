@@ -1,5 +1,11 @@
 @extends('admin.layout')
 
+@php
+    $whyChooseItems = old('why_choose_items', $homepageContent->whyChooseItems());
+    $testimonialItems = old('testimonial_items', $homepageContent->testimonialItems());
+    $faqItems = old('faq_items', $homepageContent->faqItems());
+@endphp
+
 @section('content')
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'pages-content'])
@@ -29,49 +35,335 @@
             <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}" enctype="multipart/form-data">
                 @csrf
 
-                <div class="admin-settings-field">
-                    <label class="admin-settings-label" for="hero_title">Hero Header Title</label>
-                    <input
-                        class="admin-settings-input"
-                        id="hero_title"
-                        type="text"
-                        name="hero_title"
-                        value="{{ old('hero_title', $homepageContent->hero_title) }}"
-                        @disabled(! $homepageContentStorageReady)
-                        required
-                    >
-                </div>
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Hero Section</h2>
+                        <p class="admin-settings-help">Main heading and image shown at the top of the homepage.</p>
+                    </div>
 
-                <div class="admin-settings-field">
-                    <label class="admin-settings-label" for="hero_description">Hero Header Description</label>
-                    <textarea
-                        class="admin-settings-textarea"
-                        id="hero_description"
-                        name="hero_description"
-                        rows="3"
-                        @disabled(! $homepageContentStorageReady)
-                        required
-                    >{{ old('hero_description', $homepageContent->hero_description) }}</textarea>
-                </div>
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="hero_title">Hero Header Title</label>
+                        <input
+                            class="admin-settings-input"
+                            id="hero_title"
+                            type="text"
+                            name="hero_title"
+                            value="{{ old('hero_title', $homepageContent->hero_title) }}"
+                            @disabled(! $homepageContentStorageReady)
+                            required
+                        >
+                    </div>
 
-                <div class="admin-settings-field">
-                    <label class="admin-settings-label" for="hero_image">Hero Image (1280 x 720)</label>
-                    <input
-                        class="admin-settings-file"
-                        id="hero_image"
-                        type="file"
-                        name="hero_image"
-                        accept=".jpg,.jpeg,.png,.webp,image/*"
-                        @disabled(! $homepageContentStorageReady)
-                    >
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="hero_description">Hero Header Description</label>
+                        <textarea
+                            class="admin-settings-textarea"
+                            id="hero_description"
+                            name="hero_description"
+                            rows="3"
+                            @disabled(! $homepageContentStorageReady)
+                            required
+                        >{{ old('hero_description', $homepageContent->hero_description) }}</textarea>
+                    </div>
 
-                    @if($homepageContent->heroImageUrl())
-                        <div class="admin-settings-preview">
-                            <p class="admin-settings-help">Current hero image</p>
-                            <img src="{{ $homepageContent->heroImageUrl() }}" alt="Current homepage hero image">
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="hero_image">Hero Image (1280 x 720)</label>
+                        <input
+                            class="admin-settings-file"
+                            id="hero_image"
+                            type="file"
+                            name="hero_image"
+                            accept=".jpg,.jpeg,.png,.webp,image/*"
+                            @disabled(! $homepageContentStorageReady)
+                        >
+
+                        @if($homepageContent->heroImageUrl())
+                            <div class="admin-settings-preview">
+                                <p class="admin-settings-help">Current hero image</p>
+                                <img src="{{ $homepageContent->heroImageUrl() }}" alt="Current homepage hero image">
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Why Choose Section</h2>
+                        <p class="admin-settings-help">Cards that appear below the products on the main homepage.</p>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="why_choose_title">Why Choose Title</label>
+                        <input
+                            class="admin-settings-input"
+                            id="why_choose_title"
+                            type="text"
+                            name="why_choose_title"
+                            value="{{ old('why_choose_title', $homepageContent->whyChooseTitle()) }}"
+                            @disabled(! $homepageContentStorageReady)
+                        >
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="why_choose_intro">Why Choose Intro</label>
+                        <textarea
+                            class="admin-settings-textarea"
+                            id="why_choose_intro"
+                            name="why_choose_intro"
+                            rows="3"
+                            @disabled(! $homepageContentStorageReady)
+                        >{{ old('why_choose_intro', $homepageContent->whyChooseIntro()) }}</textarea>
+                    </div>
+
+                    <div class="admin-settings-card-grid">
+                        @foreach($whyChooseItems as $index => $item)
+                            <div class="admin-settings-repeater-card">
+                                <h3 class="admin-settings-repeater-title">Benefit {{ $index + 1 }}</h3>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="why_choose_items_{{ $index }}_title">Card Title</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="why_choose_items_{{ $index }}_title"
+                                        type="text"
+                                        name="why_choose_items[{{ $index }}][title]"
+                                        value="{{ $item['title'] ?? '' }}"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="why_choose_items_{{ $index }}_description">Card Description</label>
+                                    <textarea
+                                        class="admin-settings-textarea"
+                                        id="why_choose_items_{{ $index }}_description"
+                                        name="why_choose_items[{{ $index }}][description]"
+                                        rows="3"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >{{ $item['description'] ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Testimonials Section</h2>
+                        <p class="admin-settings-help">Customer quotes shown after the Why Choose section.</p>
+                    </div>
+
+                    <div class="admin-settings-subgrid">
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="testimonials_badge">Testimonials Badge</label>
+                            <input
+                                class="admin-settings-input"
+                                id="testimonials_badge"
+                                type="text"
+                                name="testimonials_badge"
+                                value="{{ old('testimonials_badge', $homepageContent->testimonialsBadge()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
                         </div>
-                    @endif
-                </div>
+
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="testimonials_title">Testimonials Title</label>
+                            <input
+                                class="admin-settings-input"
+                                id="testimonials_title"
+                                type="text"
+                                name="testimonials_title"
+                                value="{{ old('testimonials_title', $homepageContent->testimonialsTitle()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="testimonials_intro">Testimonials Intro</label>
+                        <textarea
+                            class="admin-settings-textarea"
+                            id="testimonials_intro"
+                            name="testimonials_intro"
+                            rows="3"
+                            @disabled(! $homepageContentStorageReady)
+                        >{{ old('testimonials_intro', $homepageContent->testimonialsIntro()) }}</textarea>
+                    </div>
+
+                    <div class="admin-settings-card-grid admin-settings-card-grid--three">
+                        @foreach($testimonialItems as $index => $item)
+                            <div class="admin-settings-repeater-card">
+                                <h3 class="admin-settings-repeater-title">Testimonial {{ $index + 1 }}</h3>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_quote">Quote</label>
+                                    <textarea
+                                        class="admin-settings-textarea"
+                                        id="testimonial_items_{{ $index }}_quote"
+                                        name="testimonial_items[{{ $index }}][quote]"
+                                        rows="5"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >{{ $item['quote'] ?? '' }}</textarea>
+                                </div>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_name">Customer Name</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="testimonial_items_{{ $index }}_name"
+                                        type="text"
+                                        name="testimonial_items[{{ $index }}][name]"
+                                        value="{{ $item['name'] ?? '' }}"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="testimonial_items_{{ $index }}_role">Customer Role</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="testimonial_items_{{ $index }}_role"
+                                        type="text"
+                                        name="testimonial_items[{{ $index }}][role]"
+                                        value="{{ $item['role'] ?? '' }}"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">FAQ Section</h2>
+                        <p class="admin-settings-help">Frequently asked questions that appear below testimonials.</p>
+                    </div>
+
+                    <div class="admin-settings-subgrid">
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="faq_badge">FAQ Badge</label>
+                            <input
+                                class="admin-settings-input"
+                                id="faq_badge"
+                                type="text"
+                                name="faq_badge"
+                                value="{{ old('faq_badge', $homepageContent->faqBadge()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="faq_title">FAQ Title</label>
+                            <input
+                                class="admin-settings-input"
+                                id="faq_title"
+                                type="text"
+                                name="faq_title"
+                                value="{{ old('faq_title', $homepageContent->faqTitle()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="faq_intro">FAQ Intro</label>
+                        <textarea
+                            class="admin-settings-textarea"
+                            id="faq_intro"
+                            name="faq_intro"
+                            rows="3"
+                            @disabled(! $homepageContentStorageReady)
+                        >{{ old('faq_intro', $homepageContent->faqIntro()) }}</textarea>
+                    </div>
+
+                    <div class="admin-settings-card-grid admin-settings-card-grid--two">
+                        @foreach($faqItems as $index => $item)
+                            <div class="admin-settings-repeater-card">
+                                <h3 class="admin-settings-repeater-title">FAQ {{ $index + 1 }}</h3>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="faq_items_{{ $index }}_question">Question</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="faq_items_{{ $index }}_question"
+                                        type="text"
+                                        name="faq_items[{{ $index }}][question]"
+                                        value="{{ $item['question'] ?? '' }}"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="faq_items_{{ $index }}_answer">Answer</label>
+                                    <textarea
+                                        class="admin-settings-textarea"
+                                        id="faq_items_{{ $index }}_answer"
+                                        name="faq_items[{{ $index }}][answer]"
+                                        rows="4"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >{{ $item['answer'] ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Homepage Guide Content</h2>
+                        <p class="admin-settings-help">Long-form homepage copy that appears after the FAQ section.</p>
+                    </div>
+
+                    <div class="admin-settings-subgrid">
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="content_badge">Guide Badge</label>
+                            <input
+                                class="admin-settings-input"
+                                id="content_badge"
+                                type="text"
+                                name="content_badge"
+                                value="{{ old('content_badge', $homepageContent->contentBadge()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="content_title">Homepage Guide Title</label>
+                            <input
+                                class="admin-settings-input"
+                                id="content_title"
+                                type="text"
+                                name="content_title"
+                                value="{{ old('content_title', $homepageContent->contentTitle()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="content_intro">Guide Intro</label>
+                        <textarea
+                            class="admin-settings-textarea"
+                            id="content_intro"
+                            name="content_intro"
+                            rows="4"
+                            @disabled(! $homepageContentStorageReady)
+                        >{{ old('content_intro', $homepageContent->contentIntro()) }}</textarea>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="content_body">Guide Body</label>
+                        <textarea
+                            class="admin-settings-textarea admin-settings-textarea--large"
+                            id="content_body"
+                            name="content_body"
+                            rows="12"
+                            @disabled(! $homepageContentStorageReady)
+                        >{{ old('content_body', $homepageContent->contentBody()) }}</textarea>
+                        <p class="admin-settings-help">Supported HTML tags include <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, and <code>&lt;li&gt;</code>.</p>
+                    </div>
+                </section>
 
                 <div class="admin-settings-actions">
                     <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Update Homepage</button>

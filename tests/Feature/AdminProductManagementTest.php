@@ -659,6 +659,24 @@ class AdminProductManagementTest extends TestCase
         $response->assertSessionHas('error', 'Page storage is not ready yet. Run php artisan migrate to create the pages table.');
     }
 
+    public function test_admin_homepage_content_page_displays_extended_section_fields(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/pages-content');
+
+        $response->assertOk();
+        $response->assertSee('Why Choose Section');
+        $response->assertSee('Testimonials Section');
+        $response->assertSee('FAQ Section');
+        $response->assertSee('Homepage Guide Content');
+        $response->assertSee('Homepage Guide Title');
+    }
+
     public function test_admin_can_update_homepage_content(): void
     {
         $admin = User::factory()->create([
@@ -684,6 +702,60 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertOk();
         $homeResponse->assertSee('Starlink Kenya for Homes and Business');
         $homeResponse->assertSee('Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.');
+    }
+
+    public function test_admin_can_update_homepage_sections_and_render_them_on_homepage(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $response = $this->actingAs($admin)->post('/admin/pages-content', [
+            'hero_title' => 'Starlink Kenya for Homes and Business',
+            'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
+            'why_choose_title' => 'Why Choose Our Starlink Team?',
+            'why_choose_intro' => 'Everything needed to buy, install, and support Starlink in Kenya from one local team.',
+            'why_choose_items' => [
+                ['title' => 'Official Reseller', 'description' => 'Authentic hardware and guided setup.'],
+                ['title' => 'Nairobi Delivery', 'description' => 'Fast dispatch for urgent installations.'],
+            ],
+            'testimonials_badge' => 'Testimonials',
+            'testimonials_title' => 'What Clients Say About Us',
+            'testimonials_intro' => 'Stories from homes and businesses already using the service.',
+            'testimonial_items' => [
+                ['quote' => 'Our branch office is finally stable online.', 'name' => 'Mercy W.', 'role' => 'Operations Lead'],
+                ['quote' => 'Streaming and uploads are much faster now.', 'name' => 'David M.', 'role' => 'Creator'],
+            ],
+            'faq_badge' => 'FAQ',
+            'faq_title' => 'Questions Before You Buy',
+            'faq_intro' => 'The common things customers ask before installation.',
+            'faq_items' => [
+                ['question' => 'Do you install outside Nairobi?', 'answer' => 'Yes, installation support can be arranged outside Nairobi depending on the site and scope.'],
+                ['question' => 'What comes with the kit?', 'answer' => 'The kit includes the dish, router, mounting hardware, power supply, and cables.'],
+            ],
+            'content_badge' => 'Guide',
+            'content_title' => 'Starlink Kenya Buying and Installation Guide',
+            'content_intro' => 'A practical overview for buyers comparing Starlink with fiber and mobile internet in Kenya.',
+            'content_body' => '<h2>Installation Planning</h2><p>Choose a location with a clear view of the sky.</p><script>alert(1)</script><h3>Site Readiness</h3><p>Check power, roof access, and indoor Wi-Fi coverage before installation.</p>',
+        ]);
+
+        $response->assertRedirect('/admin/pages-content');
+        $response->assertSessionHas('success', 'Homepage content updated successfully.');
+
+        $homeResponse = $this->get('/');
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('Why Choose Our Starlink Team?');
+        $homeResponse->assertSee('Authentic hardware and guided setup.');
+        $homeResponse->assertSee('What Clients Say About Us');
+        $homeResponse->assertSee('Mercy W.');
+        $homeResponse->assertSee('Questions Before You Buy');
+        $homeResponse->assertSee('Do you install outside Nairobi?');
+        $homeResponse->assertSee('Starlink Kenya Buying and Installation Guide');
+        $homeResponse->assertSee('Installation Planning');
+        $homeResponse->assertSee('Check power, roof access, and indoor Wi-Fi coverage before installation.');
+        $homeResponse->assertDontSee('alert(1)');
     }
 
     public function test_storefront_uses_default_homepage_content_when_table_is_missing(): void

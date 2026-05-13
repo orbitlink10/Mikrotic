@@ -83,6 +83,48 @@ class AdminController extends Controller
         }
     }
 
+    private function normalizeHomepageText(?string $value, int $limit): ?string
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $value)) ?? '');
+
+        return $text !== '' ? Str::limit($text, $limit, '') : null;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>|null  $items
+     * @param  array<int, string>  $keys
+     * @param  array<string, int>  $limits
+     * @return array<int, array<string, string>>
+     */
+    private function normalizeHomepageItems(?array $items, array $keys, array $limits): array
+    {
+        if (!is_array($items)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $row = [];
+            foreach ($keys as $key) {
+                $text = $this->normalizeHomepageText((string) ($item[$key] ?? ''), $limits[$key] ?? 255);
+                if ($text === null) {
+                    continue 2;
+                }
+
+                $row[$key] = $text;
+            }
+
+            $normalized[] = $row;
+        }
+
+        return $normalized;
+    }
+
     private function syncPrimaryProductImage(Product $product, ?UploadedFile $image): void
     {
         if (!$image) {
@@ -468,14 +510,82 @@ class AdminController extends Controller
             'hero_title' => ['required', 'string', 'min:4', 'max:180'],
             'hero_description' => ['required', 'string', 'min:12', 'max:500'],
             'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'why_choose_title' => ['nullable', 'string', 'max:180'],
+            'why_choose_intro' => ['nullable', 'string', 'max:500'],
+            'why_choose_items' => ['nullable', 'array'],
+            'why_choose_items.*.title' => ['nullable', 'string', 'max:180'],
+            'why_choose_items.*.description' => ['nullable', 'string', 'max:255'],
+            'testimonials_badge' => ['nullable', 'string', 'max:120'],
+            'testimonials_title' => ['nullable', 'string', 'max:180'],
+            'testimonials_intro' => ['nullable', 'string', 'max:500'],
+            'testimonial_items' => ['nullable', 'array'],
+            'testimonial_items.*.quote' => ['nullable', 'string', 'max:1200'],
+            'testimonial_items.*.name' => ['nullable', 'string', 'max:180'],
+            'testimonial_items.*.role' => ['nullable', 'string', 'max:180'],
+            'faq_badge' => ['nullable', 'string', 'max:120'],
+            'faq_title' => ['nullable', 'string', 'max:180'],
+            'faq_intro' => ['nullable', 'string', 'max:500'],
+            'faq_items' => ['nullable', 'array'],
+            'faq_items.*.question' => ['nullable', 'string', 'max:220'],
+            'faq_items.*.answer' => ['nullable', 'string', 'max:1200'],
+            'content_badge' => ['nullable', 'string', 'max:120'],
+            'content_title' => ['nullable', 'string', 'max:220'],
+            'content_intro' => ['nullable', 'string', 'max:800'],
+            'content_body' => ['nullable', 'string'],
         ]);
 
         $homepageContent = HomepageContent::query()->firstOrNew([
             'site_key' => HomepageContent::DEFAULT_SITE_KEY,
         ]);
+        $baseline = $homepageContent->exists ? $homepageContent : HomepageContent::current();
 
         $homepageContent->hero_title = $data['hero_title'];
         $homepageContent->hero_description = $data['hero_description'];
+        $homepageContent->why_choose_title = $request->has('why_choose_title')
+            ? $this->normalizeHomepageText($data['why_choose_title'] ?? null, 180)
+            : $baseline->whyChooseTitle();
+        $homepageContent->why_choose_intro = $request->has('why_choose_intro')
+            ? $this->normalizeHomepageText($data['why_choose_intro'] ?? null, 500)
+            : $baseline->whyChooseIntro();
+        $homepageContent->why_choose_items = $request->has('why_choose_items')
+            ? ($this->normalizeHomepageItems($data['why_choose_items'] ?? null, ['title', 'description'], ['title' => 180, 'description' => 255]) ?: $baseline->whyChooseItems())
+            : $baseline->whyChooseItems();
+        $homepageContent->testimonials_badge = $request->has('testimonials_badge')
+            ? $this->normalizeHomepageText($data['testimonials_badge'] ?? null, 120)
+            : $baseline->testimonialsBadge();
+        $homepageContent->testimonials_title = $request->has('testimonials_title')
+            ? $this->normalizeHomepageText($data['testimonials_title'] ?? null, 180)
+            : $baseline->testimonialsTitle();
+        $homepageContent->testimonials_intro = $request->has('testimonials_intro')
+            ? $this->normalizeHomepageText($data['testimonials_intro'] ?? null, 500)
+            : $baseline->testimonialsIntro();
+        $homepageContent->testimonial_items = $request->has('testimonial_items')
+            ? ($this->normalizeHomepageItems($data['testimonial_items'] ?? null, ['quote', 'name', 'role'], ['quote' => 1200, 'name' => 180, 'role' => 180]) ?: $baseline->testimonialItems())
+            : $baseline->testimonialItems();
+        $homepageContent->faq_badge = $request->has('faq_badge')
+            ? $this->normalizeHomepageText($data['faq_badge'] ?? null, 120)
+            : $baseline->faqBadge();
+        $homepageContent->faq_title = $request->has('faq_title')
+            ? $this->normalizeHomepageText($data['faq_title'] ?? null, 180)
+            : $baseline->faqTitle();
+        $homepageContent->faq_intro = $request->has('faq_intro')
+            ? $this->normalizeHomepageText($data['faq_intro'] ?? null, 500)
+            : $baseline->faqIntro();
+        $homepageContent->faq_items = $request->has('faq_items')
+            ? ($this->normalizeHomepageItems($data['faq_items'] ?? null, ['question', 'answer'], ['question' => 220, 'answer' => 1200]) ?: $baseline->faqItems())
+            : $baseline->faqItems();
+        $homepageContent->content_badge = $request->has('content_badge')
+            ? $this->normalizeHomepageText($data['content_badge'] ?? null, 120)
+            : $baseline->contentBadge();
+        $homepageContent->content_title = $request->has('content_title')
+            ? $this->normalizeHomepageText($data['content_title'] ?? null, 220)
+            : $baseline->contentTitle();
+        $homepageContent->content_intro = $request->has('content_intro')
+            ? $this->normalizeHomepageText($data['content_intro'] ?? null, 800)
+            : $baseline->contentIntro();
+        $homepageContent->content_body = $request->has('content_body')
+            ? (ProductContent::sanitizeRichText($data['content_body'] ?? null) ?: $baseline->contentBody())
+            : $baseline->contentBody();
 
         if ($request->hasFile('hero_image')) {
             $directory = public_path('uploads/homepage-content');
