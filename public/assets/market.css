@@ -3294,6 +3294,64 @@ textarea.admin-post-builder-input {
     line-height: 1.7;
 }
 
+.admin-product-editor-surface > :first-child {
+    margin-top: 0;
+}
+
+.admin-product-editor-surface > :last-child {
+    margin-bottom: 0;
+}
+
+.admin-product-editor-surface h1,
+.admin-product-editor-surface h2,
+.admin-product-editor-surface h3,
+.admin-product-editor-surface h4,
+.admin-product-editor-surface h5,
+.admin-product-editor-surface h6 {
+    margin: 0 0 16px;
+    color: #0f172a;
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+}
+
+.admin-product-editor-surface h1 {
+    font-size: 2rem;
+}
+
+.admin-product-editor-surface h2 {
+    font-size: 1.55rem;
+}
+
+.admin-product-editor-surface h3 {
+    font-size: 1.24rem;
+}
+
+.admin-product-editor-surface h4,
+.admin-product-editor-surface h5,
+.admin-product-editor-surface h6 {
+    font-size: 1.05rem;
+}
+
+.admin-product-editor-surface p,
+.admin-product-editor-surface li {
+    margin: 0 0 16px;
+    color: #334155;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.8;
+}
+
+.admin-product-editor-surface ul,
+.admin-product-editor-surface ol {
+    margin: 0 0 16px;
+    padding-left: 22px;
+}
+
+.admin-product-editor-surface a {
+    color: var(--admin-primary);
+    text-decoration: underline;
+}
+
 .admin-product-editor-surface img {
     max-width: 100%;
     height: auto;

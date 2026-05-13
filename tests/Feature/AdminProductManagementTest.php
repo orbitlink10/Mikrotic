@@ -753,6 +753,46 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertDontSee('alert(1)');
     }
 
+    public function test_homepage_content_editor_normalizes_duplicate_title_and_intro_from_rich_body(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $title = 'Normalized Homepage Guide Title';
+        $intro = 'This introduction should only appear in the dedicated intro field.';
+
+        $response = $this->actingAs($admin)->post('/admin/pages-content', [
+            'hero_title' => 'Starlink Kenya for Homes and Business',
+            'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
+            'content_title' => $title,
+            'content_intro' => $intro,
+            'content_body' => '<h1>' . $title . '</h1><p>' . $intro . '</p><h2>Introduction</h2><p>Editable paragraph body.</p>',
+        ]);
+
+        $response->assertRedirect('/admin/pages-content');
+
+        $storedContent = HomepageContent::query()->where('site_key', HomepageContent::DEFAULT_SITE_KEY)->first();
+        $this->assertNotNull($storedContent);
+        $rawBody = (string) $storedContent->getRawOriginal('content_body');
+        $this->assertStringNotContainsString($title, $rawBody);
+        $this->assertStringNotContainsString($intro, $rawBody);
+        $this->assertStringContainsString('<h2>Introduction</h2><p>Editable paragraph body.</p>', $rawBody);
+
+        $homeResponse = $this->get('/');
+        $homeHtml = (string) $homeResponse->getContent();
+        $this->assertStringNotContainsString('<h1>' . $title . '</h1>', $homeHtml);
+        $homeResponse->assertSee('Editable paragraph body.');
+
+        $editorResponse = $this->actingAs($admin)->get('/admin/pages-content');
+        $editorHtml = (string) $editorResponse->getContent();
+        $this->assertStringNotContainsString('&lt;h1&gt;' . $title . '&lt;/h1&gt;', $editorHtml);
+        $this->assertStringNotContainsString('&lt;p&gt;' . $intro . '&lt;/p&gt;', $editorHtml);
+        $editorResponse->assertSee('Editable paragraph body.');
+    }
+
     public function test_admin_testimonials_index_displays_settings_and_list_management(): void
     {
         $admin = User::factory()->create([

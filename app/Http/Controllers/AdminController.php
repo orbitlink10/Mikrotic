@@ -640,8 +640,14 @@ class AdminController extends Controller
         $homepageContent->content_intro = $request->has('content_intro')
             ? $this->normalizeHomepageText($data['content_intro'] ?? null, 800)
             : $baseline->contentIntro();
+        $normalizedContentBody = ProductContent::sanitizeRichText($data['content_body'] ?? null);
+        $normalizedContentBody = HomepageContent::normalizeContentBodyHtml(
+            $normalizedContentBody,
+            $homepageContent->content_title,
+            $homepageContent->content_intro
+        );
         $homepageContent->content_body = $request->has('content_body')
-            ? (ProductContent::sanitizeRichText($data['content_body'] ?? null) ?: $baseline->contentBody())
+            ? ($normalizedContentBody !== '' ? $normalizedContentBody : $baseline->contentBody())
             : $baseline->contentBody();
 
         if ($request->hasFile('hero_image')) {
