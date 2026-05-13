@@ -8,7 +8,7 @@
         : route('home');
 @endphp
 
-@section('title', $articleTitle . ' | ' . config('app.name', 'Mikrotic Kenya'))
+@section('title', $articleTitle . ' | ' . config('app.name', 'Mikrotik Kenya'))
 @section('meta_description', $pageMetaDescription)
 
 @section('content')
