@@ -177,6 +177,8 @@ button.danger {
     display: grid;
     grid-template-columns: 260px 1fr;
     gap: 16px;
+    width: 100%;
+    align-items: start;
 }
 
 .category-sidebar {
@@ -212,6 +214,7 @@ button.danger {
 .home-main {
     display: grid;
     gap: 16px;
+    min-width: 0;
 }
 
 .hero-banner {
@@ -274,6 +277,9 @@ button.danger {
 
 .home-extra-sections--full-width {
     grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
 }
 
 .home-section {
@@ -484,6 +490,8 @@ button.danger {
     padding: 18px 18px 18px 0;
     border-radius: 34px;
     background: linear-gradient(135deg, #f8fafc, #fff7ed);
+    width: 100%;
+    min-width: 0;
 }
 
 .home-guide-border {
@@ -505,6 +513,9 @@ button.danger {
     box-shadow: 0 24px 54px rgba(15, 23, 42, 0.08);
     display: grid;
     gap: 28px;
+    width: calc(100% - 34px);
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .home-guide-card--body-only {
@@ -527,6 +538,8 @@ button.danger {
     color: #475569;
     font-size: 1.05rem;
     line-height: 1.85;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 .home-guide-body h2,
@@ -3677,6 +3690,7 @@ textarea.admin-post-builder-input {
     .home-guide-card {
         margin-left: 20px;
         padding: 28px 22px;
+        width: calc(100% - 20px);
     }
 
     .admin-post-builder-bar,
