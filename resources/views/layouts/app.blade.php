@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', config('app.name', 'Mikrotik Kenya'))</title>
+    <title>@yield('title', config('app.name', 'Mikrotic Kenya'))</title>
     <meta name="description" content="@yield('meta_description', 'Browse products from our multi-vendor marketplace.')">
     <link rel="stylesheet" href="{{ asset('assets/market.css') }}">
     @stack('head')
@@ -21,7 +21,7 @@
     <div class="promo-bar">Laravel Multi-Vendor Marketplace (MySQL)</div>
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
-            <span class="logo-main logo-main--single">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+            <span class="logo-main logo-main--single">{{ config('app.name', 'Mikrotic Kenya') }}</span>
         </a>
 
         <form class="search-form" method="get" action="{{ route('home') }}">
@@ -35,7 +35,7 @@
                 @if(auth()->user()->role === 'vendor')
                     <a href="{{ route('vendor.dashboard') }}">Vendor</a>
                 @elseif(auth()->user()->role === 'customer')
-                    <a href="{{ route('vendor.apply.form') }}">Sell on Mikrotik Kenya</a>
+                    <a href="{{ route('vendor.apply.form') }}">Sell on Mikrotic Kenya</a>
                 @endif
                 @if(auth()->user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}">Admin</a>
@@ -69,7 +69,7 @@
 </main>
 
 <footer class="footer">
-    <p>&copy; {{ date('Y') }} {{ config('app.name', 'Mikrotik Kenya') }}</p>
+    <p>&copy; {{ date('Y') }} {{ config('app.name', 'Mikrotic Kenya') }}</p>
 </footer>
 </body>
 </html>

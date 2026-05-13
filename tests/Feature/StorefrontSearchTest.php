@@ -48,7 +48,7 @@ class StorefrontSearchTest extends TestCase
 
         $vendor = Vendor::create([
             'user_id' => $vendorUser->id,
-            'shop_name' => 'Mikrotik Kenya Store',
+            'shop_name' => 'Mikrotic Kenya Store',
             'slug' => 'mikrotik-kenya-store',
             'description' => 'Network and routing equipment.',
             'phone' => '0712345678',

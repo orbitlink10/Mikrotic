@@ -2,8 +2,8 @@
 
 @php
     $catalogTitle = $currentCategory
-        ? $currentCategory->name . ' | ' . config('app.name', 'Mikrotik Kenya')
-        : config('app.name', 'Mikrotik Kenya');
+        ? $currentCategory->name . ' | ' . config('app.name', 'Mikrotic Kenya')
+        : config('app.name', 'Mikrotic Kenya');
     $catalogMetaDescription = $currentCategory?->meta_description
         ?: ($currentCategory ? \App\Support\ProductContent::excerpt($currentCategory->description, 160) : 'Browse products from our multi-vendor marketplace.');
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;

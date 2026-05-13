@@ -34,7 +34,7 @@
         : null;
 @endphp
 
-@section('title', $product->name . ' | ' . config('app.name', 'Mikrotik Kenya'))
+@section('title', $product->name . ' | ' . config('app.name', 'Mikrotic Kenya'))
 @section('meta_description', $productMetaDescription)
 
 @section('content')
