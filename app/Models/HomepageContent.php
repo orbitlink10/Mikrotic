@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use DOMDocument;
-use DOMNode;
 
 class HomepageContent extends Model
 {
@@ -196,79 +194,8 @@ class HomepageContent extends Model
     public function contentBody(): string
     {
         $html = trim((string) $this->content_body);
-        $html = static::normalizeContentBodyHtml($html, $this->contentTitle(), $this->contentIntro());
 
         return $html !== '' ? $html : (string) static::defaultContent()->content_body;
-    }
-
-    public static function normalizeContentBodyHtml(?string $html, ?string $title = null, ?string $intro = null): string
-    {
-        $html = trim((string) $html);
-        if ($html === '') {
-            return '';
-        }
-
-        $title = static::plainText($title);
-        $intro = static::plainText($intro);
-
-        if ($title === '' && $intro === '') {
-            return $html;
-        }
-
-        if (!class_exists(DOMDocument::class)) {
-            return $html;
-        }
-
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        libxml_use_internal_errors(true);
-        $dom->loadHTML(
-            '<?xml encoding="utf-8" ?><body>' . $html . '</body>',
-            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
-        );
-        libxml_clear_errors();
-
-        $body = $dom->getElementsByTagName('body')->item(0);
-        if (!$body) {
-            return $html;
-        }
-
-        $firstNode = static::firstMeaningfulNode($body);
-        if ($firstNode && $title !== '') {
-            if (
-                ($firstNode->nodeType === XML_TEXT_NODE && static::plainText($firstNode->textContent) === $title)
-                || (
-                    $firstNode->nodeType === XML_ELEMENT_NODE
-                    && in_array(strtolower($firstNode->nodeName), ['h1', 'h2', 'h3'], true)
-                    && static::plainText($firstNode->textContent) === $title
-                )
-            ) {
-                $body->removeChild($firstNode);
-            }
-        }
-
-        $nextNode = static::firstMeaningfulNode($body);
-        if ($nextNode && $intro !== '') {
-            if (
-                ($nextNode->nodeType === XML_TEXT_NODE && static::plainText($nextNode->textContent) === $intro)
-                || (
-                    $nextNode->nodeType === XML_ELEMENT_NODE
-                    && strtolower($nextNode->nodeName) === 'p'
-                    && static::plainText($nextNode->textContent) === $intro
-                )
-            ) {
-                $body->removeChild($nextNode);
-            }
-        }
-
-        $clean = '';
-        for ($index = 0; $index < $body->childNodes->length; $index++) {
-            $node = $body->childNodes->item($index);
-            if ($node) {
-                $clean .= $dom->saveHTML($node);
-            }
-        }
-
-        return trim($clean);
     }
 
     private function fallbackText(mixed $value, string $default): string
@@ -295,21 +222,6 @@ class HomepageContent extends Model
     private static function plainText(mixed $value): string
     {
         return trim(preg_replace('/\s+/u', ' ', strip_tags((string) $value)) ?? '');
-    }
-
-    private static function firstMeaningfulNode(DOMNode $node): ?DOMNode
-    {
-        foreach ($node->childNodes as $child) {
-            if ($child->nodeType === XML_ELEMENT_NODE) {
-                return $child;
-            }
-
-            if ($child->nodeType === XML_TEXT_NODE && static::plainText($child->textContent) !== '') {
-                return $child;
-            }
-        }
-
-        return null;
     }
 
     /**

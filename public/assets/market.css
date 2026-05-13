@@ -272,6 +272,10 @@ button.danger {
     margin-top: 6px;
 }
 
+.home-extra-sections--full-width {
+    grid-column: 1 / -1;
+}
+
 .home-section {
     display: grid;
     gap: 20px;
@@ -503,10 +507,19 @@ button.danger {
     gap: 28px;
 }
 
+.home-guide-card--body-only {
+    gap: 0;
+}
+
 .home-guide-body {
     border-top: 1px solid #edf2f7;
     padding-top: 28px;
     color: #334155;
+}
+
+.home-guide-body--standalone {
+    border-top: 0;
+    padding-top: 0;
 }
 
 .home-guide-body p,

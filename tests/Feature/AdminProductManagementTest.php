@@ -676,8 +676,8 @@ class AdminProductManagementTest extends TestCase
         $response->assertDontSee('Testimonials Section');
         $response->assertSee('FAQ Section');
         $response->assertSee('Homepage Guide Content');
-        $response->assertSee('Homepage Guide Title');
         $response->assertSee('Home Page Content');
+        $response->assertSee('Only the content written in this editor is shown on the homepage guide section.');
         $response->assertSee('Format');
     }
 
@@ -732,9 +732,6 @@ class AdminProductManagementTest extends TestCase
                 ['question' => 'Do you install outside Nairobi?', 'answer' => 'Yes, installation support can be arranged outside Nairobi depending on the site and scope.'],
                 ['question' => 'What comes with the kit?', 'answer' => 'The kit includes the dish, router, mounting hardware, power supply, and cables.'],
             ],
-            'content_badge' => 'Guide',
-            'content_title' => 'Starlink Kenya Buying and Installation Guide',
-            'content_intro' => 'A practical overview for buyers comparing Starlink with fiber and mobile internet in Kenya.',
             'content_body' => '<h2>Installation Planning</h2><p>Choose a location with a clear view of the sky.</p><script>alert(1)</script><h3>Site Readiness</h3><p>Check power, roof access, and indoor Wi-Fi coverage before installation.</p>',
         ]);
 
@@ -747,13 +744,12 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertSee('Authentic hardware and guided setup.');
         $homeResponse->assertSee('Questions Before You Buy');
         $homeResponse->assertSee('Do you install outside Nairobi?');
-        $homeResponse->assertSee('Starlink Kenya Buying and Installation Guide');
         $homeResponse->assertSee('Installation Planning');
         $homeResponse->assertSee('Check power, roof access, and indoor Wi-Fi coverage before installation.');
         $homeResponse->assertDontSee('alert(1)');
     }
 
-    public function test_homepage_content_editor_normalizes_duplicate_title_and_intro_from_rich_body(): void
+    public function test_homepage_guide_section_renders_only_the_rich_body_content(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
@@ -761,35 +757,34 @@ class AdminProductManagementTest extends TestCase
             'phone' => '0700000000',
         ]);
 
-        $title = 'Normalized Homepage Guide Title';
-        $intro = 'This introduction should only appear in the dedicated intro field.';
-
         $response = $this->actingAs($admin)->post('/admin/pages-content', [
             'hero_title' => 'Starlink Kenya for Homes and Business',
             'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
-            'content_title' => $title,
-            'content_intro' => $intro,
-            'content_body' => '<h1>' . $title . '</h1><p>' . $intro . '</p><h2>Introduction</h2><p>Editable paragraph body.</p>',
+            'content_body' => '<h2>Guide Title From Editor</h2><p>Editable paragraph body.</p>',
         ]);
 
         $response->assertRedirect('/admin/pages-content');
 
         $storedContent = HomepageContent::query()->where('site_key', HomepageContent::DEFAULT_SITE_KEY)->first();
         $this->assertNotNull($storedContent);
-        $rawBody = (string) $storedContent->getRawOriginal('content_body');
-        $this->assertStringNotContainsString($title, $rawBody);
-        $this->assertStringNotContainsString($intro, $rawBody);
-        $this->assertStringContainsString('<h2>Introduction</h2><p>Editable paragraph body.</p>', $rawBody);
+        $storedContent->update([
+            'content_badge' => 'Legacy Guide Badge',
+            'content_title' => 'Legacy Separate Guide Title',
+            'content_intro' => 'Legacy separate intro should not render on the homepage.',
+        ]);
 
         $homeResponse = $this->get('/');
-        $homeHtml = (string) $homeResponse->getContent();
-        $this->assertStringNotContainsString('<h1>' . $title . '</h1>', $homeHtml);
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('Guide Title From Editor');
         $homeResponse->assertSee('Editable paragraph body.');
+        $homeResponse->assertDontSee('Legacy Guide Badge');
+        $homeResponse->assertDontSee('Legacy Separate Guide Title');
+        $homeResponse->assertDontSee('Legacy separate intro should not render on the homepage.');
 
         $editorResponse = $this->actingAs($admin)->get('/admin/pages-content');
-        $editorHtml = (string) $editorResponse->getContent();
-        $this->assertStringNotContainsString('&lt;h1&gt;' . $title . '&lt;/h1&gt;', $editorHtml);
-        $this->assertStringNotContainsString('&lt;p&gt;' . $intro . '&lt;/p&gt;', $editorHtml);
+        $editorResponse->assertOk();
+        $editorResponse->assertDontSee('Homepage Guide Title');
+        $editorResponse->assertDontSee('Guide Badge');
         $editorResponse->assertSee('Editable paragraph body.');
     }
 

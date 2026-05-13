@@ -114,98 +114,88 @@ SVG,
                 @endif
             </div>
         @endif
+    </div>
 
-        @if($showHomepageSections)
-            <section class="home-extra-sections">
-                <section class="home-section home-section--why-choose">
+    @if($showHomepageSections)
+        <section class="home-extra-sections home-extra-sections--full-width">
+            <section class="home-section home-section--why-choose">
+                <div class="home-section-head">
+                    <h2>{{ $homepageContent->whyChooseTitle() }}</h2>
+                    @if($homepageContent->whyChooseIntro())
+                        <p>{{ $homepageContent->whyChooseIntro() }}</p>
+                    @endif
+                </div>
+
+                <div class="why-choose-grid">
+                    @foreach($homepageContent->whyChooseItems() as $item)
+                        <article class="why-choose-card">
+                            <div class="why-choose-icon">{!! $whyChooseIcons[$loop->index % count($whyChooseIcons)] !!}</div>
+                            <h3>{{ $item['title'] }}</h3>
+                            <p>{{ $item['description'] }}</p>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+
+            @if($testimonials->isNotEmpty())
+                <section class="home-section home-section--testimonials">
                     <div class="home-section-head">
-                        <h2>{{ $homepageContent->whyChooseTitle() }}</h2>
-                        @if($homepageContent->whyChooseIntro())
-                            <p>{{ $homepageContent->whyChooseIntro() }}</p>
+                        @if($homepageContent->testimonialsBadge())
+                            <p class="home-section-kicker">{{ $homepageContent->testimonialsBadge() }}</p>
+                        @endif
+                        <h2>{{ $homepageContent->testimonialsTitle() }}</h2>
+                        @if($homepageContent->testimonialsIntro())
+                            <p>{{ $homepageContent->testimonialsIntro() }}</p>
                         @endif
                     </div>
 
-                    <div class="why-choose-grid">
-                        @foreach($homepageContent->whyChooseItems() as $item)
-                            <article class="why-choose-card">
-                                <div class="why-choose-icon">{!! $whyChooseIcons[$loop->index % count($whyChooseIcons)] !!}</div>
-                                <h3>{{ $item['title'] }}</h3>
-                                <p>{{ $item['description'] }}</p>
+                    <div class="testimonial-grid">
+                        @foreach($testimonials as $testimonial)
+                            @php($rating = max(1, min(5, (int) $testimonial->rating)))
+                            <article class="testimonial-card">
+                                <span class="testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
+                                <div class="testimonial-stars" aria-label="{{ $rating }} out of 5 stars">{{ str_repeat('â˜…', $rating) }}</div>
+                                <p class="testimonial-quote">{{ $testimonial->quote }}</p>
+                                <h3>{{ $testimonial->name }}</h3>
+                                <p class="testimonial-role">{{ $testimonial->role }}</p>
                             </article>
                         @endforeach
                     </div>
                 </section>
+            @endif
 
-                @if($testimonials->isNotEmpty())
-                    <section class="home-section home-section--testimonials">
-                        <div class="home-section-head">
-                            @if($homepageContent->testimonialsBadge())
-                                <p class="home-section-kicker">{{ $homepageContent->testimonialsBadge() }}</p>
-                            @endif
-                            <h2>{{ $homepageContent->testimonialsTitle() }}</h2>
-                            @if($homepageContent->testimonialsIntro())
-                                <p>{{ $homepageContent->testimonialsIntro() }}</p>
-                            @endif
-                        </div>
+            <section class="home-section home-section--faq">
+                <div class="home-section-head">
+                    @if($homepageContent->faqBadge())
+                        <p class="home-section-kicker">{{ $homepageContent->faqBadge() }}</p>
+                    @endif
+                    <h2>{{ $homepageContent->faqTitle() }}</h2>
+                    @if($homepageContent->faqIntro())
+                        <p>{{ $homepageContent->faqIntro() }}</p>
+                    @endif
+                </div>
 
-                        <div class="testimonial-grid">
-                            @foreach($testimonials as $testimonial)
-                                @php($rating = max(1, min(5, (int) $testimonial->rating)))
-                                <article class="testimonial-card">
-                                    <span class="testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
-                                    <div class="testimonial-stars" aria-label="{{ $rating }} out of 5 stars">{{ str_repeat('★', $rating) }}</div>
-                                    <p class="testimonial-quote">{{ $testimonial->quote }}</p>
-                                    <h3>{{ $testimonial->name }}</h3>
-                                    <p class="testimonial-role">{{ $testimonial->role }}</p>
-                                </article>
-                            @endforeach
-                        </div>
-                    </section>
-                @endif
-
-                <section class="home-section home-section--faq">
-                    <div class="home-section-head">
-                        @if($homepageContent->faqBadge())
-                            <p class="home-section-kicker">{{ $homepageContent->faqBadge() }}</p>
-                        @endif
-                        <h2>{{ $homepageContent->faqTitle() }}</h2>
-                        @if($homepageContent->faqIntro())
-                            <p>{{ $homepageContent->faqIntro() }}</p>
-                        @endif
-                    </div>
-
-                    <div class="faq-list">
-                        @foreach($homepageContent->faqItems() as $item)
-                            <details class="faq-item" @if($loop->first) open @endif>
-                                <summary>{{ $item['question'] }}</summary>
-                                <p>{{ $item['answer'] }}</p>
-                            </details>
-                        @endforeach
-                    </div>
-                </section>
-
-                <section class="home-section home-section--guide">
-                    <div class="home-guide-shell">
-                        <div class="home-guide-border" aria-hidden="true"></div>
-                        <div class="home-guide-card">
-                            <div class="home-section-head home-section-head--guide">
-                                @if($homepageContent->contentBadge())
-                                    <p class="home-section-kicker">{{ $homepageContent->contentBadge() }}</p>
-                                @endif
-                                <h2>{{ $homepageContent->contentTitle() }}</h2>
-                                @if($homepageContent->contentIntro())
-                                    <p>{{ $homepageContent->contentIntro() }}</p>
-                                @endif
-                            </div>
-
-                            <div class="home-guide-body rich-content">
-                                {!! $homepageContent->contentBody() !!}
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <div class="faq-list">
+                    @foreach($homepageContent->faqItems() as $item)
+                        <details class="faq-item" @if($loop->first) open @endif>
+                            <summary>{{ $item['question'] }}</summary>
+                            <p>{{ $item['answer'] }}</p>
+                        </details>
+                    @endforeach
+                </div>
             </section>
-        @endif
-    </div>
+
+            <section class="home-section home-section--guide">
+                <div class="home-guide-shell">
+                    <div class="home-guide-border" aria-hidden="true"></div>
+                    <div class="home-guide-card home-guide-card--body-only">
+                        <div class="home-guide-body home-guide-body--standalone rich-content">
+                            {!! $homepageContent->contentBody() !!}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    @endif
 </section>
 @endsection

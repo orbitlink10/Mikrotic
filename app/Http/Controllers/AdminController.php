@@ -585,9 +585,6 @@ class AdminController extends Controller
             'faq_items' => ['nullable', 'array'],
             'faq_items.*.question' => ['nullable', 'string', 'max:220'],
             'faq_items.*.answer' => ['nullable', 'string', 'max:1200'],
-            'content_badge' => ['nullable', 'string', 'max:120'],
-            'content_title' => ['nullable', 'string', 'max:220'],
-            'content_intro' => ['nullable', 'string', 'max:800'],
             'content_body' => ['nullable', 'string'],
         ]);
 
@@ -631,21 +628,7 @@ class AdminController extends Controller
         $homepageContent->faq_items = $request->has('faq_items')
             ? ($this->normalizeHomepageItems($data['faq_items'] ?? null, ['question', 'answer'], ['question' => 220, 'answer' => 1200]) ?: $baseline->faqItems())
             : $baseline->faqItems();
-        $homepageContent->content_badge = $request->has('content_badge')
-            ? $this->normalizeHomepageText($data['content_badge'] ?? null, 120)
-            : $baseline->contentBadge();
-        $homepageContent->content_title = $request->has('content_title')
-            ? $this->normalizeHomepageText($data['content_title'] ?? null, 220)
-            : $baseline->contentTitle();
-        $homepageContent->content_intro = $request->has('content_intro')
-            ? $this->normalizeHomepageText($data['content_intro'] ?? null, 800)
-            : $baseline->contentIntro();
         $normalizedContentBody = ProductContent::sanitizeRichText($data['content_body'] ?? null);
-        $normalizedContentBody = HomepageContent::normalizeContentBodyHtml(
-            $normalizedContentBody,
-            $homepageContent->content_title,
-            $homepageContent->content_intro
-        );
         $homepageContent->content_body = $request->has('content_body')
             ? ($normalizedContentBody !== '' ? $normalizedContentBody : $baseline->contentBody())
             : $baseline->contentBody();

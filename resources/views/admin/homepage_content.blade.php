@@ -228,44 +228,7 @@
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Homepage Guide Content</h2>
-                        <p class="admin-settings-help">Long-form homepage copy that appears after the FAQ section.</p>
-                    </div>
-
-                    <div class="admin-settings-subgrid">
-                        <div class="admin-settings-field">
-                            <label class="admin-settings-label" for="content_badge">Guide Badge</label>
-                            <input
-                                class="admin-settings-input"
-                                id="content_badge"
-                                type="text"
-                                name="content_badge"
-                                value="{{ old('content_badge', $homepageContent->contentBadge()) }}"
-                                @disabled(! $homepageContentStorageReady)
-                            >
-                        </div>
-
-                        <div class="admin-settings-field">
-                            <label class="admin-settings-label" for="content_title">Homepage Guide Title</label>
-                            <input
-                                class="admin-settings-input"
-                                id="content_title"
-                                type="text"
-                                name="content_title"
-                                value="{{ old('content_title', $homepageContent->contentTitle()) }}"
-                                @disabled(! $homepageContentStorageReady)
-                            >
-                        </div>
-                    </div>
-
-                    <div class="admin-settings-field">
-                        <label class="admin-settings-label" for="content_intro">Guide Intro</label>
-                        <textarea
-                            class="admin-settings-textarea"
-                            id="content_intro"
-                            name="content_intro"
-                            rows="4"
-                            @disabled(! $homepageContentStorageReady)
-                        >{{ old('content_intro', $homepageContent->contentIntro()) }}</textarea>
+                        <p class="admin-settings-help">Only the content written in this editor is shown on the homepage guide section.</p>
                     </div>
 
                     <div class="admin-settings-field">
