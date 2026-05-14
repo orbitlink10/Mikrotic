@@ -91,9 +91,21 @@ SVG,
 
 <aside class="admin-sidebar">
     @if($showSidebarBrand)
-        <div class="admin-brand-card">
-            <h2>{{ config('app.name', 'Mikrotik Kenya') }}</h2>
-        </div>
+        <a class="admin-brand-card admin-brand-logo" href="{{ route('admin.dashboard') }}" aria-label="{{ config('app.name', 'Mikrotik Kenya') }} admin dashboard">
+            <span class="admin-brand-logo-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" focusable="false">
+                    <path class="admin-brand-logo-ring" d="M24 4 41.3 14v20L24 44 6.7 34V14L24 4Z"></path>
+                    <path d="M15 28.5c2.25-2.1 5.3-3.38 9-3.38s6.75 1.28 9 3.38"></path>
+                    <path d="M18.8 22.8a8.1 8.1 0 0 1 10.4 0"></path>
+                    <path d="M22.2 17.4a3.6 3.6 0 0 1 3.6 0"></path>
+                    <circle cx="24" cy="33" r="2.3"></circle>
+                </svg>
+            </span>
+            <span class="admin-brand-logo-text">
+                <span class="admin-brand-logo-name">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+                <span class="admin-brand-logo-kicker">Admin Panel</span>
+            </span>
+        </a>
     @endif
 
     <div class="admin-sidebar-panel">

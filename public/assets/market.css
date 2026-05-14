@@ -3845,6 +3845,72 @@ textarea.admin-post-builder-input {
     font-weight: 600;
 }
 
+.admin-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 100px;
+    color: #172033;
+}
+
+.admin-brand-logo:hover {
+    border-color: rgba(22, 119, 255, 0.28);
+    box-shadow: 0 16px 34px rgba(22, 119, 255, 0.12);
+}
+
+.admin-brand-logo-mark {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #e53946 0%, #f68b1e 54%, #1677ff 100%);
+    box-shadow: 0 14px 26px rgba(22, 119, 255, 0.18);
+}
+
+.admin-brand-logo-mark svg {
+    width: 42px;
+    height: 42px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.admin-brand-logo-mark circle {
+    fill: #fff;
+    stroke: none;
+}
+
+.admin-brand-logo-ring {
+    opacity: 0.48;
+}
+
+.admin-brand-logo-text {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.admin-brand-logo-name {
+    color: #172033;
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.admin-brand-logo-kicker {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
 .admin-sidebar-menu {
     padding: 0 2px 4px;
 }
