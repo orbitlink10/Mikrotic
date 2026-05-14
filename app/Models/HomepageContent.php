@@ -15,6 +15,7 @@ class HomepageContent extends Model
 
     protected $fillable = [
         'site_key',
+        'site_logo_path',
         'hero_title',
         'hero_description',
         'hero_image_path',
@@ -61,6 +62,7 @@ class HomepageContent extends Model
 
         foreach ([
             'site_key',
+            'site_logo_path',
             'hero_title',
             'hero_description',
             'hero_image_path',
@@ -119,6 +121,15 @@ class HomepageContent extends Model
         }
 
         return asset($this->hero_image_path);
+    }
+
+    public function siteLogoUrl(): ?string
+    {
+        if (!$this->site_logo_path) {
+            return null;
+        }
+
+        return asset($this->site_logo_path);
     }
 
     public function whyChooseTitle(): string

@@ -68,6 +68,14 @@ a {
     align-items: center;
 }
 
+.logo-image {
+    display: block;
+    width: auto;
+    max-width: 210px;
+    max-height: 58px;
+    object-fit: contain;
+}
+
 .logo-main {
     font-size: 30px;
     font-weight: 800;
@@ -1712,6 +1720,15 @@ th {
     border-radius: 16px;
     border: 1px solid #dbe3ef;
     display: block;
+}
+
+.admin-settings-preview--logo img {
+    width: auto;
+    max-width: min(260px, 100%);
+    max-height: 110px;
+    padding: 12px;
+    object-fit: contain;
+    background: #fff;
 }
 
 .admin-settings-group {
@@ -3878,6 +3895,14 @@ textarea.admin-post-builder-input {
     stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+.admin-brand-logo-mark img {
+    width: 44px;
+    height: 44px;
+    display: block;
+    object-fit: contain;
+    border-radius: 12px;
 }
 
 .admin-brand-logo-mark circle {

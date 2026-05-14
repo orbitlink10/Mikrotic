@@ -672,6 +672,7 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/pages-content');
 
         $response->assertOk();
+        $response->assertSee('Website Logo');
         $response->assertSee('Why Choose Section');
         $response->assertDontSee('Testimonials Section');
         $response->assertSee('FAQ Section');
@@ -689,23 +690,30 @@ class AdminProductManagementTest extends TestCase
             'phone' => '0700000000',
         ]);
 
+        $logo = UploadedFile::fake()->create('mikrotik-logo.png', 64, 'image/png');
+
         $response = $this->actingAs($admin)->post('/admin/pages-content', [
             'hero_title' => 'Starlink Kenya for Homes and Business',
             'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
+            'site_logo' => $logo,
         ]);
 
         $response->assertRedirect('/admin/pages-content');
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseHas('homepage_contents', [
-            'site_key' => HomepageContent::DEFAULT_SITE_KEY,
-            'hero_title' => 'Starlink Kenya for Homes and Business',
-        ]);
+        $storedContent = HomepageContent::query()->where('site_key', HomepageContent::DEFAULT_SITE_KEY)->first();
+        $this->assertNotNull($storedContent);
+        $this->assertSame('Starlink Kenya for Homes and Business', $storedContent->hero_title);
+        $this->assertNotNull($storedContent->site_logo_path);
+        $this->assertFileExists(public_path($storedContent->site_logo_path));
 
         $homeResponse = $this->get('/');
         $homeResponse->assertOk();
         $homeResponse->assertSee('Starlink Kenya for Homes and Business');
         $homeResponse->assertSee('Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.');
+        $homeResponse->assertSee($storedContent->siteLogoUrl());
+
+        File::delete(public_path($storedContent->site_logo_path));
     }
 
     public function test_admin_can_update_homepage_sections_and_render_them_on_homepage(): void

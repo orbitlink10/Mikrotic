@@ -10,6 +10,8 @@
 </head>
 <body>
 @php
+    $homepageBrandContent = \App\Models\HomepageContent::current();
+    $siteLogoUrl = $homepageBrandContent->siteLogoUrl();
     $cartCount = 0;
     if (auth()->check()) {
         $cartCount = \App\Models\CartItem::query()
@@ -21,7 +23,11 @@
     <div class="promo-bar">Laravel Multi-Vendor Marketplace (MySQL)</div>
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
-            <span class="logo-main logo-main--single">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+            @if($siteLogoUrl)
+                <img class="logo-image" src="{{ $siteLogoUrl }}" alt="{{ config('app.name', 'Mikrotik Kenya') }}">
+            @else
+                <span class="logo-main logo-main--single">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+            @endif
         </a>
 
         <form class="search-form" method="get" action="{{ route('home') }}">

@@ -566,6 +566,7 @@ class AdminController extends Controller
         $data = $request->validate([
             'hero_title' => ['required', 'string', 'min:4', 'max:180'],
             'hero_description' => ['required', 'string', 'min:12', 'max:500'],
+            'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'why_choose_title' => ['nullable', 'string', 'max:180'],
             'why_choose_intro' => ['nullable', 'string', 'max:500'],
@@ -632,6 +633,21 @@ class AdminController extends Controller
         $homepageContent->content_body = $request->has('content_body')
             ? ($normalizedContentBody !== '' ? $normalizedContentBody : $baseline->contentBody())
             : $baseline->contentBody();
+
+        if ($request->hasFile('site_logo')) {
+            $directory = public_path('uploads/homepage-content');
+            File::ensureDirectoryExists($directory);
+
+            if ($homepageContent->site_logo_path && File::exists(public_path($homepageContent->site_logo_path))) {
+                File::delete(public_path($homepageContent->site_logo_path));
+            }
+
+            $logo = $request->file('site_logo');
+            $filename = now()->format('YmdHis') . '-logo-' . Str::lower(Str::random(10)) . '.' . $logo->getClientOriginalExtension();
+            $logo->move($directory, $filename);
+
+            $homepageContent->site_logo_path = 'uploads/homepage-content/' . $filename;
+        }
 
         if ($request->hasFile('hero_image')) {
             $directory = public_path('uploads/homepage-content');

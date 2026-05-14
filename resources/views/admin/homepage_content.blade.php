@@ -41,7 +41,26 @@
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Hero Section</h2>
-                        <p class="admin-settings-help">Main heading and image shown at the top of the homepage.</p>
+                        <p class="admin-settings-help">Logo, main heading, and image shown on the homepage.</p>
+                    </div>
+
+                    <div class="admin-settings-field">
+                        <label class="admin-settings-label" for="site_logo">Website Logo</label>
+                        <input
+                            class="admin-settings-file"
+                            id="site_logo"
+                            type="file"
+                            name="site_logo"
+                            accept=".jpg,.jpeg,.png,.webp,image/*"
+                            @disabled(! $homepageContentStorageReady)
+                        >
+
+                        @if($homepageContent->siteLogoUrl())
+                            <div class="admin-settings-preview admin-settings-preview--logo">
+                                <p class="admin-settings-help">Current website logo</p>
+                                <img src="{{ $homepageContent->siteLogoUrl() }}" alt="Current website logo">
+                            </div>
+                        @endif
                     </div>
 
                     <div class="admin-settings-field">
