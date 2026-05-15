@@ -1,7 +1,7 @@
 :root {
-    --brand-orange: #f68b1e;
+    --brand-orange: #1677ff;
     --brand-dark: #111827;
-    --brand-red: #c61f1f;
+    --brand-red: #0a4588;
     --surface: #ffffff;
     --muted: #6b7280;
     --line: #e5e7eb;
@@ -47,7 +47,7 @@ a {
 
 .promo-bar {
     text-align: center;
-    background: linear-gradient(90deg, var(--brand-orange), #ffad4f);
+    background: linear-gradient(90deg, #0a4588, var(--brand-orange));
     color: #fff;
     padding: 10px;
     font-weight: 600;
@@ -130,8 +130,8 @@ button,
 }
 
 .button-link.secondary {
-    background: #fff4e6;
-    color: #ad5b00;
+    background: #eff6ff;
+    color: #0a4588;
 }
 
 button.danger {
@@ -223,8 +223,8 @@ button.danger {
 
 .category-sidebar a.active,
 .category-sidebar a:hover {
-    background: #fff4e6;
-    color: #ad5b00;
+    background: #eff6ff;
+    color: #0a4588;
 }
 
 .home-main {
@@ -234,7 +234,7 @@ button.danger {
 }
 
 .hero-banner {
-    background: linear-gradient(120deg, var(--brand-red), #ea580c);
+    background: linear-gradient(120deg, #0a4588, var(--brand-orange));
     border-radius: 14px;
     color: #fff;
     padding: 26px;
@@ -256,8 +256,8 @@ button.danger {
 .catalog-search-summary {
     display: grid;
     gap: 8px;
-    background: linear-gradient(135deg, #fff7ed, #ffffff);
-    border-color: #fed7aa;
+    background: linear-gradient(135deg, #eff6ff, #ffffff);
+    border-color: #bfdbfe;
 }
 
 .catalog-search-summary h1 {
@@ -272,7 +272,7 @@ button.danger {
 }
 
 .catalog-search-eyebrow {
-    color: #b45309;
+    color: #0a4588;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -506,7 +506,7 @@ button.danger {
     position: relative;
     padding: 18px 18px 18px 0;
     border-radius: 34px;
-    background: linear-gradient(135deg, #f8fafc, #fff7ed);
+    background: linear-gradient(135deg, #f8fafc, #eff6ff);
     width: 100%;
     min-width: 0;
 }
@@ -518,7 +518,7 @@ button.danger {
     bottom: 36px;
     width: 5px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #f97316, #facc15);
+    background: linear-gradient(180deg, #0a4588, var(--brand-orange));
 }
 
 .home-guide-card {
@@ -609,7 +609,7 @@ button.danger {
 
 .price {
     margin: 0 0 10px;
-    color: #b45309;
+    color: #0a4588;
     font-weight: 700;
 }
 
@@ -752,8 +752,8 @@ th {
 .product-gallery-card,
 .product-summary-card,
 .product-tabs-shell {
-    background: linear-gradient(180deg, #ffffff, #fffaf5);
-    border: 1px solid rgba(246, 139, 30, 0.12);
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
+    border: 1px solid rgba(22, 119, 255, 0.12);
     border-radius: 28px;
     box-shadow: 0 24px 60px rgba(17, 24, 39, 0.08);
 }
@@ -767,7 +767,7 @@ th {
     display: grid;
     place-items: center;
     background:
-        radial-gradient(circle at top right, rgba(246, 139, 30, 0.12), transparent 34%),
+        radial-gradient(circle at top right, rgba(22, 119, 255, 0.12), transparent 34%),
         linear-gradient(180deg, #fffefc, #f8fafc);
     border: 1px solid #eef2f7;
     border-radius: 24px;
@@ -800,7 +800,7 @@ th {
 .product-gallery-thumb:hover,
 .product-gallery-thumb.is-active {
     border-color: var(--brand-orange);
-    box-shadow: 0 18px 28px rgba(246, 139, 30, 0.16);
+    box-shadow: 0 18px 28px rgba(22, 119, 255, 0.16);
     transform: translateY(-2px);
 }
 
@@ -1045,8 +1045,8 @@ th {
 }
 
 .product-primary-cta {
-    background: linear-gradient(135deg, #ffac2f, #f68b1e);
-    box-shadow: 0 16px 28px rgba(246, 139, 30, 0.24);
+    background: linear-gradient(135deg, #0a4588, var(--brand-orange));
+    box-shadow: 0 16px 28px rgba(22, 119, 255, 0.24);
     color: #fff;
 }
 
@@ -1064,8 +1064,8 @@ th {
 
 .product-secondary-cta {
     background: #fff;
-    color: #c86b00;
-    border: 1px solid rgba(246, 139, 30, 0.28);
+    color: #0a4588;
+    border: 1px solid rgba(22, 119, 255, 0.28);
 }
 
 .product-whatsapp-cta {
@@ -1237,8 +1237,8 @@ th {
 }
 
 .editor-toolbar button.is-active {
-    background: #fff4e6;
-    color: #ad5b00;
+    background: #eff6ff;
+    color: #0a4588;
 }
 
 .editor-surface {
@@ -1266,7 +1266,7 @@ th {
 }
 
 .rich-content a {
-    color: #ad5b00;
+    color: #0a4588;
     text-decoration: underline;
 }
 
@@ -1379,7 +1379,7 @@ th {
 }
 
 .admin-section-kicker {
-    color: #b45309;
+    color: #0a4588;
 }
 
 .admin-sidebar-section {
@@ -1491,8 +1491,8 @@ th {
 }
 
 .admin-nav-badge {
-    background: rgba(246, 139, 30, 0.12);
-    color: #ad5b00;
+    background: rgba(22, 119, 255, 0.12);
+    color: #0a4588;
 }
 
 .admin-nav-link:hover .admin-nav-badge,
@@ -2032,15 +2032,15 @@ textarea.admin-post-builder-input {
 }
 
 .tone-orange {
-    --admin-accent: rgba(246, 139, 30, 0.16);
-    --admin-ink: #ad5b00;
+    --admin-accent: rgba(22, 119, 255, 0.16);
+    --admin-ink: #0a4588;
     --admin-border: var(--brand-orange);
 }
 
 .tone-warm {
-    --admin-accent: rgba(246, 139, 30, 0.1);
-    --admin-ink: #c56b00;
-    --admin-border: #ffad4f;
+    --admin-accent: rgba(36, 173, 194, 0.12);
+    --admin-ink: #0e7490;
+    --admin-border: #24adc2;
 }
 
 .tone-dark {
@@ -2050,9 +2050,9 @@ textarea.admin-post-builder-input {
 }
 
 .tone-red {
-    --admin-accent: rgba(198, 31, 31, 0.12);
+    --admin-accent: rgba(10, 69, 136, 0.12);
     --admin-ink: #9f1239;
-    --admin-border: #c61f1f;
+    --admin-border: #0a4588;
 }
 
 .admin-overview-icon {
@@ -2170,7 +2170,7 @@ textarea.admin-post-builder-input {
 }
 
 .admin-section-card table tbody tr:hover {
-    background: rgba(246, 139, 30, 0.04);
+    background: rgba(22, 119, 255, 0.04);
 }
 
 .activity-list {
@@ -2199,8 +2199,8 @@ textarea.admin-post-builder-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(246, 139, 30, 0.12);
-    color: #ad5b00;
+    background: rgba(22, 119, 255, 0.12);
+    color: #0a4588;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.18em;
@@ -2235,7 +2235,7 @@ textarea.admin-post-builder-input {
     padding: 16px;
     border: 1px solid var(--line);
     border-radius: 20px;
-    background: linear-gradient(135deg, rgba(246, 139, 30, 0.08), #ffffff);
+    background: linear-gradient(135deg, rgba(22, 119, 255, 0.08), #ffffff);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -2255,8 +2255,8 @@ textarea.admin-post-builder-input {
 
 .admin-action-tile:hover {
     transform: translateY(-2px);
-    border-color: rgba(246, 139, 30, 0.36);
-    box-shadow: 0 18px 30px rgba(246, 139, 30, 0.12);
+    border-color: rgba(22, 119, 255, 0.36);
+    box-shadow: 0 18px 30px rgba(22, 119, 255, 0.12);
 }
 
 .admin-action-tile strong {
@@ -2289,7 +2289,7 @@ textarea.admin-post-builder-input {
     border: 1px solid var(--line);
     border-radius: 18px;
     padding: 14px 16px;
-    background: linear-gradient(135deg, rgba(246, 139, 30, 0.08), rgba(255, 255, 255, 1));
+    background: linear-gradient(135deg, rgba(22, 119, 255, 0.08), rgba(255, 255, 255, 1));
     margin-bottom: 12px;
 }
 
@@ -2850,7 +2850,7 @@ textarea.admin-post-builder-input {
     align-items: center;
     padding: 40px 42px;
     background:
-        radial-gradient(circle at top left, rgba(246, 139, 30, 0.1), transparent 28%),
+        radial-gradient(circle at top left, rgba(22, 119, 255, 0.1), transparent 28%),
         linear-gradient(135deg, #fbfdff, #eef4ff);
 }
 
@@ -2917,7 +2917,7 @@ textarea.admin-post-builder-input {
     border-radius: 30px;
     border: 1px solid #e6edf6;
     background:
-        radial-gradient(circle at top right, rgba(246, 139, 30, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(22, 119, 255, 0.18), transparent 32%),
         linear-gradient(180deg, #ffffff, #f3f7ff);
     overflow: hidden;
     display: grid;
@@ -2956,7 +2956,7 @@ textarea.admin-post-builder-input {
     left: 0;
     width: 12px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #ffb347, #f68b1e);
+    background: linear-gradient(180deg, #0a4588, var(--brand-orange));
 }
 
 .page-story-article-head {
@@ -3505,8 +3505,8 @@ textarea.admin-post-builder-input {
     min-height: 44px;
     padding: 0 18px;
     border-radius: 999px;
-    background: #fff7ed;
-    color: #d97706;
+    background: #eff6ff;
+    color: #0a4588;
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -3897,7 +3897,7 @@ textarea.admin-post-builder-input {
     align-items: center;
     justify-content: center;
     border-radius: 18px;
-    background: linear-gradient(135deg, #e53946 0%, #f68b1e 54%, #1677ff 100%);
+    background: linear-gradient(135deg, #0a4588 0%, #1677ff 100%);
     box-shadow: 0 14px 26px rgba(22, 119, 255, 0.18);
 }
 
