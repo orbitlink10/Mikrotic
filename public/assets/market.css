@@ -58,7 +58,7 @@ a {
     margin: 0 auto;
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: 260px minmax(300px, 1fr) auto;
+    grid-template-columns: 320px minmax(300px, 1fr) auto;
     gap: 16px;
     align-items: center;
 }
@@ -66,8 +66,9 @@ a {
 .logo {
     display: inline-flex;
     align-items: center;
-    width: 260px;
-    height: 82px;
+    justify-content: center;
+    width: 320px;
+    height: 126px;
     min-width: 0;
     overflow: hidden;
 }
@@ -77,8 +78,8 @@ a {
     display: block;
     width: 100%;
     height: 100%;
-    max-width: 260px;
-    max-height: 82px;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     object-position: center;
 }
@@ -336,17 +337,17 @@ button.danger {
 
 .home-section-head h2 {
     margin: 0;
-    font-size: clamp(2rem, 3vw, 3.35rem);
-    line-height: 1.06;
-    letter-spacing: -0.04em;
+    font-size: clamp(1.75rem, 2.35vw, 2.65rem);
+    line-height: 1.12;
+    letter-spacing: 0;
     color: #0f172a;
 }
 
 .home-section-head p {
     margin: 0;
     color: #64748b;
-    font-size: 1.05rem;
-    line-height: 1.7;
+    font-size: 0.98rem;
+    line-height: 1.6;
 }
 
 .why-choose-grid,
@@ -398,14 +399,15 @@ button.danger {
 }
 
 .why-choose-card h3 {
-    font-size: 1.8rem;
-    line-height: 1.12;
+    font-size: 1.35rem;
+    line-height: 1.18;
 }
 
 .why-choose-card p {
     margin: 0;
     color: #64748b;
-    line-height: 1.7;
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 .testimonial-card {
@@ -3567,8 +3569,8 @@ textarea.admin-post-builder-input {
     }
 
     .logo {
-        width: min(260px, 100%);
-        height: 74px;
+        width: min(320px, 100%);
+        height: 112px;
     }
 
     .top-links {
