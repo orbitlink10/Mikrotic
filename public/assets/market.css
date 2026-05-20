@@ -155,6 +155,10 @@ button.danger {
     padding: 0;
 }
 
+.register-link {
+    font-weight: 700;
+}
+
 .cart-link {
     font-weight: 700;
 }

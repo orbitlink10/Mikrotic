@@ -55,7 +55,7 @@
                 </form>
             @else
                 <a href="{{ route('login') }}">Login</a>
-                <a href="{{ route('register') }}">Register</a>
+                <a class="register-link" href="{{ route('register') }}">Register</a>
             @endauth
             <a class="cart-link" href="{{ route('cart.index') }}">Cart ({{ $cartCount }})</a>
         </nav>
