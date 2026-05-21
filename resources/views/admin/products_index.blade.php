@@ -4,7 +4,7 @@
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
 
-    <div class="admin-main admin-management-main">
+    <div class="admin-main admin-management-main admin-products-main">
         <section class="admin-page-head">
             <div>
                 <h1 class="admin-page-title">Products</h1>
@@ -13,7 +13,7 @@
             <a class="admin-primary-pill" href="{{ route('admin.products.create') }}">+ Add Product</a>
         </section>
 
-        <section class="panel admin-list-panel">
+        <section class="panel admin-list-panel admin-products-panel">
             <div class="admin-list-panel-head">
                 <h2>Product List</h2>
                 <form class="admin-search-form" method="get" action="{{ route('admin.products.index') }}">
