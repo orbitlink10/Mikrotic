@@ -198,10 +198,23 @@ class AdminController extends Controller
             return null;
         }
 
+        $adminShopName = 'Mikrotik Kenya Official Store';
+
         $vendor = Vendor::query()->where('user_id', $user->id)->first();
         if ($vendor) {
+            $updates = [];
+
             if (!$vendor->is_approved) {
-                $vendor->update(['is_approved' => true]);
+                $updates['is_approved'] = true;
+            }
+
+            if (strcasecmp((string) $vendor->shop_name, 'Almar Market Official Store') === 0) {
+                $updates['shop_name'] = $adminShopName;
+                $updates['slug'] = $this->uniqueSlug('vendors', $adminShopName, $vendor->id);
+            }
+
+            if ($updates !== []) {
+                $vendor->update($updates);
                 $vendor->refresh();
             }
 
@@ -214,8 +227,8 @@ class AdminController extends Controller
 
         return Vendor::create([
             'user_id' => $user->id,
-            'shop_name' => config('app.name', 'Mikrotik Kenya') . ' Official Store',
-            'slug' => $this->uniqueSlug('vendors', config('app.name', 'Mikrotik Kenya') . ' Official Store'),
+            'shop_name' => $adminShopName,
+            'slug' => $this->uniqueSlug('vendors', $adminShopName),
             'description' => 'Products managed by the marketplace admin.',
             'phone' => $user->phone ?: 'Admin desk',
             'address' => 'Platform managed catalog',
