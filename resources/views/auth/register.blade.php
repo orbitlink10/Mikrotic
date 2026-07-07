@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Mikrotik Kenya')
+
 @section('content')
 <section class="panel auth-card">
     <h1>{{ $pageTitle ?? 'Create Account' }}</h1>
