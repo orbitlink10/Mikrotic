@@ -287,6 +287,47 @@ button.danger {
     text-transform: uppercase;
 }
 
+.category-content-panel {
+    display: grid;
+    gap: 18px;
+    overflow: hidden;
+}
+
+.category-content-panel--with-image {
+    grid-template-columns: minmax(0, 1fr) 240px;
+}
+
+.category-content-media {
+    order: 2;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.category-content-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+}
+
+.category-content-body {
+    min-width: 0;
+}
+
+.category-content-body h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+    line-height: 1.15;
+}
+
+.category-content-summary,
+.category-description-content {
+    color: #334155;
+    line-height: 1.7;
+}
+
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -3625,6 +3666,15 @@ textarea.admin-post-builder-input {
 
     .hero-banner {
         min-height: 150px;
+    }
+
+    .category-content-panel--with-image {
+        grid-template-columns: 1fr;
+    }
+
+    .category-content-media {
+        order: 0;
+        max-width: 320px;
     }
 
     .product-detail,

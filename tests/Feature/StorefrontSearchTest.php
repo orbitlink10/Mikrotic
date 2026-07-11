@@ -35,6 +35,24 @@ class StorefrontSearchTest extends TestCase
         $response->assertDontSee($otherProduct->name);
     }
 
+    public function test_category_page_displays_saved_category_content(): void
+    {
+        $category = Category::create([
+            'name' => 'Mikrotik Wired Routers Price in Kenya',
+            'slug' => 'mikrotik-wired-routers-price-in-kenya',
+            'meta_description' => 'Wired router price guide.',
+            'description' => '<h2>RouterBOARD options</h2><p>Compare MikroTik wired routers for homes, businesses, and ISPs.</p><script>alert(1)</script>',
+        ]);
+
+        $response = $this->get(route('category.show', $category));
+
+        $response->assertOk();
+        $response->assertSee('Mikrotik Wired Routers Price in Kenya');
+        $response->assertSee('RouterBOARD options');
+        $response->assertSee('Compare MikroTik wired routers for homes, businesses, and ISPs.');
+        $response->assertDontSee('<script', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\Product}
      */

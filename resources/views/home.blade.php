@@ -6,6 +6,9 @@
         : 'Mikrotik Kenya';
     $catalogMetaDescription = $currentCategory?->meta_description
         ?: ($currentCategory ? \App\Support\ProductContent::excerpt($currentCategory->description, 160) : 'Browse products from our multi-vendor marketplace.');
+    $categoryDescriptionHtml = $currentCategory
+        ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
+        : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
     $whyChooseIcons = [
         <<<'SVG'
@@ -62,6 +65,25 @@ SVG,
                         Try a different product name, SKU, or category.
                     @endif
                 </p>
+            </section>
+        @elseif($currentCategory)
+            <section class="panel category-content-panel {{ $currentCategory->image_url ? 'category-content-panel--with-image' : '' }}">
+                @if($currentCategory->image_url)
+                    <div class="category-content-media">
+                        <img src="{{ $currentCategory->image_url }}" alt="{{ $currentCategory->name }}">
+                    </div>
+                @endif
+
+                <div class="category-content-body">
+                    <p class="catalog-search-eyebrow">{{ $currentCategory->parent?->name ?? 'Category' }}</p>
+                    <h1>{{ $currentCategory->name }}</h1>
+
+                    @if($categoryDescriptionHtml)
+                        <div class="rich-content category-description-content">{!! $categoryDescriptionHtml !!}</div>
+                    @elseif($currentCategory->meta_description)
+                        <p class="category-content-summary">{{ $currentCategory->meta_description }}</p>
+                    @endif
+                </div>
             </section>
         @else
             <div
