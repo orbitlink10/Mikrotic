@@ -39,9 +39,18 @@
                             </td>
                             <td>
                                 <div class="admin-action-row">
-                                    <a class="admin-row-action tone-info" href="{{ route('home', ['category' => $category->id]) }}">Show</a>
-                                    <button type="button" class="admin-row-action tone-warning">Edit</button>
-                                    <button type="button" class="admin-row-action tone-danger">Delete</button>
+                                    <a
+                                        class="admin-row-action tone-info"
+                                        href="{{ route('category.show', $category) }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >Preview</a>
+                                    <a class="admin-row-action tone-warning" href="{{ route('admin.categories.edit', $category) }}">Update</a>
+                                    <form method="post" action="{{ route('admin.categories.destroy', $category) }}" onsubmit="return confirm('Delete this category?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="admin-row-action tone-danger">Delete</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

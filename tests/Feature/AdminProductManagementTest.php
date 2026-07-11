@@ -159,6 +159,56 @@ class AdminProductManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_categories_index_renders_working_preview_update_and_delete_actions(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $category = Category::create([
+            'name' => 'Business Routers',
+            'slug' => 'business-routers',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/categories');
+
+        $response->assertOk();
+        $response->assertSee('Preview');
+        $response->assertSee(route('category.show', $category), false);
+        $response->assertSee(route('admin.categories.edit', $category), false);
+        $response->assertSee(route('admin.categories.destroy', $category), false);
+    }
+
+    public function test_admin_subcategories_index_renders_working_preview_update_and_delete_actions(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $parent = Category::create([
+            'name' => 'Routers',
+            'slug' => 'routers',
+        ]);
+
+        $subcategory = Category::create([
+            'name' => 'Wired Routers',
+            'slug' => 'wired-routers',
+            'parent_id' => $parent->id,
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/sub-categories');
+
+        $response->assertOk();
+        $response->assertSee('Preview');
+        $response->assertSee(route('category.show', $subcategory), false);
+        $response->assertSee(route('admin.categories.edit', $subcategory), false);
+        $response->assertSee(route('admin.categories.destroy', $subcategory), false);
+    }
+
     public function test_admin_product_create_page_displays_form(): void
     {
         $admin = User::factory()->create([

@@ -41,9 +41,18 @@
                             </td>
                             <td>
                                 <div class="admin-action-row">
-                                    <button type="button" class="admin-row-action tone-info">Show</button>
-                                    <button type="button" class="admin-row-action tone-warning">Edit</button>
-                                    <button type="button" class="admin-row-action tone-danger">Delete</button>
+                                    <a
+                                        class="admin-row-action tone-info"
+                                        href="{{ route('category.show', $subcategory) }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >Preview</a>
+                                    <a class="admin-row-action tone-warning" href="{{ route('admin.categories.edit', $subcategory) }}">Update</a>
+                                    <form method="post" action="{{ route('admin.categories.destroy', $subcategory) }}" onsubmit="return confirm('Delete this sub category?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="admin-row-action tone-danger">Delete</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

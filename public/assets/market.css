@@ -2458,6 +2458,7 @@ textarea.admin-post-builder-input {
     align-items: flex-start;
 }
 
+.admin-action-row form,
 .admin-action-stack form,
 .admin-actions-inline {
     margin: 0;
