@@ -53,6 +53,18 @@ class StorefrontSearchTest extends TestCase
         $response->assertDontSee('<script', false);
     }
 
+    public function test_catalog_uses_local_placeholder_when_product_has_no_image(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->delete();
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('/assets/product-placeholder.svg', false);
+        $response->assertDontSee('via.placeholder.com', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\Product}
      */

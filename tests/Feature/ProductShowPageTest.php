@@ -67,6 +67,18 @@ class ProductShowPageTest extends TestCase
         $response->assertDontSee('name="redirect" value="checkout"', false);
     }
 
+    public function test_product_show_page_uses_local_placeholder_when_product_has_no_images(): void
+    {
+        [$product] = $this->createApprovedProduct();
+        $product->images()->delete();
+
+        $response = $this->get(route('product.show', $product));
+
+        $response->assertOk();
+        $response->assertSee('/assets/product-placeholder.svg', false);
+        $response->assertDontSee('via.placeholder.com', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\User}
      */

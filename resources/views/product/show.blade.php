@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @php
+    $productImageFallback = rtrim(request()->getBaseUrl(), '/') . '/assets/product-placeholder.svg';
     $descriptionHtml = \App\Support\ProductContent::sanitizeRichText($product->description)
         ?: '<p>No description available.</p>';
     $productMetaDescription = $product->meta_description
         ?: \App\Support\ProductContent::excerpt($product->description, 160);
     $galleryImages = $product->images->pluck('image_url')->filter()->values();
     if ($galleryImages->isEmpty()) {
-        $galleryImages = collect(['https://via.placeholder.com/960x960?text=Product']);
+        $galleryImages = collect([$productImageFallback]);
     }
 
     $primaryImage = $galleryImages->first();
@@ -57,6 +58,7 @@
                     alt="{{ $product->name }}"
                     class="product-gallery-main-image"
                     data-product-main-image
+                    onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
                 >
             </div>
 
@@ -70,7 +72,11 @@
                             data-product-alt="{{ $product->name }} image {{ $index + 1 }}"
                             aria-label="View image {{ $index + 1 }} of {{ $product->name }}"
                         >
-                            <img src="{{ $galleryImage }}" alt="{{ $product->name }} thumbnail {{ $index + 1 }}">
+                            <img
+                                src="{{ $galleryImage }}"
+                                alt="{{ $product->name }} thumbnail {{ $index + 1 }}"
+                                onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
+                            >
                         </button>
                     @endforeach
                 </div>
