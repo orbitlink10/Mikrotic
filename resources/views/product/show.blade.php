@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @php
-    $productImageFallback = rtrim(request()->getBaseUrl(), '/') . '/assets/product-placeholder.svg';
+    $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
+    $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
     $descriptionHtml = \App\Support\ProductContent::sanitizeRichText($product->description)
         ?: '<p>No description available.</p>';
     $productMetaDescription = $product->meta_description
@@ -11,7 +12,7 @@
         ->filter()
         ->values();
     if ($galleryImages->isEmpty()) {
-        $galleryImages = collect([$productImageFallback]);
+        $galleryImages = collect([$officialProductImage ?: $productImageFallback]);
     }
 
     $primaryImage = $galleryImages->first();

@@ -79,6 +79,21 @@ class ProductShowPageTest extends TestCase
         $response->assertDontSee('via.placeholder.com', false);
     }
 
+    public function test_product_show_page_uses_official_mikrotik_image_when_known_product_has_no_images(): void
+    {
+        [$product] = $this->createApprovedProduct();
+        $product->update([
+            'name' => 'Mikrotik GrooveA 52 ac',
+            'slug' => 'mikrotik-groovea-52-ac',
+        ]);
+        $product->images()->delete();
+
+        $response = $this->get(route('product.show', $product));
+
+        $response->assertOk();
+        $response->assertSee('src="https://cdn.mikrotik.com/web-assets/rb_images/1208_lg.webp"', false);
+    }
+
     public function test_product_show_page_renders_legacy_public_product_image_paths(): void
     {
         [$product] = $this->createApprovedProduct();

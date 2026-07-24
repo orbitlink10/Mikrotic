@@ -55,13 +55,25 @@ class StorefrontSearchTest extends TestCase
 
     public function test_catalog_uses_local_placeholder_when_product_has_no_image(): void
     {
-        [$product] = $this->createCatalogProducts();
+        [, $product] = $this->createCatalogProducts();
         $product->images()->delete();
 
         $response = $this->get('/');
 
         $response->assertOk();
         $response->assertSee('/assets/product-placeholder.svg', false);
+        $response->assertDontSee('via.placeholder.com', false);
+    }
+
+    public function test_catalog_uses_official_mikrotik_image_when_known_product_has_no_image(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->delete();
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp', false);
         $response->assertDontSee('via.placeholder.com', false);
     }
 

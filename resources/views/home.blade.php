@@ -10,7 +10,7 @@
         ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
-    $productImageFallback = rtrim(request()->getBaseUrl(), '/') . '/assets/product-placeholder.svg';
+    $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
 <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l7 3 7 8-2 10-7 5-5 10-5-10-7-5-2-10 7-8 7-3zM17 37h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -104,7 +104,9 @@ SVG,
             @forelse($products as $product)
                 @php
                     $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
-                    $image = $productImage?->publicUrl() ?: $productImageFallback;
+                    $image = $productImage?->publicUrl()
+                        ?: \App\Support\ProductImageCatalog::officialUrlFor($product->name)
+                        ?: $productImageFallback;
                 @endphp
                 <article class="product-card">
                     <a class="product-image-wrap" href="{{ route('product.show', $product) }}">
