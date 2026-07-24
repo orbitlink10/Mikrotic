@@ -337,7 +337,7 @@
                     <div class="admin-product-optional-body">
                         @if($primaryImage?->image_url)
                             <div class="admin-settings-preview">
-                                <img src="{{ $primaryImage->image_url }}" alt="{{ $productToEdit?->name }}">
+                                <img src="{{ $primaryImage->publicUrl() }}" alt="{{ $productToEdit?->name }}">
                             </div>
                         @endif
 

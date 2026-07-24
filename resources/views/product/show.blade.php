@@ -6,7 +6,10 @@
         ?: '<p>No description available.</p>';
     $productMetaDescription = $product->meta_description
         ?: \App\Support\ProductContent::excerpt($product->description, 160);
-    $galleryImages = $product->images->pluck('image_url')->filter()->values();
+    $galleryImages = $product->images
+        ->map(fn ($image) => $image->publicUrl())
+        ->filter()
+        ->values();
     if ($galleryImages->isEmpty()) {
         $galleryImages = collect([$productImageFallback]);
     }

@@ -103,8 +103,8 @@ SVG,
         <section class="product-grid">
             @forelse($products as $product)
                 @php
-                    $image = optional($product->images->firstWhere('is_primary', true) ?? $product->images->first())->image_url
-                        ?: $productImageFallback;
+                    $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+                    $image = $productImage?->publicUrl() ?: $productImageFallback;
                 @endphp
                 <article class="product-card">
                     <a class="product-image-wrap" href="{{ route('product.show', $product) }}">

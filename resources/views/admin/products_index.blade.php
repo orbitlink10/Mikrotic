@@ -42,7 +42,7 @@
                             <td>{{ $products->firstItem() + $loop->index }}</td>
                             <td>
                                 @if($primaryImage?->image_url)
-                                    <img class="admin-thumb admin-thumb--product" src="{{ $primaryImage->image_url }}" alt="{{ $product->name }}">
+                                    <img class="admin-thumb admin-thumb--product" src="{{ $primaryImage->publicUrl() }}" alt="{{ $product->name }}">
                                 @else
                                     <div class="admin-thumb admin-thumb--placeholder admin-thumb--product">No Image</div>
                                 @endif

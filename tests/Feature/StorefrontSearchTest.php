@@ -65,6 +65,18 @@ class StorefrontSearchTest extends TestCase
         $response->assertDontSee('via.placeholder.com', false);
     }
 
+    public function test_catalog_renders_legacy_relative_product_image_paths(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->update(['image_url' => 'uploads/products/rb5009.jpg']);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('src="/uploads/products/rb5009.jpg"', false);
+        $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\Product}
      */
