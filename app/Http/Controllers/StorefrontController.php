@@ -120,6 +120,10 @@ class StorefrontController extends Controller
                 ->get()
             : collect();
 
+        if ($homepageRouterProducts->isNotEmpty()) {
+            $productsQuery->whereNotIn('id', $homepageRouterProducts->modelKeys());
+        }
+
         $products = $productsQuery->latest()->paginate(24)->withQueryString();
 
         return view('home', [

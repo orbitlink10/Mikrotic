@@ -153,8 +153,8 @@ class StorefrontSearchTest extends TestCase
         $response->assertSee('products-grid--router-rows', false);
         $response->assertSee('Mikrotik Router Model 9');
         $response->assertSee('Mikrotik Router Model 2');
-        $response->assertDontSee('Mikrotik Router Model 1');
-        $response->assertDontSee('Mikrotik Switch Outside Category');
+        $response->assertSee('Mikrotik Router Model 1');
+        $response->assertSee('Mikrotik Switch Outside Category');
         $response->assertSee('KES 10,009.00');
         $response->assertSee('product-desc', false);
         $response->assertDontSee('Page 1 of', false);

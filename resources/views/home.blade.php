@@ -10,7 +10,7 @@
         ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
-    $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory;
+    $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -101,7 +101,14 @@ SVG,
             </div>
         @endif
 
-        @unless($showRouterProductRows)
+        @if($showRouterProductRows)
+            <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory->name }}">
+                @foreach($homepageRouterProducts as $product)
+                    @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
+                @endforeach
+            </section>
+        @endif
+
         <section class="products-grid">
             @forelse($products as $product)
                 @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
@@ -125,18 +132,7 @@ SVG,
                 @endif
             </div>
         @endif
-        @endunless
     </div>
-
-    @if($showRouterProductRows)
-        <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory->name }}">
-            @forelse($homepageRouterProducts as $product)
-                @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
-            @empty
-                <p class="empty">No products found.</p>
-            @endforelse
-        </section>
-    @endif
 
     @if($showHomepageSections)
         <section class="home-extra-sections home-extra-sections--full-width">

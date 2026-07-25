@@ -335,11 +335,9 @@ button.danger {
 }
 
 .products-grid--router-rows {
-    grid-column: 1 / -1;
-    width: min(1320px, calc(100vw - 32px));
-    justify-self: center;
+    width: 100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin-top: 8px;
+    margin-top: 0;
 }
 
 @media (max-width: 1200px) {
@@ -4656,7 +4654,7 @@ textarea.admin-post-builder-input {
     }
 
     .products-grid--router-rows {
-        width: min(1320px, calc(100vw - 24px));
+        width: 100%;
     }
 
     .product-image {
