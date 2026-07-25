@@ -9,6 +9,9 @@
     $categoryDescriptionHtml = $currentCategory
         ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
         : null;
+    $categorySummary = $currentCategory
+        ? ($currentCategory->meta_description ?: \App\Support\ProductContent::excerpt($currentCategory->description, 240))
+        : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
     $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
@@ -80,10 +83,8 @@ SVG,
                     <p class="catalog-search-eyebrow">{{ $currentCategory->parent?->name ?? 'Category' }}</p>
                     <h1>{{ $currentCategory->name }}</h1>
 
-                    @if($categoryDescriptionHtml)
-                        <div class="rich-content category-description-content">{!! $categoryDescriptionHtml !!}</div>
-                    @elseif($currentCategory->meta_description)
-                        <p class="category-content-summary">{{ $currentCategory->meta_description }}</p>
+                    @if($categorySummary)
+                        <p class="category-content-summary">{{ $categorySummary }}</p>
                     @endif
                 </div>
             </section>
@@ -131,6 +132,12 @@ SVG,
                     <span class="pager-link disabled">Next</span>
                 @endif
             </div>
+        @endif
+
+        @if($currentCategory && $categoryDescriptionHtml)
+            <section class="panel category-description-panel">
+                <div class="rich-content category-description-content">{!! $categoryDescriptionHtml !!}</div>
+            </section>
         @endif
     </div>
 

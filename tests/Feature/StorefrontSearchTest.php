@@ -44,13 +44,55 @@ class StorefrontSearchTest extends TestCase
             'description' => '<h2>RouterBOARD options</h2><p>Compare MikroTik wired routers for homes, businesses, and ISPs.</p><script>alert(1)</script>',
         ]);
 
+        $vendorUser = User::factory()->create([
+            'role' => 'vendor',
+            'status' => 'active',
+            'phone' => '0712345678',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $vendorUser->id,
+            'shop_name' => 'Mikrotik Kenya Store',
+            'slug' => 'mikrotik-kenya-store',
+            'description' => 'Network and routing equipment.',
+            'phone' => '0712345678',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $category->id,
+            'name' => 'RB4011 Business Router',
+            'slug' => 'rb4011-business-router',
+            'description' => '<p>Rackmount router for offices.</p>',
+            'meta_description' => 'RB4011 router for Kenyan businesses.',
+            'price' => '29000.00',
+            'stock' => 4,
+            'sku' => 'RB4011',
+            'status' => 'active',
+        ]);
+
         $response = $this->get(route('category.show', $category));
 
         $response->assertOk();
         $response->assertSee('Mikrotik Wired Routers Price in Kenya');
+        $response->assertSee('Wired router price guide.');
+        $response->assertSee('RB4011 Business Router');
         $response->assertSee('RouterBOARD options');
         $response->assertSee('Compare MikroTik wired routers for homes, businesses, and ISPs.');
         $response->assertDontSee('<script', false);
+
+        $content = $response->getContent();
+        $summaryPosition = strpos($content, 'category-content-summary">Wired router price guide.');
+        $productPosition = strpos($content, 'RB4011 Business Router');
+        $descriptionPosition = strpos($content, 'RouterBOARD options');
+
+        $this->assertNotFalse($summaryPosition);
+        $this->assertNotFalse($productPosition);
+        $this->assertNotFalse($descriptionPosition);
+        $this->assertLessThan($productPosition, $summaryPosition);
+        $this->assertLessThan($descriptionPosition, $productPosition);
     }
 
     public function test_catalog_uses_local_placeholder_when_product_has_no_image(): void
