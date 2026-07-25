@@ -151,8 +151,21 @@ class StorefrontSearchTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('products-grid--router-rows', false);
-        $response->assertSee('Mikrotik Router Model 9');
-        $response->assertSee('Mikrotik Router Model 2');
+        $content = $response->getContent();
+        $featuredStart = strpos($content, 'products-grid products-grid--router-rows');
+
+        $this->assertNotFalse($featuredStart);
+
+        $featuredEnd = strpos($content, '</section>', $featuredStart);
+        $this->assertNotFalse($featuredEnd);
+
+        $featuredSection = substr($content, $featuredStart, $featuredEnd - $featuredStart);
+
+        $this->assertSame(6, substr_count($featuredSection, 'class="product-card"'));
+        $this->assertStringContainsString('Mikrotik Router Model 9', $featuredSection);
+        $this->assertStringContainsString('Mikrotik Router Model 4', $featuredSection);
+        $this->assertStringNotContainsString('Mikrotik Router Model 3', $featuredSection);
+        $response->assertSee('Mikrotik Router Model 3');
         $response->assertSee('Mikrotik Router Model 1');
         $response->assertSee('Mikrotik Switch Outside Category');
         $response->assertSee('KES 10,009.00');

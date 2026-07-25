@@ -17,7 +17,7 @@ class StorefrontController extends Controller
 {
     private const ROUTER_PRICES_CATEGORY_NAME = 'Mikrotik Router Prices in Kenya';
     private const ROUTER_PRICES_CATEGORY_SLUG = 'mikrotik-router-prices-in-kenya';
-    private const ROUTER_PRODUCTS_LIMIT = 8;
+    private const ROUTER_PRODUCTS_LIMIT = 6;
 
     public function index(Request $request): View|RedirectResponse
     {
