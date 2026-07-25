@@ -23,7 +23,6 @@
     }
 @endphp
 <header class="top-header">
-    <div class="promo-bar">Laravel Multi-Vendor Marketplace (MySQL)</div>
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
             @if($siteLogoUrl)
