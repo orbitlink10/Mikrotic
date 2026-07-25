@@ -15,6 +15,10 @@ use Illuminate\View\View;
 
 class StorefrontController extends Controller
 {
+    private const ROUTER_PRICES_CATEGORY_NAME = 'Mikrotik Router Prices in Kenya';
+    private const ROUTER_PRICES_CATEGORY_SLUG = 'mikrotik-router-prices-in-kenya';
+    private const ROUTER_PRODUCTS_LIMIT = 8;
+
     public function index(Request $request): View|RedirectResponse
     {
         $category = $request->filled('category')
@@ -67,11 +71,7 @@ class StorefrontController extends Controller
         if ($currentCategory) {
             $currentCategory->loadMissing('children', 'parent');
             $selectedCategory = $currentCategory->parent_id ?: $currentCategory->id;
-            $categoryIds = $currentCategory->parent_id
-                ? [$currentCategory->id]
-                : array_merge([$currentCategory->id], $currentCategory->children->pluck('id')->all());
-
-            $productsQuery->whereIn('category_id', $categoryIds);
+            $productsQuery->whereIn('category_id', $this->catalogCategoryIds($currentCategory));
         }
 
         if ($search !== '' && !$currentCategory) {
@@ -107,16 +107,56 @@ class StorefrontController extends Controller
             });
         }
 
+        $homepageProductCategory = $search === '' && !$currentCategory
+            ? $this->routerPricesCategory()
+            : null;
+        $homepageRouterProducts = $homepageProductCategory
+            ? Product::query()
+                ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
+                ->active()
+                ->whereIn('category_id', $this->catalogCategoryIds($homepageProductCategory))
+                ->latest()
+                ->limit(self::ROUTER_PRODUCTS_LIMIT)
+                ->get()
+            : collect();
+
         $products = $productsQuery->latest()->paginate(24)->withQueryString();
 
         return view('home', [
             'categories' => $categories,
             'homepageContent' => HomepageContent::current(),
+            'homepageProductCategory' => $homepageProductCategory,
+            'homepageRouterProducts' => $homepageRouterProducts,
             'products' => $products,
             'search' => $search,
             'selectedCategory' => $selectedCategory,
             'testimonials' => Testimonial::homepageItems(),
             'currentCategory' => $currentCategory,
         ]);
+    }
+
+    private function routerPricesCategory(): ?Category
+    {
+        return Category::query()
+            ->where(function ($query): void {
+                $query->whereRaw('LOWER(name) = ?', [Str::lower(self::ROUTER_PRICES_CATEGORY_NAME)])
+                    ->orWhere('slug', self::ROUTER_PRICES_CATEGORY_SLUG);
+            })
+            ->with('children')
+            ->first();
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function catalogCategoryIds(Category $category): array
+    {
+        if ($category->parent_id) {
+            return [$category->id];
+        }
+
+        $category->loadMissing('children');
+
+        return array_merge([$category->id], $category->children->pluck('id')->all());
     }
 }

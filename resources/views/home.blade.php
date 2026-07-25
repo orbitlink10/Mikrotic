@@ -10,6 +10,7 @@
         ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
+    $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory;
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -100,29 +101,10 @@ SVG,
             </div>
         @endif
 
-        <section class="product-grid">
+        @unless($showRouterProductRows)
+        <section class="products-grid">
             @forelse($products as $product)
-                @php
-                    $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
-                    $image = $productImage?->publicUrl()
-                        ?: \App\Support\ProductImageCatalog::officialUrlFor($product->name)
-                        ?: $productImageFallback;
-                @endphp
-                <article class="product-card">
-                    <a class="product-image-wrap" href="{{ route('product.show', $product) }}">
-                        <img
-                            src="{{ $image }}"
-                            alt="{{ $product->name }}"
-                            onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
-                        >
-                    </a>
-                    <div class="product-body">
-                        <h4><a href="{{ route('product.show', $product) }}">{{ $product->name }}</a></h4>
-                        <p class="vendor-name">{{ $product->vendor->shop_name }}</p>
-                        <p class="price">KSh {{ number_format((float) $product->price, 2) }}</p>
-                        <a class="button-link" href="{{ route('product.show', $product) }}">View</a>
-                    </div>
-                </article>
+                @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
             @empty
                 <p class="empty">No products found.</p>
             @endforelse
@@ -143,7 +125,18 @@ SVG,
                 @endif
             </div>
         @endif
+        @endunless
     </div>
+
+    @if($showRouterProductRows)
+        <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory->name }}">
+            @forelse($homepageRouterProducts as $product)
+                @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
+            @empty
+                <p class="empty">No products found.</p>
+            @endforelse
+        </section>
+    @endif
 
     @if($showHomepageSections)
         <section class="home-extra-sections home-extra-sections--full-width">

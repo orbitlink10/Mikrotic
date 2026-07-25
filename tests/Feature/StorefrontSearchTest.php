@@ -89,6 +89,77 @@ class StorefrontSearchTest extends TestCase
         $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
     }
 
+    public function test_homepage_shows_two_router_product_rows_from_requested_category(): void
+    {
+        $vendorUser = User::factory()->create([
+            'role' => 'vendor',
+            'status' => 'active',
+            'phone' => '0712345678',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $vendorUser->id,
+            'shop_name' => 'Mikrotik Kenya Store',
+            'slug' => 'mikrotik-kenya-store',
+            'description' => 'Network and routing equipment.',
+            'phone' => '0712345678',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        $routerCategory = Category::create([
+            'name' => 'Mikrotik Router Prices in Kenya',
+            'slug' => 'mikrotik-router-prices-in-kenya',
+        ]);
+
+        $otherCategory = Category::create([
+            'name' => 'Mikrotik Switch Prices in Kenya',
+            'slug' => 'mikrotik-switch-prices-in-kenya',
+        ]);
+
+        for ($index = 1; $index <= 9; $index++) {
+            Product::create([
+                'vendor_id' => $vendor->id,
+                'category_id' => $routerCategory->id,
+                'name' => 'Mikrotik Router Model ' . $index,
+                'slug' => 'mikrotik-router-model-' . $index,
+                'description' => '<p>Router model ' . $index . ' for homes and offices.</p>',
+                'meta_description' => 'Mikrotik router model ' . $index . ' price in Kenya.',
+                'price' => (string) (10000 + $index),
+                'stock' => 5,
+                'sku' => 'ROUTER-' . $index,
+                'status' => 'active',
+                'created_at' => now()->addMinutes($index),
+                'updated_at' => now()->addMinutes($index),
+            ]);
+        }
+
+        Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $otherCategory->id,
+            'name' => 'Mikrotik Switch Outside Category',
+            'slug' => 'mikrotik-switch-outside-category',
+            'description' => '<p>Switch product.</p>',
+            'meta_description' => 'Switch product outside the router price category.',
+            'price' => '22000.00',
+            'stock' => 5,
+            'sku' => 'SWITCH-1',
+            'status' => 'active',
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('products-grid--router-rows', false);
+        $response->assertSee('Mikrotik Router Model 9');
+        $response->assertSee('Mikrotik Router Model 2');
+        $response->assertDontSee('Mikrotik Router Model 1');
+        $response->assertDontSee('Mikrotik Switch Outside Category');
+        $response->assertSee('KES 10,009.00');
+        $response->assertSee('product-desc', false);
+        $response->assertDontSee('Page 1 of', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\Product}
      */
