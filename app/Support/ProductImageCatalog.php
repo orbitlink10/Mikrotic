@@ -108,7 +108,43 @@ class ProductImageCatalog
         'mikrotik cubesa 60pro ac' => 'https://cdn.mikrotik.com/web-assets/rb_images/2144_lg.webp',
         'mikrotik wap 60g ap' => 'https://cdn.mikrotik.com/web-assets/rb_images/1474_lg.webp',
         'mikrotik wap 60g' => 'https://cdn.mikrotik.com/web-assets/rb_images/1473_lg.webp',
+        'mikrotik rb760igs (hex s)' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'mikrotik rb760igs hex s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'mikrotik hex s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'hex s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'mikrotik rb4011igs+rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/1633_lg.webp',
+        'rb4011igs+rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/1633_lg.webp',
+        'mikrotik rb951ui-2hnd' => 'https://cdn.mikrotik.com/web-assets/rb_images/902_lg.webp',
+        'rb951ui-2hnd' => 'https://cdn.mikrotik.com/web-assets/rb_images/902_lg.webp',
+        'mikrotik l009uigs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp',
+        'l009uigs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp',
+        'mikrotik l009uigs-2haxd-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2263_lg.webp',
+        'l009uigs-2haxd-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2263_lg.webp',
+        'mikrotik rb5009ug+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
+        'rb5009ug+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
         'mikrotik rb5009upr+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
+    ];
+
+    /**
+     * @var array<string, string>
+     */
+    private const OFFICIAL_IMAGE_SLUGS = [
+        'mikrotik-rb760igs-hex-s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'rb760igs-hex-s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'mikrotik-hex-s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'hex-s' => 'https://cdn.mikrotik.com/web-assets/rb_images/1539_lg.webp',
+        'mikrotik-rb4011igs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/1633_lg.webp',
+        'rb4011igs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/1633_lg.webp',
+        'mikrotik-rb951ui-2hnd' => 'https://cdn.mikrotik.com/web-assets/rb_images/902_lg.webp',
+        'rb951ui-2hnd' => 'https://cdn.mikrotik.com/web-assets/rb_images/902_lg.webp',
+        'mikrotik-l009uigs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp',
+        'l009uigs-rm' => 'https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp',
+        'mikrotik-l009uigs-2haxd-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2263_lg.webp',
+        'l009uigs-2haxd-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2263_lg.webp',
+        'mikrotik-rb5009ug-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
+        'rb5009ug-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
+        'mikrotik-rb5009upr-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
+        'rb5009upr-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
     ];
 
     public static function officialUrlFor(?string $productName): ?string
@@ -120,6 +156,8 @@ class ProductImageCatalog
 
         return self::OFFICIAL_IMAGES[$key]
             ?? self::OFFICIAL_IMAGES['mikrotik ' . $key]
+            ?? self::OFFICIAL_IMAGE_SLUGS[Str::slug($key)]
+            ?? self::OFFICIAL_IMAGE_SLUGS[Str::slug('mikrotik ' . $key)]
             ?? null;
     }
 

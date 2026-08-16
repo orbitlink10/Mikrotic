@@ -45,16 +45,16 @@ class ProductImage extends Model
 
         $publicPath = $this->pathRelativeToRoot($imageUrl, public_path());
         if ($publicPath !== null) {
-            return ProductImageCatalog::publicPathUrl($publicPath);
+            return $this->publicFileUrlIfExists($publicPath);
         }
 
         $storagePath = $this->pathRelativeToRoot($imageUrl, storage_path('app/public'));
         if ($storagePath !== null) {
-            return ProductImageCatalog::publicPathUrl('storage/' . $storagePath);
+            return $this->storageFileUrlIfExists($storagePath, 'app/public');
         }
 
         if (preg_match('#^/?(?:storage/app/public|app/public)/(.*)$#i', $imageUrl, $matches) === 1) {
-            return ProductImageCatalog::publicPathUrl('storage/' . $matches[1]);
+            return $this->storageFileUrlIfExists($matches[1], 'app/public');
         }
 
         $imageUrl = preg_replace('#^/?public/#', '', $imageUrl) ?? $imageUrl;
@@ -68,10 +68,10 @@ class ProductImage extends Model
         }
 
         if (Str::startsWith($imageUrl, '/')) {
-            return $imageUrl;
+            return $this->publicFileUrlIfExists($imageUrl);
         }
 
-        return ProductImageCatalog::publicPathUrl($imageUrl);
+        return $this->publicFileUrlIfExists($imageUrl);
     }
 
     private function pathRelativeToRoot(string $path, string $root): ?string
@@ -85,5 +85,51 @@ class ProductImage extends Model
         }
 
         return ltrim(substr($normalizedPath, strlen($normalizedRoot)), '/');
+    }
+
+    private function publicFileUrlIfExists(string $path): ?string
+    {
+        $relativePath = ltrim(str_replace('\\', '/', $path), '/');
+
+        if ($relativePath === '' || Str::contains($relativePath, '..')) {
+            return null;
+        }
+
+        if (!is_file(public_path($relativePath))) {
+            if (!$this->storageUploadFileExists($relativePath)) {
+                return null;
+            }
+        }
+
+        return ProductImageCatalog::publicPathUrl($relativePath);
+    }
+
+    private function storageFileUrlIfExists(string $path, string $storageRoot): ?string
+    {
+        $relativePath = ltrim(str_replace('\\', '/', $path), '/');
+
+        if ($relativePath === '' || Str::contains($relativePath, '..')) {
+            return null;
+        }
+
+        if (!is_file(storage_path(trim($storageRoot, '/') . '/' . $relativePath))) {
+            return null;
+        }
+
+        if (Str::startsWith($relativePath, 'uploads/products/')) {
+            return ProductImageCatalog::publicPathUrl($relativePath);
+        }
+
+        return ProductImageCatalog::publicPathUrl('storage/' . $relativePath);
+    }
+
+    private function storageUploadFileExists(string $relativePath): bool
+    {
+        if (!Str::startsWith($relativePath, 'uploads/products/')) {
+            return false;
+        }
+
+        return is_file(storage_path('app/public/' . $relativePath))
+            || is_file(storage_path('app/' . $relativePath));
     }
 }

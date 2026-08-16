@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class ProductShowPageTest extends TestCase
@@ -99,23 +100,55 @@ class ProductShowPageTest extends TestCase
         [$product] = $this->createApprovedProduct();
         $product->images()->update(['image_url' => 'public/uploads/products/product-main.jpg']);
 
-        $response = $this->get(route('product.show', $product));
+        $uploadedPath = public_path('uploads/products/product-main.jpg');
+        File::ensureDirectoryExists(dirname($uploadedPath));
+        File::put($uploadedPath, 'test image');
 
-        $response->assertOk();
-        $response->assertSee('src="/uploads/products/product-main.jpg"', false);
-        $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        try {
+            $response = $this->get(route('product.show', $product));
+
+            $response->assertOk();
+            $response->assertSee('src="/uploads/products/product-main.jpg"', false);
+            $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        } finally {
+            File::delete($uploadedPath);
+        }
     }
 
     public function test_product_show_page_renders_absolute_public_product_image_paths(): void
     {
         [$product] = $this->createApprovedProduct();
-        $product->images()->update(['image_url' => public_path('uploads/products/product-main.jpg')]);
+        $uploadedPath = public_path('uploads/products/product-main.jpg');
+        $product->images()->update(['image_url' => $uploadedPath]);
+
+        File::ensureDirectoryExists(dirname($uploadedPath));
+        File::put($uploadedPath, 'test image');
+
+        try {
+            $response = $this->get(route('product.show', $product));
+
+            $response->assertOk();
+            $response->assertSee('src="/uploads/products/product-main.jpg"', false);
+            $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        } finally {
+            File::delete($uploadedPath);
+        }
+    }
+
+    public function test_product_show_page_ignores_missing_local_product_image_and_uses_official_fallback(): void
+    {
+        [$product] = $this->createApprovedProduct();
+        $product->update([
+            'name' => 'MikroTik RB4011iGS+RM',
+            'slug' => 'mikrotik-rb4011igsrm',
+        ]);
+        $product->images()->update(['image_url' => '/uploads/products/missing-rb4011.webp']);
 
         $response = $this->get(route('product.show', $product));
 
         $response->assertOk();
-        $response->assertSee('src="/uploads/products/product-main.jpg"', false);
-        $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        $response->assertSee('src="https://cdn.mikrotik.com/web-assets/rb_images/1633_lg.webp"', false);
+        $response->assertDontSee('src="/uploads/products/missing-rb4011.webp"', false);
     }
 
     /**

@@ -125,11 +125,31 @@ class StorefrontSearchTest extends TestCase
         [$product] = $this->createCatalogProducts();
         $product->images()->update(['image_url' => 'uploads/products/rb5009.jpg']);
 
+        $uploadedPath = public_path('uploads/products/rb5009.jpg');
+        File::ensureDirectoryExists(dirname($uploadedPath));
+        File::put($uploadedPath, 'test image');
+
+        try {
+            $response = $this->get('/');
+
+            $response->assertOk();
+            $response->assertSee('src="/uploads/products/rb5009.jpg"', false);
+            $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        } finally {
+            File::delete($uploadedPath);
+        }
+    }
+
+    public function test_catalog_ignores_missing_local_product_image_and_uses_official_fallback(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->update(['image_url' => 'uploads/products/missing-rb5009.jpg']);
+
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('src="/uploads/products/rb5009.jpg"', false);
-        $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        $response->assertSee('src="https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp"', false);
+        $response->assertDontSee('src="/uploads/products/missing-rb5009.jpg"', false);
     }
 
     public function test_catalog_uses_preuploaded_product_file_matching_the_product_slug(): void
@@ -149,6 +169,28 @@ class StorefrontSearchTest extends TestCase
             $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
         } finally {
             File::delete($uploadedPath);
+        }
+    }
+
+    public function test_catalog_can_render_product_uploads_stored_under_laravel_storage(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->update(['image_url' => 'uploads/products/storage-rb5009.jpg']);
+
+        $storagePath = storage_path('app/public/uploads/products/storage-rb5009.jpg');
+        File::ensureDirectoryExists(dirname($storagePath));
+        File::put($storagePath, 'test image');
+
+        try {
+            $response = $this->get('/');
+
+            $response->assertOk();
+            $response->assertSee('src="/uploads/products/storage-rb5009.jpg"', false);
+            $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+
+            $this->get('/uploads/products/storage-rb5009.jpg')->assertOk();
+        } finally {
+            File::delete($storagePath);
         }
     }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\VendorController;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
@@ -15,6 +16,23 @@ Route::get('/product/{product:slug}', [StorefrontController::class, 'show'])->na
 Route::get('/products/{product:slug}', fn (Product $product) => redirect()->route('product.show', $product, 301));
 Route::get('/categories/{category:slug}', fn (Category $category) => redirect()->route('category.show', $category, 301));
 Route::get('/pages/{page:slug}', [StorefrontController::class, 'showPage'])->name('pages.show');
+Route::get('/uploads/products/{filename}', function (string $filename) {
+    $paths = [
+        public_path('uploads/products/' . $filename),
+        storage_path('app/public/uploads/products/' . $filename),
+        storage_path('app/uploads/products/' . $filename),
+    ];
+
+    foreach ($paths as $path) {
+        if (File::isFile($path)) {
+            return response()->file($path, [
+                'Cache-Control' => 'public, max-age=604800',
+            ]);
+        }
+    }
+
+    abort(404);
+})->where('filename', '[A-Za-z0-9._-]+')->name('uploads.products.show');
 
 Route::redirect('/login', '/login.php');
 Route::redirect('/admin/register', '/admin/register.php');
