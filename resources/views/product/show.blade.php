@@ -2,6 +2,7 @@
 
 @php
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
+    $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
     $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
     $descriptionHtml = \App\Support\ProductContent::sanitizeRichText($product->description)
         ?: '<p>No description available.</p>';
@@ -11,11 +12,17 @@
         ->map(fn ($image) => $image->publicUrl())
         ->filter()
         ->values();
+    if ($galleryImages->isEmpty() && $uploadedProductImage) {
+        $galleryImages = collect([$uploadedProductImage]);
+    }
     if ($galleryImages->isEmpty()) {
         $galleryImages = collect([$officialProductImage ?: $productImageFallback]);
     }
 
     $primaryImage = $galleryImages->first();
+    $imageErrorFallback = $primaryImage !== $uploadedProductImage && $uploadedProductImage
+        ? $uploadedProductImage
+        : ($primaryImage !== $officialProductImage && $officialProductImage ? $officialProductImage : $productImageFallback);
     $currentPrice = (float) $product->price;
     $compareAtPrice = (float) ($product->compare_at_price ?? 0);
     $hasDiscount = $compareAtPrice > $currentPrice && $compareAtPrice > 0;
@@ -62,7 +69,7 @@
                     alt="{{ $product->name }}"
                     class="product-gallery-main-image"
                     data-product-main-image
-                    onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
+                    onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
                 >
             </div>
 
@@ -79,7 +86,7 @@
                             <img
                                 src="{{ $galleryImage }}"
                                 alt="{{ $product->name }} thumbnail {{ $index + 1 }}"
-                                onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
+                                onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
                             >
                         </button>
                     @endforeach

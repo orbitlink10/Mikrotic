@@ -7,6 +7,11 @@ use Illuminate\Support\Str;
 class ProductImageCatalog
 {
     /**
+     * @var array<int, string>
+     */
+    private const UPLOADED_IMAGE_EXTENSIONS = ['webp', 'jpg', 'jpeg', 'png'];
+
+    /**
      * @var array<string, string>
      */
     private const OFFICIAL_IMAGES = [
@@ -120,7 +125,29 @@ class ProductImageCatalog
 
     public static function placeholderUrl(): string
     {
-        return rtrim(request()->getBaseUrl(), '/') . '/assets/product-placeholder.svg';
+        return self::publicPathUrl('assets/product-placeholder.svg');
+    }
+
+    public static function uploadedUrlFor(?string $productName, ?string $productSlug = null): ?string
+    {
+        foreach (self::uploadedImageBasenames($productName, $productSlug) as $basename) {
+            foreach (self::UPLOADED_IMAGE_EXTENSIONS as $extension) {
+                $relativePath = 'uploads/products/' . $basename . '.' . $extension;
+
+                if (is_file(public_path($relativePath))) {
+                    return self::publicPathUrl($relativePath);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static function publicPathUrl(string $path): string
+    {
+        $path = str_replace('\\', '/', $path);
+
+        return rtrim(request()->getBaseUrl(), '/') . '/' . ltrim($path, '/');
     }
 
     private static function normalizeName(?string $productName): string
@@ -128,5 +155,32 @@ class ProductImageCatalog
         $name = Str::lower(trim(strip_tags((string) $productName)));
 
         return preg_replace('/\s+/u', ' ', $name) ?? '';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function uploadedImageBasenames(?string $productName, ?string $productSlug): array
+    {
+        $candidates = [];
+
+        foreach ([$productSlug, $productName] as $value) {
+            $slug = Str::slug((string) $value);
+            if ($slug !== '') {
+                $candidates[] = $slug;
+            }
+        }
+
+        $normalizedName = self::normalizeName($productName);
+        if (Str::startsWith($normalizedName, 'mikrotik ')) {
+            $withoutBrand = trim(Str::after($normalizedName, 'mikrotik '));
+            $slug = Str::slug($withoutBrand);
+
+            if ($slug !== '') {
+                $candidates[] = $slug;
+            }
+        }
+
+        return array_values(array_unique($candidates));
     }
 }

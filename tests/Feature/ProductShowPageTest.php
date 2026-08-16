@@ -106,6 +106,18 @@ class ProductShowPageTest extends TestCase
         $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
     }
 
+    public function test_product_show_page_renders_absolute_public_product_image_paths(): void
+    {
+        [$product] = $this->createApprovedProduct();
+        $product->images()->update(['image_url' => public_path('uploads/products/product-main.jpg')]);
+
+        $response = $this->get(route('product.show', $product));
+
+        $response->assertOk();
+        $response->assertSee('src="/uploads/products/product-main.jpg"', false);
+        $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\User}
      */

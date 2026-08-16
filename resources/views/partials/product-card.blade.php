@@ -1,8 +1,14 @@
 @php
     $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+    $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
+    $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
     $image = $productImage?->publicUrl()
-        ?: \App\Support\ProductImageCatalog::officialUrlFor($product->name)
+        ?: $uploadedProductImage
+        ?: $officialProductImage
         ?: $productImageFallback;
+    $imageErrorFallback = $image !== $uploadedProductImage && $uploadedProductImage
+        ? $uploadedProductImage
+        : ($image !== $officialProductImage && $officialProductImage ? $officialProductImage : $productImageFallback);
     $productDescription = \App\Support\ProductContent::excerpt($product->meta_description ?: $product->description, 132);
     $productDescription = $productDescription !== ''
         ? $productDescription
@@ -17,7 +23,7 @@
             alt="{{ $product->name }}"
             loading="lazy"
             decoding="async"
-            onerror="this.onerror=null;this.src='{{ $productImageFallback }}';"
+            onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
         >
     </a>
     <div class="product-body">

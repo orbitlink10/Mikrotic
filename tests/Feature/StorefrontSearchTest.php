@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class StorefrontSearchTest extends TestCase
@@ -129,6 +130,26 @@ class StorefrontSearchTest extends TestCase
         $response->assertOk();
         $response->assertSee('src="/uploads/products/rb5009.jpg"', false);
         $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+    }
+
+    public function test_catalog_uses_preuploaded_product_file_matching_the_product_slug(): void
+    {
+        [$product] = $this->createCatalogProducts();
+        $product->images()->delete();
+
+        $uploadedPath = public_path('uploads/products/' . $product->slug . '.jpg');
+        File::ensureDirectoryExists(dirname($uploadedPath));
+        File::put($uploadedPath, 'test image');
+
+        try {
+            $response = $this->get('/');
+
+            $response->assertOk();
+            $response->assertSee('src="/uploads/products/' . $product->slug . '.jpg"', false);
+            $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
+        } finally {
+            File::delete($uploadedPath);
+        }
     }
 
     public function test_homepage_shows_two_router_product_rows_from_requested_category(): void
