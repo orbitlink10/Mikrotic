@@ -211,21 +211,41 @@ button.danger {
     border-radius: 12px;
     padding: 14px;
     align-self: start;
+    position: sticky;
+    top: 16px;
 }
 
 .category-sidebar h3 {
-    margin-top: 0;
+    margin: 0 0 14px;
 }
 
 .category-sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 6px;
+    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-width: thin;
+}
+
+.category-sidebar ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.category-sidebar ul::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.category-sidebar ul::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
 }
 
 .category-sidebar a {
     display: block;
-    padding: 8px 10px;
+    padding: 9px 10px;
     border-radius: 8px;
 }
 
@@ -3720,14 +3740,17 @@ textarea.admin-post-builder-input {
     .category-sidebar {
         position: relative;
         overflow: hidden;
+        top: auto;
     }
 
     .category-sidebar ul {
         display: flex;
         gap: 8px;
+        max-height: none;
         margin: 0 -14px;
         padding: 0 14px 2px;
         overflow-x: auto;
+        overflow-y: hidden;
         scrollbar-width: thin;
     }
 
