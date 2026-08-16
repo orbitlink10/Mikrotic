@@ -33,7 +33,7 @@
         </a>
 
         <form class="search-form" method="get" action="{{ route('home') }}">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search products, brands and categories">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories">
             <button type="submit">Search</button>
         </form>
 
