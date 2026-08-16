@@ -256,6 +256,8 @@ class StorefrontSearchTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('products-grid--router-rows', false);
+        $response->assertSee('home-product-section--full-width', false);
+        $response->assertSee('products-grid--catalog', false);
         $content = $response->getContent();
         $featuredStart = strpos($content, 'products-grid products-grid--router-rows');
 

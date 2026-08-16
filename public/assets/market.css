@@ -360,7 +360,26 @@ button.danger {
     margin-top: 0;
 }
 
+.home-product-section {
+    display: grid;
+    gap: 16px;
+}
+
+.home-product-section--full-width {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
+.products-grid--catalog {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 @media (max-width: 1200px) {
+    .products-grid--catalog {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .products-grid--router-rows {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -368,6 +387,7 @@ button.danger {
 
 @media (max-width: 900px) {
     .products-grid,
+    .products-grid--catalog,
     .products-grid--router-rows {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

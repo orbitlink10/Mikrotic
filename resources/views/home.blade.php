@@ -14,6 +14,7 @@
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
     $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
+    $showFullWidthProductGrid = $search === '' && !$currentCategory;
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -110,29 +111,31 @@ SVG,
             </section>
         @endif
 
-        <section class="products-grid">
-            @forelse($products as $product)
-                @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
-            @empty
-                <p class="empty">No products found.</p>
-            @endforelse
-        </section>
+        @unless($showFullWidthProductGrid)
+            <section class="products-grid">
+                @forelse($products as $product)
+                    @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
+                @empty
+                    <p class="empty">No products found.</p>
+                @endforelse
+            </section>
 
-        @if($products->hasPages())
-            <div class="pager">
-                @if($products->onFirstPage())
-                    <span class="pager-link disabled">Previous</span>
-                @else
-                    <a class="pager-link" href="{{ $products->previousPageUrl() }}">Previous</a>
-                @endif
-                <span>Page {{ $products->currentPage() }} of {{ $products->lastPage() }}</span>
-                @if($products->hasMorePages())
-                    <a class="pager-link" href="{{ $products->nextPageUrl() }}">Next</a>
-                @else
-                    <span class="pager-link disabled">Next</span>
-                @endif
-            </div>
-        @endif
+            @if($products->hasPages())
+                <div class="pager">
+                    @if($products->onFirstPage())
+                        <span class="pager-link disabled">Previous</span>
+                    @else
+                        <a class="pager-link" href="{{ $products->previousPageUrl() }}">Previous</a>
+                    @endif
+                    <span>Page {{ $products->currentPage() }} of {{ $products->lastPage() }}</span>
+                    @if($products->hasMorePages())
+                        <a class="pager-link" href="{{ $products->nextPageUrl() }}">Next</a>
+                    @else
+                        <span class="pager-link disabled">Next</span>
+                    @endif
+                </div>
+            @endif
+        @endunless
 
         @if($currentCategory && $categoryDescriptionHtml)
             <section class="panel category-description-panel">
@@ -140,6 +143,34 @@ SVG,
             </section>
         @endif
     </div>
+
+    @if($showFullWidthProductGrid)
+        <section class="home-product-section home-product-section--full-width">
+            <section class="products-grid products-grid--catalog" aria-label="All products">
+                @forelse($products as $product)
+                    @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
+                @empty
+                    <p class="empty">No products found.</p>
+                @endforelse
+            </section>
+
+            @if($products->hasPages())
+                <div class="pager">
+                    @if($products->onFirstPage())
+                        <span class="pager-link disabled">Previous</span>
+                    @else
+                        <a class="pager-link" href="{{ $products->previousPageUrl() }}">Previous</a>
+                    @endif
+                    <span>Page {{ $products->currentPage() }} of {{ $products->lastPage() }}</span>
+                    @if($products->hasMorePages())
+                        <a class="pager-link" href="{{ $products->nextPageUrl() }}">Next</a>
+                    @else
+                        <span class="pager-link disabled">Next</span>
+                    @endif
+                </div>
+            @endif
+        </section>
+    @endif
 
     @if($showHomepageSections)
         <section class="home-extra-sections home-extra-sections--full-width">
