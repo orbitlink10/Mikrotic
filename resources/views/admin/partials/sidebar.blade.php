@@ -93,7 +93,7 @@ SVG,
 
 <aside class="admin-sidebar">
     @if($showSidebarBrand)
-        <a class="admin-brand-card admin-brand-logo" href="{{ route('admin.dashboard') }}" aria-label="{{ config('app.name', 'Mikrotik Kenya') }} admin dashboard">
+        <a class="admin-brand-card admin-brand-logo" href="{{ route('home') }}" aria-label="Go to {{ config('app.name', 'Mikrotik Kenya') }} homepage">
             <span class="admin-brand-logo-mark" aria-hidden="true">
                 @if($siteLogoUrl)
                     <img src="{{ $siteLogoUrl }}" alt="">
