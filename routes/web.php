@@ -3,24 +3,31 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ComparisonController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\VendorController;
-use App\Models\Category;
-use App\Models\Product;
+use App\Support\MikrotikSeoCatalog;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
-Route::get('/category/{category:slug}', [StorefrontController::class, 'showCategory'])->name('category.show');
-Route::get('/product/{product:slug}', [StorefrontController::class, 'show'])->name('product.show');
-Route::get('/products/{product:slug}', fn (Product $product) => redirect()->route('product.show', $product, 301));
-Route::get('/categories/{category:slug}', fn (Category $category) => redirect()->route('category.show', $category, 301));
-Route::get('/pages/{page:slug}', [StorefrontController::class, 'showPage'])->name('pages.show');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/compare/{comparison}', [ComparisonController::class, 'show'])
+    ->where('comparison', 'rb760igs-vs-rb750gr3|rb4011-vs-rb5009|l009uigs-rm-vs-l009uigs-2haxd-in|ccr2004-vs-ccr2116')
+    ->name('comparison.show');
+Route::get('/category/{category}', [StorefrontController::class, 'showCategory'])->name('category.show');
+Route::get('/product/{product}', [StorefrontController::class, 'show'])->name('product.show');
+Route::get('/products/{product}', [StorefrontController::class, 'redirectLegacyProduct']);
+Route::get('/categories/{category}', [StorefrontController::class, 'redirectLegacyCategory']);
+Route::get('/pages/{page}', [StorefrontController::class, 'showPage'])->name('pages.show');
+Route::get('/{categorySlug}', [StorefrontController::class, 'redirectTopLevelCategory'])
+    ->where('categorySlug', implode('|', array_keys(MikrotikSeoCatalog::topLevelCategoryRedirects())));
 Route::get('/uploads/products/{filename}', function (string $filename) {
     $paths = [
-        public_path('uploads/products/' . $filename),
-        storage_path('app/public/uploads/products/' . $filename),
-        storage_path('app/uploads/products/' . $filename),
+        public_path('uploads/products/'.$filename),
+        storage_path('app/public/uploads/products/'.$filename),
+        storage_path('app/uploads/products/'.$filename),
     ];
 
     foreach ($paths as $path) {

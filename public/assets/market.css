@@ -772,6 +772,11 @@ button.danger {
     box-shadow: 0 16px 32px rgba(255, 155, 47, 0.24);
     font-size: 14px;
     font-weight: 700;
+    max-width: 54%;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -789,6 +794,182 @@ button.danger {
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 18px;
+}
+
+.category-hub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0 0;
+}
+
+.category-hub-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid #d9e6f4;
+    border-radius: 999px;
+    background: #fff;
+    color: #0d1c3d;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.category-fallback-note {
+    border-color: rgba(255, 155, 47, 0.35);
+    background: #fff8ec;
+}
+
+.category-fallback-note p {
+    margin: 0;
+    color: #7a4c12;
+}
+
+.router-price-panel,
+.router-guide-panel {
+    display: grid;
+    gap: 16px;
+}
+
+.router-price-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.6fr);
+    gap: 16px;
+    align-items: end;
+}
+
+.router-price-head h2,
+.router-guide-panel h2,
+.product-info-panel h2,
+.product-faq-shell h2,
+.product-link-panel h2,
+.product-related-shell h2,
+.comparison-head h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.25rem, 1.5vw, 1.7rem);
+    line-height: 1.2;
+}
+
+.router-price-head p,
+.router-guide-panel li,
+.product-info-panel li,
+.product-info-panel p,
+.comparison-head p {
+    color: #475569;
+    line-height: 1.65;
+}
+
+.router-price-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 680px;
+}
+
+.router-price-table th,
+.router-price-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    vertical-align: top;
+}
+
+.router-price-table th {
+    color: #0d1c3d;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.router-price-table a {
+    color: #0a4588;
+    font-weight: 700;
+}
+
+.router-guide-grid,
+.product-seo-grid,
+.trust-info-grid,
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.router-guide-panel ul,
+.product-info-panel ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.product-identity-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.product-identity-row span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: #fff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.product-info-panel,
+.product-link-panel,
+.product-related-shell,
+.product-faq-shell {
+    background: #fff;
+    border: 1px solid #e6edf5;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 14px 30px rgba(17, 24, 39, 0.05);
+}
+
+.product-spec-table {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+}
+
+.product-spec-table div,
+.trust-info-grid div {
+    display: grid;
+    gap: 4px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.product-spec-table dt,
+.trust-info-grid dt {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.product-spec-table dd,
+.trust-info-grid dd {
+    margin: 0;
+    color: #0d1c3d;
+    line-height: 1.55;
+}
+
+.comparison-page {
+    display: grid;
+    gap: 18px;
+}
+
+.page-faq-section {
+    margin-top: 28px;
 }
 
 .auth-card {
@@ -3755,6 +3936,19 @@ textarea.admin-post-builder-input {
 
     .home-layout {
         grid-template-columns: 1fr;
+    }
+
+    .router-price-head,
+    .router-guide-grid,
+    .product-seo-grid,
+    .trust-info-grid,
+    .admin-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .router-price-table-wrap,
+    .table-wrap {
+        overflow-x: auto;
     }
 
     .category-sidebar {

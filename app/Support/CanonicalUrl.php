@@ -24,6 +24,17 @@ class CanonicalUrl
         return self::normalize(url()->current());
     }
 
+    public static function absoluteAsset(string $url): string
+    {
+        $parts = parse_url($url);
+
+        if ($parts !== false && isset($parts['host'])) {
+            return $url;
+        }
+
+        return self::normalize($url);
+    }
+
     public static function normalize(string $url): string
     {
         $parts = parse_url($url);

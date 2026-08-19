@@ -9,13 +9,13 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Testimonial;
-use App\Support\ProductContent;
 use App\Models\User;
 use App\Models\Vendor;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Support\ProductContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -38,7 +38,7 @@ class AdminController extends Controller
             ->where('slug', $slug)
             ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
             ->exists()) {
-            $slug = $base . '-' . $counter;
+            $slug = $base.'-'.$counter;
             $counter++;
         }
 
@@ -47,10 +47,10 @@ class AdminController extends Controller
 
     private function nextSku(): string
     {
-        $sku = strtoupper('SKU-' . Str::upper(Str::random(8)));
+        $sku = strtoupper('SKU-'.Str::upper(Str::random(8)));
 
         while (Product::where('sku', $sku)->exists()) {
-            $sku = strtoupper('SKU-' . Str::upper(Str::random(8)));
+            $sku = strtoupper('SKU-'.Str::upper(Str::random(8)));
         }
 
         return $sku;
@@ -61,20 +61,20 @@ class AdminController extends Controller
         $targetDirectory = public_path(trim($directory, '/'));
         File::ensureDirectoryExists($targetDirectory);
 
-        $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $file->getClientOriginalExtension();
+        $filename = now()->format('YmdHis').'-'.Str::lower(Str::random(10)).'.'.$file->getClientOriginalExtension();
         $file->move($targetDirectory, $filename);
 
-        return '/' . trim($directory, '/') . '/' . $filename;
+        return '/'.trim($directory, '/').'/'.$filename;
     }
 
     private function deleteManagedUpload(?string $path, string $prefix): void
     {
-        if (!$path) {
+        if (! $path) {
             return;
         }
 
-        $normalizedPath = '/' . ltrim($path, '/');
-        if (!Str::startsWith($normalizedPath, $prefix)) {
+        $normalizedPath = '/'.ltrim($path, '/');
+        if (! Str::startsWith($normalizedPath, $prefix)) {
             return;
         }
 
@@ -99,14 +99,14 @@ class AdminController extends Controller
      */
     private function normalizeHomepageItems(?array $items, array $keys, array $limits): array
     {
-        if (!is_array($items)) {
+        if (! is_array($items)) {
             return [];
         }
 
         $normalized = [];
 
         foreach ($items as $item) {
-            if (!is_array($item)) {
+            if (! is_array($item)) {
                 continue;
             }
 
@@ -126,6 +126,90 @@ class AdminController extends Controller
         return $normalized;
     }
 
+    private function cleanOptionalText(?string $value, int $limit): ?string
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $value)) ?? '');
+
+        return $text !== '' ? Str::limit($text, $limit, '') : null;
+    }
+
+    private function cleanOptionalMultiline(?string $value, int $limit = 4000): ?string
+    {
+        $lines = preg_split('/\r\n|\r|\n/', strip_tags((string) $value)) ?: [];
+        $text = implode(PHP_EOL, array_values(array_filter(array_map(
+            fn (string $line): string => trim(preg_replace('/\s+/u', ' ', $line) ?? ''),
+            $lines
+        ))));
+
+        return $text !== '' ? Str::limit($text, $limit, '') : null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function seoRules(): array
+    {
+        return [
+            'seo_title' => ['nullable', 'string', 'max:180'],
+            'canonical_url' => ['nullable', 'url', 'max:255'],
+            'robots' => ['nullable', Rule::in(['index,follow', 'noindex,follow'])],
+            'og_title' => ['nullable', 'string', 'max:180'],
+            'og_description' => ['nullable', 'string', 'max:255'],
+            'og_image' => ['nullable', 'url', 'max:255'],
+            'faq_items' => ['nullable', 'array'],
+            'faq_items.*.question' => ['nullable', 'string', 'max:220'],
+            'faq_items.*.answer' => ['nullable', 'string', 'max:1200'],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function seoPayload(array $data): array
+    {
+        return [
+            'seo_title' => $this->cleanOptionalText($data['seo_title'] ?? null, 180),
+            'canonical_url' => $this->cleanOptionalText($data['canonical_url'] ?? null, 255),
+            'robots' => $this->cleanOptionalText($data['robots'] ?? null, 40),
+            'og_title' => $this->cleanOptionalText($data['og_title'] ?? null, 180),
+            'og_description' => ProductContent::sanitizeMetaDescription($data['og_description'] ?? null),
+            'og_image' => $this->cleanOptionalText($data['og_image'] ?? null, 255),
+            'faq_items' => $this->normalizeFaqItems($data['faq_items'] ?? null) ?: null,
+        ];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>|null  $items
+     * @return array<int, array{question: string, answer: string}>
+     */
+    private function normalizeFaqItems(?array $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $question = $this->cleanOptionalText((string) ($item['question'] ?? ''), 220);
+            $answer = $this->cleanOptionalText((string) ($item['answer'] ?? ''), 1200);
+
+            if ($question && $answer) {
+                $normalized[] = [
+                    'question' => $question,
+                    'answer' => $answer,
+                ];
+            }
+        }
+
+        return array_slice($normalized, 0, 12);
+    }
+
     private function validateTestimonialData(Request $request): array
     {
         return $request->validate([
@@ -140,7 +224,7 @@ class AdminController extends Controller
 
     private function syncPrimaryProductImage(Product $product, ?UploadedFile $image): void
     {
-        if (!$image) {
+        if (! $image) {
             return;
         }
 
@@ -168,11 +252,11 @@ class AdminController extends Controller
 
     private function resolveCategory(array $data): Category
     {
-        if (!empty($data['subcategory_id'])) {
+        if (! empty($data['subcategory_id'])) {
             return Category::query()->findOrFail($data['subcategory_id']);
         }
 
-        if (!empty($data['category_id'])) {
+        if (! empty($data['category_id'])) {
             return Category::query()->findOrFail($data['category_id']);
         }
 
@@ -194,21 +278,25 @@ class AdminController extends Controller
     private function adminVendor(Request $request, bool $create = false): ?Vendor
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
-        $adminShopName = 'Mikrotik Kenya Official Store';
+        $adminShopName = 'Mikrotik Kenya Store';
 
         $vendor = Vendor::query()->where('user_id', $user->id)->first();
         if ($vendor) {
             $updates = [];
 
-            if (!$vendor->is_approved) {
+            if (! $vendor->is_approved) {
                 $updates['is_approved'] = true;
             }
 
-            if (strcasecmp((string) $vendor->shop_name, 'Almar Market Official Store') === 0) {
+            $legacyOfficial = 'official';
+            if (in_array(strtolower((string) $vendor->shop_name), [
+                'almar market '.$legacyOfficial.' store',
+                'mikrotik kenya '.$legacyOfficial.' store',
+            ], true)) {
                 $updates['shop_name'] = $adminShopName;
                 $updates['slug'] = $this->uniqueSlug('vendors', $adminShopName, $vendor->id);
             }
@@ -221,7 +309,7 @@ class AdminController extends Controller
             return $vendor;
         }
 
-        if (!$create) {
+        if (! $create) {
             return null;
         }
 
@@ -328,6 +416,7 @@ class AdminController extends Controller
                 ->get(),
             'defaultParentId' => $defaultParentId > 0 ? $defaultParentId : null,
             'categoryContentFieldsReady' => Category::contentFieldsReady(),
+            'categorySeoFieldsReady' => Category::seoFieldsReady(),
         ]);
     }
 
@@ -341,6 +430,7 @@ class AdminController extends Controller
                 ->get(),
             'defaultParentId' => $category->parent_id,
             'categoryContentFieldsReady' => Category::contentFieldsReady(),
+            'categorySeoFieldsReady' => Category::seoFieldsReady(),
             'categoryToEdit' => $category,
         ]);
     }
@@ -348,6 +438,7 @@ class AdminController extends Controller
     public function storeCategory(Request $request): RedirectResponse
     {
         $categoryContentFieldsReady = Category::contentFieldsReady();
+        $categorySeoFieldsReady = Category::seoFieldsReady();
 
         $rules = [
             'name' => ['required', 'string', 'min:2', 'max:120', 'unique:categories,name'],
@@ -358,6 +449,13 @@ class AdminController extends Controller
         if ($categoryContentFieldsReady) {
             $rules['meta_description'] = ['nullable', 'string', 'max:255'];
             $rules['description'] = ['nullable', 'string'];
+        }
+
+        if ($categorySeoFieldsReady) {
+            $rules = array_merge($rules, $this->seoRules(), [
+                'intro' => ['nullable', 'string', 'max:500'],
+                'seo_content' => ['nullable', 'string'],
+            ]);
         }
 
         $data = $request->validate($rules);
@@ -379,6 +477,13 @@ class AdminController extends Controller
             $payload['description'] = ProductContent::sanitizeRichText($data['description'] ?? null);
         }
 
+        if ($categorySeoFieldsReady) {
+            $payload = array_merge($payload, $this->seoPayload($data), [
+                'intro' => $this->cleanOptionalText($data['intro'] ?? null, 500),
+                'seo_content' => ProductContent::sanitizeRichText($data['seo_content'] ?? null),
+            ]);
+        }
+
         $category = Category::create($payload);
 
         $redirectRoute = $category->parent_id ? 'admin.subcategories.index' : 'admin.categories.index';
@@ -392,6 +497,7 @@ class AdminController extends Controller
     public function updateCategory(Request $request, Category $category): RedirectResponse
     {
         $categoryContentFieldsReady = Category::contentFieldsReady();
+        $categorySeoFieldsReady = Category::seoFieldsReady();
 
         $rules = [
             'name' => ['required', 'string', 'min:2', 'max:120', Rule::unique('categories', 'name')->ignore($category->id)],
@@ -402,6 +508,13 @@ class AdminController extends Controller
         if ($categoryContentFieldsReady) {
             $rules['meta_description'] = ['nullable', 'string', 'max:255'];
             $rules['description'] = ['nullable', 'string'];
+        }
+
+        if ($categorySeoFieldsReady) {
+            $rules = array_merge($rules, $this->seoRules(), [
+                'intro' => ['nullable', 'string', 'max:500'],
+                'seo_content' => ['nullable', 'string'],
+            ]);
         }
 
         $data = $request->validate($rules);
@@ -422,6 +535,13 @@ class AdminController extends Controller
         if ($categoryContentFieldsReady) {
             $payload['meta_description'] = ProductContent::sanitizeMetaDescription($data['meta_description'] ?? null);
             $payload['description'] = ProductContent::sanitizeRichText($data['description'] ?? null);
+        }
+
+        if ($categorySeoFieldsReady) {
+            $payload = array_merge($payload, $this->seoPayload($data), [
+                'intro' => $this->cleanOptionalText($data['intro'] ?? null, 500),
+                'seo_content' => ProductContent::sanitizeRichText($data['seo_content'] ?? null),
+            ]);
         }
 
         $category->update($payload);
@@ -461,9 +581,9 @@ class AdminController extends Controller
             ])
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($builder) use ($search): void {
-                    $builder->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('slug', 'like', '%' . $search . '%')
-                        ->orWhere('sku', 'like', '%' . $search . '%');
+                    $builder->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('slug', 'like', '%'.$search.'%')
+                        ->orWhere('sku', 'like', '%'.$search.'%');
                 });
             })
             ->latest()
@@ -485,10 +605,10 @@ class AdminController extends Controller
             ->with('user')
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($builder) use ($search): void {
-                    $builder->where('order_number', 'like', '%' . $search . '%')
-                        ->orWhere('shipping_name', 'like', '%' . $search . '%')
-                        ->orWhere('shipping_email', 'like', '%' . $search . '%')
-                        ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%' . $search . '%'));
+                    $builder->where('order_number', 'like', '%'.$search.'%')
+                        ->orWhere('shipping_name', 'like', '%'.$search.'%')
+                        ->orWhere('shipping_email', 'like', '%'.$search.'%')
+                        ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%'.$search.'%'));
                 });
             })
             ->when($status !== '', fn ($query) => $query->where('status', $status))
@@ -540,7 +660,7 @@ class AdminController extends Controller
 
     public function updateTestimonialSettings(Request $request): RedirectResponse
     {
-        if (!HomepageContent::storageReady()) {
+        if (! HomepageContent::storageReady()) {
             return redirect()
                 ->route('admin.testimonials.index')
                 ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
@@ -570,7 +690,7 @@ class AdminController extends Controller
 
     public function updateHomepageContent(Request $request): RedirectResponse
     {
-        if (!HomepageContent::storageReady()) {
+        if (! HomepageContent::storageReady()) {
             return redirect()
                 ->route('admin.pages-content.edit')
                 ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
@@ -656,10 +776,10 @@ class AdminController extends Controller
             }
 
             $logo = $request->file('site_logo');
-            $filename = now()->format('YmdHis') . '-logo-' . Str::lower(Str::random(10)) . '.' . $logo->getClientOriginalExtension();
+            $filename = now()->format('YmdHis').'-logo-'.Str::lower(Str::random(10)).'.'.$logo->getClientOriginalExtension();
             $logo->move($directory, $filename);
 
-            $homepageContent->site_logo_path = 'uploads/homepage-content/' . $filename;
+            $homepageContent->site_logo_path = 'uploads/homepage-content/'.$filename;
         }
 
         if ($request->hasFile('hero_image')) {
@@ -671,10 +791,10 @@ class AdminController extends Controller
             }
 
             $image = $request->file('hero_image');
-            $filename = now()->format('YmdHis') . '-' . Str::lower(Str::random(10)) . '.' . $image->getClientOriginalExtension();
+            $filename = now()->format('YmdHis').'-'.Str::lower(Str::random(10)).'.'.$image->getClientOriginalExtension();
             $image->move($directory, $filename);
 
-            $homepageContent->hero_image_path = 'uploads/homepage-content/' . $filename;
+            $homepageContent->hero_image_path = 'uploads/homepage-content/'.$filename;
         }
 
         $homepageContent->save();
@@ -692,7 +812,7 @@ class AdminController extends Controller
 
     public function storeTestimonial(Request $request): RedirectResponse
     {
-        if (!Testimonial::storageReady()) {
+        if (! Testimonial::storageReady()) {
             return redirect()
                 ->route('admin.testimonials.index')
                 ->with('error', 'Testimonial storage is not ready yet. Run php artisan migrate to create the testimonials table.');
@@ -760,7 +880,7 @@ class AdminController extends Controller
 
     private function validatePageData(Request $request, ?Page $page = null): array
     {
-        return $request->validate([
+        $rules = [
             'meta_title' => ['required', 'string', 'min:2', 'max:180'],
             'meta_description' => ['required', 'string', 'min:10', 'max:255'],
             'title' => ['required', 'string', 'min:2', 'max:180'],
@@ -770,22 +890,34 @@ class AdminController extends Controller
             'heading_two' => ['required', 'string', 'min:2', 'max:180'],
             'type' => ['required', 'in:page,post'],
             'body' => ['required', 'string'],
-        ]);
+        ];
+
+        if (Page::seoFieldsReady()) {
+            $rules = array_merge($rules, $this->seoRules());
+        }
+
+        return $request->validate($rules);
     }
 
     private function persistPage(Page $page, array $data): void
     {
-        $page->fill([
+        $payload = [
             'meta_title' => Str::limit(trim(strip_tags($data['meta_title'])), 180, ''),
             'meta_description' => ProductContent::sanitizeMetaDescription($data['meta_description']),
             'title' => trim($data['title']),
             'heading_two' => Str::limit(trim(strip_tags($data['heading_two'])), 180, ''),
-            'slug' => !empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title'], $page->id),
+            'slug' => ! empty($data['slug']) ? Str::slug($data['slug']) : $this->uniqueSlug('pages', $data['title'], $page->id),
             'image_url' => $data['image_url'] ?? null,
-            'alt_text' => !empty($data['alt_text']) ? trim($data['alt_text']) : null,
+            'alt_text' => ! empty($data['alt_text']) ? trim($data['alt_text']) : null,
             'type' => $data['type'],
             'body' => ProductContent::sanitizeRichText($data['body']),
-        ]);
+        ];
+
+        if (Page::seoFieldsReady()) {
+            $payload = array_merge($payload, $this->seoPayload($data));
+        }
+
+        $page->fill($payload);
 
         $page->save();
     }
@@ -800,7 +932,7 @@ class AdminController extends Controller
 
     public function storePage(Request $request): RedirectResponse
     {
-        if (!Page::storageReady()) {
+        if (! Page::storageReady()) {
             return redirect()
                 ->route('admin.pages.index')
                 ->with('error', 'Page storage is not ready yet. Run php artisan migrate to create the pages table.');
@@ -808,7 +940,7 @@ class AdminController extends Controller
 
         $data = $this->validatePageData($request);
 
-        $this->persistPage(new Page(), $data);
+        $this->persistPage(new Page, $data);
 
         return redirect()->route('admin.pages.index')->with('success', 'Page saved successfully.');
     }
@@ -866,7 +998,7 @@ class AdminController extends Controller
 
     public function storeProduct(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'min:2', 'max:180'],
             'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
             'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
@@ -877,21 +1009,42 @@ class AdminController extends Controller
             'compare_at_price' => ['nullable', 'numeric', 'gte:price'],
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]);
+        ];
 
-        if (!empty($data['subcategory_id'])) {
+        if (Product::seoFieldsReady()) {
+            $rules = array_merge($rules, $this->seoRules(), [
+                'model_number' => ['nullable', 'string', 'max:120'],
+                'brand' => ['nullable', 'string', 'max:120'],
+                'key_use' => ['nullable', 'string', 'max:255'],
+                'key_specifications' => ['nullable', 'string'],
+                'use_cases' => ['nullable', 'string'],
+                'technical_specifications' => ['nullable', 'string'],
+                'whats_in_box' => ['nullable', 'string'],
+                'recommended_applications' => ['nullable', 'string'],
+                'choose_another_model' => ['nullable', 'string', 'max:1200'],
+                'compatibility' => ['nullable', 'string', 'max:1200'],
+                'power_requirements' => ['nullable', 'string', 'max:1200'],
+                'warranty_info' => ['nullable', 'string', 'max:1200'],
+                'delivery_info' => ['nullable', 'string', 'max:1200'],
+                'payment_info' => ['nullable', 'string', 'max:1200'],
+            ]);
+        }
+
+        $data = $request->validate($rules);
+
+        if (! empty($data['subcategory_id'])) {
             $subcategory = Category::query()
                 ->whereKey($data['subcategory_id'])
                 ->whereNotNull('parent_id')
                 ->first();
 
-            if (!$subcategory) {
+            if (! $subcategory) {
                 throw ValidationException::withMessages([
                     'subcategory_id' => 'Select a valid subcategory.',
                 ]);
             }
 
-            if (!empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
+            if (! empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
                 throw ValidationException::withMessages([
                     'subcategory_id' => 'Select a subcategory that belongs to the chosen category.',
                 ]);
@@ -899,13 +1052,13 @@ class AdminController extends Controller
         }
 
         $vendor = $this->adminVendor($request, true);
-        if (!$vendor) {
+        if (! $vendor) {
             return redirect()->route('admin.dashboard')->with('error', 'Unable to initialize the admin store.');
         }
 
         $category = $this->resolveCategory($data);
 
-        $product = Product::create([
+        $payload = [
             'vendor_id' => $vendor->id,
             'category_id' => $category->id,
             'name' => $data['name'],
@@ -917,7 +1070,28 @@ class AdminController extends Controller
             'stock' => $data['stock'],
             'sku' => $this->nextSku(),
             'status' => 'active',
-        ]);
+        ];
+
+        if (Product::seoFieldsReady()) {
+            $payload = array_merge($payload, $this->seoPayload($data), [
+                'model_number' => $this->cleanOptionalText($data['model_number'] ?? null, 120),
+                'brand' => $this->cleanOptionalText($data['brand'] ?? null, 120),
+                'key_use' => $this->cleanOptionalText($data['key_use'] ?? null, 255),
+                'key_specifications' => $this->cleanOptionalMultiline($data['key_specifications'] ?? null),
+                'use_cases' => $this->cleanOptionalMultiline($data['use_cases'] ?? null),
+                'technical_specifications' => $this->cleanOptionalMultiline($data['technical_specifications'] ?? null),
+                'whats_in_box' => $this->cleanOptionalMultiline($data['whats_in_box'] ?? null),
+                'recommended_applications' => $this->cleanOptionalMultiline($data['recommended_applications'] ?? null),
+                'choose_another_model' => $this->cleanOptionalText($data['choose_another_model'] ?? null, 1200),
+                'compatibility' => $this->cleanOptionalText($data['compatibility'] ?? null, 1200),
+                'power_requirements' => $this->cleanOptionalText($data['power_requirements'] ?? null, 1200),
+                'warranty_info' => $this->cleanOptionalText($data['warranty_info'] ?? null, 1200),
+                'delivery_info' => $this->cleanOptionalText($data['delivery_info'] ?? null, 1200),
+                'payment_info' => $this->cleanOptionalText($data['payment_info'] ?? null, 1200),
+            ]);
+        }
+
+        $product = Product::create($payload);
 
         $this->syncPrimaryProductImage($product, $request->file('image'));
 
@@ -926,7 +1100,7 @@ class AdminController extends Controller
 
     public function updateProduct(Request $request, Product $product): RedirectResponse
     {
-        $data = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'min:2', 'max:180'],
             'category_id' => ['nullable', 'exists:categories,id', 'required_without:category_name'],
             'category_name' => ['nullable', 'string', 'min:2', 'max:120', 'required_without:category_id'],
@@ -937,21 +1111,42 @@ class AdminController extends Controller
             'compare_at_price' => ['nullable', 'numeric', 'gte:price'],
             'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]);
+        ];
 
-        if (!empty($data['subcategory_id'])) {
+        if (Product::seoFieldsReady()) {
+            $rules = array_merge($rules, $this->seoRules(), [
+                'model_number' => ['nullable', 'string', 'max:120'],
+                'brand' => ['nullable', 'string', 'max:120'],
+                'key_use' => ['nullable', 'string', 'max:255'],
+                'key_specifications' => ['nullable', 'string'],
+                'use_cases' => ['nullable', 'string'],
+                'technical_specifications' => ['nullable', 'string'],
+                'whats_in_box' => ['nullable', 'string'],
+                'recommended_applications' => ['nullable', 'string'],
+                'choose_another_model' => ['nullable', 'string', 'max:1200'],
+                'compatibility' => ['nullable', 'string', 'max:1200'],
+                'power_requirements' => ['nullable', 'string', 'max:1200'],
+                'warranty_info' => ['nullable', 'string', 'max:1200'],
+                'delivery_info' => ['nullable', 'string', 'max:1200'],
+                'payment_info' => ['nullable', 'string', 'max:1200'],
+            ]);
+        }
+
+        $data = $request->validate($rules);
+
+        if (! empty($data['subcategory_id'])) {
             $subcategory = Category::query()
                 ->whereKey($data['subcategory_id'])
                 ->whereNotNull('parent_id')
                 ->first();
 
-            if (!$subcategory) {
+            if (! $subcategory) {
                 throw ValidationException::withMessages([
                     'subcategory_id' => 'Select a valid subcategory.',
                 ]);
             }
 
-            if (!empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
+            if (! empty($data['category_id']) && $subcategory->parent_id !== (int) $data['category_id']) {
                 throw ValidationException::withMessages([
                     'subcategory_id' => 'Select a subcategory that belongs to the chosen category.',
                 ]);
@@ -960,7 +1155,7 @@ class AdminController extends Controller
 
         $category = $this->resolveCategory($data);
 
-        $product->update([
+        $payload = [
             'category_id' => $category->id,
             'name' => $data['name'],
             'slug' => $this->uniqueSlug('products', $data['name'], $product->id),
@@ -969,7 +1164,28 @@ class AdminController extends Controller
             'price' => $data['price'],
             'compare_at_price' => $data['compare_at_price'] ?? null,
             'stock' => $data['stock'],
-        ]);
+        ];
+
+        if (Product::seoFieldsReady()) {
+            $payload = array_merge($payload, $this->seoPayload($data), [
+                'model_number' => $this->cleanOptionalText($data['model_number'] ?? null, 120),
+                'brand' => $this->cleanOptionalText($data['brand'] ?? null, 120),
+                'key_use' => $this->cleanOptionalText($data['key_use'] ?? null, 255),
+                'key_specifications' => $this->cleanOptionalMultiline($data['key_specifications'] ?? null),
+                'use_cases' => $this->cleanOptionalMultiline($data['use_cases'] ?? null),
+                'technical_specifications' => $this->cleanOptionalMultiline($data['technical_specifications'] ?? null),
+                'whats_in_box' => $this->cleanOptionalMultiline($data['whats_in_box'] ?? null),
+                'recommended_applications' => $this->cleanOptionalMultiline($data['recommended_applications'] ?? null),
+                'choose_another_model' => $this->cleanOptionalText($data['choose_another_model'] ?? null, 1200),
+                'compatibility' => $this->cleanOptionalText($data['compatibility'] ?? null, 1200),
+                'power_requirements' => $this->cleanOptionalText($data['power_requirements'] ?? null, 1200),
+                'warranty_info' => $this->cleanOptionalText($data['warranty_info'] ?? null, 1200),
+                'delivery_info' => $this->cleanOptionalText($data['delivery_info'] ?? null, 1200),
+                'payment_info' => $this->cleanOptionalText($data['payment_info'] ?? null, 1200),
+            ]);
+        }
+
+        $product->update($payload);
 
         $this->syncPrimaryProductImage($product, $request->file('image'));
 

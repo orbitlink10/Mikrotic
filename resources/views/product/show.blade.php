@@ -31,7 +31,19 @@
         : null;
     $availabilityLabel = $product->stock > 0 ? 'IN STOCK' : 'OUT OF STOCK';
     $availabilityClass = $product->stock > 0 ? 'is-available' : 'is-unavailable';
-    $summary = trim((string) ($product->meta_description ?: \App\Support\ProductContent::excerpt($product->description, 280)));
+    $productSeoTitle = \App\Support\SeoMetadata::productTitle($product);
+    $productMetaDescription = \App\Support\SeoMetadata::productDescription($product);
+    $summary = trim((string) $productMetaDescription);
+    $productCanonicalUrl = \App\Support\SeoMetadata::canonicalOverride($product)
+        ?: \App\Support\CanonicalUrl::route('product.show', $product);
+    $productBrand = \App\Support\ProductSeo::brand($product);
+    $productModel = \App\Support\ProductSeo::model($product);
+    $productSpecs = \App\Support\ProductSeo::specs($product);
+    $productUseCases = \App\Support\ProductSeo::useCases($product);
+    $productApplications = \App\Support\ProductSeo::applications($product);
+    $productBoxItems = \App\Support\ProductSeo::whatsInBox($product);
+    $productFaqItems = \App\Support\ProductSeo::faqs($product);
+    $chooseAnotherModel = \App\Support\ProductSeo::chooseAnotherModel($product);
     $vendorPhoneDigits = preg_replace('/\D+/', '', (string) $product->vendor->phone);
     if ($vendorPhoneDigits !== '') {
         if (str_starts_with($vendorPhoneDigits, '0')) {
@@ -44,11 +56,42 @@
     $whatsAppUrl = $vendorPhoneDigits !== ''
         ? 'https://wa.me/' . $vendorPhoneDigits . '?text=' . rawurlencode('Hello, I would like to inquire about ' . $product->name . '.')
         : null;
+
+    $breadcrumbItems = [
+        ['name' => 'Home', 'url' => \App\Support\CanonicalUrl::route('home')],
+    ];
+    if ($product->category) {
+        $breadcrumbItems[] = ['name' => $product->category->name, 'url' => \App\Support\CanonicalUrl::route('category.show', $product->category)];
+    }
+    $breadcrumbItems[] = ['name' => $product->name, 'url' => $productCanonicalUrl];
+    $productSchema = \App\Support\StructuredData::product(
+        $product,
+        $galleryImages->map(fn ($image) => \App\Support\CanonicalUrl::absoluteAsset($image))->all(),
+        $productMetaDescription,
+        $productCanonicalUrl
+    );
+    $breadcrumbSchema = \App\Support\StructuredData::breadcrumbs($breadcrumbItems);
+    $faqSchema = \App\Support\StructuredData::faq($productFaqItems);
 @endphp
 
-@section('title', $product->name . ' | ' . config('app.name', 'Mikrotik Kenya'))
+@section('title', $productSeoTitle)
 @section('meta_description', $productMetaDescription)
-@section('canonical_url', \App\Support\CanonicalUrl::route('product.show', $product))
+@section('canonical_url', $productCanonicalUrl)
+@section('og_type', 'product')
+@section('og_title', \App\Support\SeoMetadata::openGraphTitle($product, $productSeoTitle))
+@section('og_description', \App\Support\SeoMetadata::openGraphDescription($product, $productMetaDescription))
+@section('og_image', \App\Support\SeoMetadata::openGraphImage($product, $primaryImage))
+@if(\App\Support\SeoMetadata::robots($product))
+    @section('robots', \App\Support\SeoMetadata::robots($product))
+@endif
+
+@push('head')
+    <script type="application/ld+json">@json($productSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    <script type="application/ld+json">@json($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @if($faqSchema)
+        <script type="application/ld+json">@json($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @endif
+@endpush
 
 @section('content')
 <div class="product-page">
@@ -67,9 +110,13 @@
             <div class="product-gallery-stage">
                 <img
                     src="{{ $primaryImage }}"
-                    alt="{{ $product->name }}"
+                    alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $product->name }}"
                     class="product-gallery-main-image"
                     data-product-main-image
+                    width="900"
+                    height="680"
+                    fetchpriority="high"
+                    decoding="async"
                     onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
                 >
             </div>
@@ -86,7 +133,11 @@
                         >
                             <img
                                 src="{{ $galleryImage }}"
-                                alt="{{ $product->name }} thumbnail {{ $index + 1 }}"
+                                alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $product->name }} thumbnail {{ $index + 1 }}"
+                                width="120"
+                                height="90"
+                                loading="lazy"
+                                decoding="async"
                                 onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
                             >
                         </button>
@@ -108,6 +159,12 @@
             </div>
 
             <h1 class="product-page-title">{{ $product->name }}</h1>
+
+            <div class="product-identity-row">
+                <span>Brand: {{ $productBrand }}</span>
+                <span>Model: {{ $productModel }}</span>
+                <span>SKU: {{ $product->sku }}</span>
+            </div>
 
             <div class="product-price-row">
                 <span class="product-current-price">KSh {{ number_format($currentPrice, 2) }}</span>
@@ -188,6 +245,82 @@
         </div>
     </section>
 
+    <section class="product-seo-grid">
+        <article class="product-info-panel">
+            <h2>Who is this product best for?</h2>
+            <ul>
+                @foreach($productUseCases as $useCase)
+                    <li>{{ $useCase }}</li>
+                @endforeach
+            </ul>
+        </article>
+
+        @if($chooseAnotherModel)
+            <article class="product-info-panel">
+                <h2>When should you choose another MikroTik model?</h2>
+                <p>{{ $chooseAnotherModel }}</p>
+            </article>
+        @endif
+
+        <article class="product-info-panel">
+            <h2>Key specifications</h2>
+            <dl class="product-spec-table">
+                @foreach($productSpecs as $specLabel => $specValue)
+                    <div>
+                        <dt>{{ $specLabel }}</dt>
+                        <dd>{{ $specValue }}</dd>
+                    </div>
+                @endforeach
+            </dl>
+        </article>
+
+        <article class="product-info-panel">
+            <h2>Recommended applications</h2>
+            <ul>
+                @foreach($productApplications as $application)
+                    <li>{{ $application }}</li>
+                @endforeach
+            </ul>
+        </article>
+
+        <article class="product-info-panel">
+            <h2>Compatibility</h2>
+            <p>{{ \App\Support\ProductSeo::compatibility($product) }}</p>
+        </article>
+
+        <article class="product-info-panel">
+            <h2>Power requirements</h2>
+            <p>{{ \App\Support\ProductSeo::powerRequirements($product) }}</p>
+        </article>
+
+        <article class="product-info-panel">
+            <h2>What's in the box?</h2>
+            <ul>
+                @foreach($productBoxItems as $boxItem)
+                    <li>{{ $boxItem }}</li>
+                @endforeach
+            </ul>
+        </article>
+
+        <article class="product-info-panel">
+            <h2>Warranty, delivery and payment</h2>
+            <dl class="product-spec-table">
+                <div>
+                    <dt>Warranty</dt>
+                    <dd>{{ \App\Support\ProductSeo::warrantyInfo($product) }}</dd>
+                </div>
+                <div>
+                    <dt>Delivery</dt>
+                    <dd>{{ \App\Support\ProductSeo::deliveryInfo($product) }}</dd>
+                </div>
+                <div>
+                    <dt>Payment</dt>
+                    <dd>{{ \App\Support\ProductSeo::paymentInfo($product) }}</dd>
+                </div>
+            </dl>
+        </article>
+    </section>
+
     <section class="product-tabs-shell" data-product-tabs>
         <div class="product-tabs" role="tablist" aria-label="Product information tabs">
             <button type="button" class="product-tab-button is-active" data-tab-target="details" role="tab" aria-selected="true">Product details</button>
@@ -245,6 +378,53 @@
             <p class="product-reviews-empty">Reviews are not available yet for this product.</p>
         </div>
     </section>
+
+    @if($productFaqItems !== [])
+        <section class="product-tabs-shell product-faq-shell">
+            <h2>FAQs about {{ $productModel }}</h2>
+            <div class="faq-list">
+                @foreach($productFaqItems as $item)
+                    <details class="faq-item" @if($loop->first) open @endif>
+                        <summary>{{ $item['question'] }}</summary>
+                        <p>{{ $item['answer'] }}</p>
+                    </details>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    @if(!empty($comparisonLinks))
+        <section class="product-tabs-shell product-link-panel">
+            <h2>Useful comparisons</h2>
+            <nav class="category-hub-links" aria-label="MikroTik product comparisons">
+                @foreach($comparisonLinks as $comparisonLink)
+                    <a href="{{ $comparisonLink['url'] }}">{{ $comparisonLink['label'] }}</a>
+                @endforeach
+            </nav>
+        </section>
+    @endif
+
+    @if($relatedCategories->isNotEmpty())
+        <section class="product-tabs-shell product-link-panel">
+            <h2>Related MikroTik categories</h2>
+            <nav class="category-hub-links" aria-label="Related MikroTik categories">
+                @foreach($relatedCategories as $relatedCategory)
+                    <a href="{{ route('category.show', $relatedCategory) }}">{{ $relatedCategory->name }}</a>
+                @endforeach
+            </nav>
+        </section>
+    @endif
+
+    @if($relatedProducts->isNotEmpty())
+        <section class="product-tabs-shell product-related-shell">
+            <h2>Related products</h2>
+            <div class="products-grid">
+                @foreach($relatedProducts as $relatedProduct)
+                    @include('partials.product-card', ['product' => $relatedProduct, 'productImageFallback' => $productImageFallback])
+                @endforeach
+            </div>
+        </section>
+    @endif
 </div>
 
 <script>

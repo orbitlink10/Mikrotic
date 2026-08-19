@@ -20,10 +20,36 @@ class Page extends Model
         'alt_text',
         'type',
         'body',
+        'seo_title',
+        'canonical_url',
+        'robots',
+        'og_title',
+        'og_description',
+        'og_image',
+        'faq_items',
+    ];
+
+    protected $casts = [
+        'faq_items' => 'array',
     ];
 
     public static function storageReady(): bool
     {
-        return Schema::hasTable((new static())->getTable());
+        return Schema::hasTable((new static)->getTable());
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public static function seoFieldsReady(): bool
+    {
+        $table = (new static)->getTable();
+
+        return Schema::hasTable($table)
+            && Schema::hasColumn($table, 'seo_title')
+            && Schema::hasColumn($table, 'canonical_url')
+            && Schema::hasColumn($table, 'faq_items');
     }
 }

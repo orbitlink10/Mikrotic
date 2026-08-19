@@ -3,24 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', config('app.name', 'Mikrotik Kenya'))</title>
-    <meta name="description" content="@yield('meta_description', 'Browse products from our multi-vendor marketplace.')">
     @php
+        $homepageBrandContent = \App\Models\HomepageContent::current();
+        $siteLogoUrl = $homepageBrandContent->siteLogoUrl();
+        $pageTitle = trim($__env->yieldContent('title')) ?: config('app.name', 'Mikrotik Kenya');
+        $pageDescription = trim($__env->yieldContent('meta_description')) ?: 'Browse MikroTik products, networking equipment and current prices in Kenya.';
         $marketCssVersion = @filemtime(public_path('assets/market.css')) ?: time();
         $canonicalUrl = trim($__env->yieldContent('canonical_url'));
         $robotsContent = trim($__env->yieldContent('robots'));
+        $openGraphTitle = trim($__env->yieldContent('og_title')) ?: $pageTitle;
+        $openGraphDescription = trim($__env->yieldContent('og_description')) ?: $pageDescription;
+        $openGraphImage = trim($__env->yieldContent('og_image')) ?: $siteLogoUrl;
+        $openGraphType = trim($__env->yieldContent('og_type')) ?: 'website';
+        $organizationSchema = \App\Support\StructuredData::organization($homepageBrandContent);
     @endphp
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
     <link rel="canonical" href="{{ $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() }}">
     @if($robotsContent !== '')
         <meta name="robots" content="{{ $robotsContent }}">
     @endif
+    <meta property="og:type" content="{{ $openGraphType }}">
+    <meta property="og:site_name" content="{{ config('app.name', 'Mikrotik Kenya') }}">
+    <meta property="og:title" content="{{ $openGraphTitle }}">
+    <meta property="og:description" content="{{ $openGraphDescription }}">
+    <meta property="og:url" content="{{ $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() }}">
+    @if($openGraphImage)
+        <meta property="og:image" content="{{ \App\Support\CanonicalUrl::absoluteAsset($openGraphImage) }}">
+    @endif
+    <meta name="twitter:card" content="{{ $openGraphImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ $openGraphTitle }}">
+    <meta name="twitter:description" content="{{ $openGraphDescription }}">
+    @if($openGraphImage)
+        <meta name="twitter:image" content="{{ \App\Support\CanonicalUrl::absoluteAsset($openGraphImage) }}">
+    @endif
+    <script type="application/ld+json">@json($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
     <link rel="stylesheet" href="{{ asset('assets/market.css') }}?v={{ $marketCssVersion }}">
     @stack('head')
 </head>
 <body>
 @php
-    $homepageBrandContent = \App\Models\HomepageContent::current();
-    $siteLogoUrl = $homepageBrandContent->siteLogoUrl();
     $cartCount = 0;
     if (auth()->check()) {
         $cartCount = \App\Models\CartItem::query()
@@ -83,7 +105,16 @@
 </main>
 
 <footer class="footer">
-    <p>&copy; {{ date('Y') }} {{ config('app.name', 'Mikrotik Kenya') }}</p>
+    <nav class="footer-links" aria-label="Footer">
+        <a href="{{ route('pages.show', ['page' => 'about-us']) }}">About Us</a>
+        <a href="{{ route('pages.show', ['page' => 'contact-us']) }}">Contact Us</a>
+        <a href="{{ route('pages.show', ['page' => 'delivery-policy']) }}">Delivery Policy</a>
+        <a href="{{ route('pages.show', ['page' => 'returns-policy']) }}">Returns Policy</a>
+        <a href="{{ route('pages.show', ['page' => 'warranty-policy']) }}">Warranty Policy</a>
+        <a href="{{ route('pages.show', ['page' => 'privacy-policy']) }}">Privacy Policy</a>
+        <a href="{{ route('pages.show', ['page' => 'terms-and-conditions']) }}">Terms and Conditions</a>
+    </nav>
+    <p>&copy; {{ date('Y') }} {{ config('business.name', config('app.name', 'Mikrotik Kenya')) }}</p>
 </footer>
 </body>
 </html>

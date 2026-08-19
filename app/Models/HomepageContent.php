@@ -44,7 +44,7 @@ class HomepageContent extends Model
 
     public static function current(): self
     {
-        if (!static::storageReady()) {
+        if (! static::storageReady()) {
             return static::defaultContent();
         }
 
@@ -54,9 +54,9 @@ class HomepageContent extends Model
 
     public static function storageReady(): bool
     {
-        $table = (new static())->getTable();
+        $table = (new static)->getTable();
 
-        if (!Schema::hasTable($table)) {
+        if (! Schema::hasTable($table)) {
             return false;
         }
 
@@ -82,7 +82,7 @@ class HomepageContent extends Model
             'content_intro',
             'content_body',
         ] as $column) {
-            if (!Schema::hasColumn($table, $column)) {
+            if (! Schema::hasColumn($table, $column)) {
                 return false;
             }
         }
@@ -94,29 +94,29 @@ class HomepageContent extends Model
     {
         return new static([
             'site_key' => static::DEFAULT_SITE_KEY,
-            'hero_title' => 'Starlink Kenya | High-Speed Satellite Internet Across Kenya',
-            'hero_description' => 'Starlink Kenya offers high-speed satellite internet with affordable packages, hardware, and monthly plans. Stay connected anywhere in Kenya today.',
-            'why_choose_title' => 'Why Choose Starlink Kenya?',
-            'why_choose_intro' => 'Get dependable high-speed internet for homes, businesses, schools, farms, and remote sites with a local team that understands the Kenyan market.',
+            'hero_title' => 'MikroTik Kenya | Routers, Switches & Access Points',
+            'hero_description' => 'Shop MikroTik routers, switches, access points and networking equipment in Kenya with current prices, availability and delivery options.',
+            'why_choose_title' => 'Why Buy MikroTik Equipment From Us?',
+            'why_choose_intro' => 'Compare practical RouterOS hardware for homes, offices, ISPs and enterprise networks from a catalogue built around Kenyan networking needs.',
             'why_choose_items' => self::defaultWhyChooseItems(),
             'testimonials_badge' => 'Testimonials',
-            'testimonials_title' => 'What Our Clients Say',
-            'testimonials_intro' => 'Reliable satellite internet is changing how families, creators, and growing businesses stay connected across Kenya.',
+            'testimonials_title' => 'Customer Feedback',
+            'testimonials_intro' => 'Feedback from customers can be managed from the admin panel when genuine testimonials are available.',
             'testimonial_items' => self::defaultTestimonialItems(),
             'faq_badge' => 'FAQ',
-            'faq_title' => 'Frequently Asked Questions',
-            'faq_intro' => 'Answers to the most common questions about Starlink hardware, speeds, installation, and support in Kenya.',
+            'faq_title' => 'MikroTik Buying Questions',
+            'faq_intro' => 'Answers to common questions about MikroTik prices, stock, delivery and product selection in Kenya.',
             'faq_items' => self::defaultFaqItems(),
-            'content_badge' => 'Starlink Kenya Guide',
-            'content_title' => 'Starlink Kenya: A Comprehensive Guide to Satellite Internet Connectivity',
-            'content_intro' => 'Explore how Starlink is transforming internet access across Kenya, from urban homes and branch offices to rural schools, farms, lodges, and construction sites.',
+            'content_badge' => 'MikroTik Kenya Guide',
+            'content_title' => 'MikroTik Kenya: RouterOS Hardware for Homes, Offices and ISPs',
+            'content_intro' => 'Explore MikroTik products for routing, switching, wireless access, LTE backup and network management.',
             'content_body' => self::defaultContentBody(),
         ]);
     }
 
     public function heroImageUrl(): ?string
     {
-        if (!$this->hero_image_path) {
+        if (! $this->hero_image_path) {
             return null;
         }
 
@@ -125,7 +125,7 @@ class HomepageContent extends Model
 
     public function siteLogoUrl(): ?string
     {
-        if (!$this->site_logo_path) {
+        if (! $this->site_logo_path) {
             return null;
         }
 
@@ -236,21 +236,20 @@ class HomepageContent extends Model
     }
 
     /**
-     * @param  mixed  $items
      * @param  array<int, string>  $keys
      * @param  array<int, array<string, string>>  $defaults
      * @return array<int, array<string, string>>
      */
     private function normalizeItems(mixed $items, array $keys, array $defaults): array
     {
-        if (!is_array($items)) {
+        if (! is_array($items)) {
             return $defaults;
         }
 
         $normalized = [];
 
         foreach ($items as $item) {
-            if (!is_array($item)) {
+            if (! is_array($item)) {
                 continue;
             }
 
@@ -276,12 +275,12 @@ class HomepageContent extends Model
     private static function defaultWhyChooseItems(): array
     {
         return [
-            ['title' => 'Official Reseller', 'description' => 'Authentic Starlink hardware and reliable local guidance.'],
-            ['title' => 'Local Delivery', 'description' => 'Fast dispatch in Nairobi with nationwide coordination.'],
-            ['title' => 'Professional Installation', 'description' => 'Clean alignment, mounting, and cable routing support.'],
-            ['title' => 'Flexible Payments', 'description' => 'Practical options for hardware, setup, and monthly service.'],
-            ['title' => 'Warranty Support', 'description' => 'Responsive after-sales help for faults, setup, and replacements.'],
-            ['title' => 'Kenya-Based Support', 'description' => 'Talk to a local team that understands your environment.'],
+            ['title' => 'Current Catalogue Prices', 'description' => 'Product pages show prices from the store catalogue instead of static SEO copy.'],
+            ['title' => 'RouterOS-Focused Selection', 'description' => 'Browse routers, switches, wireless systems, LTE devices and accessories by practical network use.'],
+            ['title' => 'Product-Level Details', 'description' => 'Review SKU, stock status, category, use cases and technical guidance before purchase.'],
+            ['title' => 'Quotation Friendly', 'description' => 'Business buyers can use product pages as a starting point for larger networking enquiries.'],
+            ['title' => 'Delivery Information', 'description' => 'Delivery options are confirmed during checkout or enquiry based on product availability and destination.'],
+            ['title' => 'Configuration Guidance', 'description' => 'Product pages include RouterOS and compatibility notes where available.'],
         ];
     }
 
@@ -292,19 +291,19 @@ class HomepageContent extends Model
     {
         return [
             [
-                'quote' => 'The installation team arrived on time, explained the ideal mounting position, and got us online the same day. The experience felt professional from start to finish.',
-                'name' => 'Joan K., Nairobi',
-                'role' => 'Homeowner',
+                'quote' => 'Add genuine customer feedback from completed orders or verified support interactions in the admin panel.',
+                'name' => 'Customer feedback',
+                'role' => 'Managed from admin',
             ],
             [
-                'quote' => 'Our children now attend online classes without interruptions, and video meetings are finally stable. Starlink has made a visible difference in our day-to-day routine.',
-                'name' => 'Samuel O., Meru',
-                'role' => 'Parent',
+                'quote' => 'Do not publish ratings or reviews unless they come from real customers and can be supported by business records.',
+                'name' => 'Review policy',
+                'role' => 'Verified reviews only',
             ],
             [
-                'quote' => 'Uploads that used to take forever now finish quickly, which matters a lot for my content work. For creators working outside strong fiber zones, this is a serious upgrade.',
-                'name' => 'Victor M., Rongai',
-                'role' => 'Content Creator',
+                'quote' => 'Use this section for real installation, procurement or support feedback once available.',
+                'name' => 'Trust signals',
+                'role' => 'Real customer proof',
             ],
         ];
     }
@@ -316,20 +315,20 @@ class HomepageContent extends Model
     {
         return [
             [
-                'question' => 'What is included in a Starlink kit?',
-                'answer' => 'A typical kit includes the dish, router, power supply, mounting hardware, and the cables required for the initial setup.',
+                'question' => 'Are prices on the website current?',
+                'answer' => 'Product prices are generated from the store catalogue and should update when the admin changes a product price.',
             ],
             [
-                'question' => 'Do you offer installation support in Kenya?',
-                'answer' => 'Yes. Installation support can include site checks, mounting advice, dish alignment, cable routing, and post-install connectivity checks.',
+                'question' => 'Can I compare MikroTik routers before buying?',
+                'answer' => 'Use category pages and product pages to compare price, stock status, SKU, category and recommended applications.',
             ],
             [
-                'question' => 'Is Starlink suitable for rural homes and remote business sites?',
-                'answer' => 'Yes. Starlink is especially useful where fiber is unavailable, unreliable, or too slow to support remote work, CCTV, school access, or business operations.',
+                'question' => 'Do product pages show stock status?',
+                'answer' => 'Yes. Each product page shows whether the product is currently listed as available or out of stock.',
             ],
             [
-                'question' => 'What speeds should customers expect?',
-                'answer' => 'Actual speeds vary by location, weather, and network demand, but Starlink is designed to provide a much stronger broadband experience than many underserved terrestrial options.',
+                'question' => 'Can businesses request quotations?',
+                'answer' => 'Business quotation availability should be confirmed through the contact details configured by the site owner.',
             ],
         ];
     }
@@ -337,18 +336,18 @@ class HomepageContent extends Model
     private static function defaultContentBody(): string
     {
         return implode('', [
-            '<h2>Introduction: Bridging Kenya&apos;s Digital Divide</h2>',
-            '<p>Starlink is opening new connectivity options for homes, schools, hospitality properties, farms, logistics teams, and field operations that sit beyond dependable fiber or fixed wireless coverage.</p>',
-            '<p>For many customers, the biggest value is not just headline speed. It is the ability to get stable internet in places where traditional infrastructure is delayed, inconsistent, or simply unavailable.</p>',
-            '<h3>Where Starlink Fits Best</h3>',
+            '<h2>MikroTik networking equipment in Kenya</h2>',
+            '<p>MikroTik routers, switches and wireless systems are used for home internet, office networks, ISP deployments, hotspot management, VPNs, firewalling and fibre uplinks.</p>',
+            '<p>Use the catalogue to compare current prices, stock status, SKUs and product categories before choosing a RouterOS device.</p>',
+            '<h3>Where MikroTik fits best</h3>',
             '<ul>',
-            '<li>Homes that need dependable streaming, remote work, and online learning.</li>',
-            '<li>Businesses operating branches, remote offices, warehouses, or project sites.</li>',
-            '<li>Schools, clinics, camps, and lodges located far from strong terrestrial networks.</li>',
+            '<li>Homes and small offices that need reliable routing and Wi-Fi management.</li>',
+            '<li>Businesses that need firewall, VPN, VLAN and multi-WAN RouterOS features.</li>',
+            '<li>ISPs and installers building outdoor wireless, fibre and aggregation networks.</li>',
             '</ul>',
             '<h3>What to Consider Before Buying</h3>',
-            '<p>Before installation, it is important to assess line of sight, the best mounting position, power stability, internal Wi-Fi coverage, and how the service will be used across the property.</p>',
-            '<p>A proper setup helps customers get the most from the hardware and reduces avoidable service interruptions caused by obstructions or poor equipment placement.</p>',
+            '<p>Check the number of Ethernet ports, throughput requirements, PoE support, SFP or SFP+ uplinks, wireless bands, LTE or 5G needs, mounting options and RouterOS feature requirements.</p>',
+            '<p>For larger networks, confirm compatibility with your switches, access points, power setup and internet handoff before purchase.</p>',
         ]);
     }
 }

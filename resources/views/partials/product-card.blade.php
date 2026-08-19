@@ -20,7 +20,9 @@
         <img
             class="product-image"
             src="{{ $image }}"
-            alt="{{ $product->name }}"
+            alt="{{ \App\Support\ProductSeo::brand($product) === 'MikroTik' ? 'MikroTik ' . \App\Support\ProductSeo::model($product) : $product->name }}"
+            width="480"
+            height="360"
             loading="lazy"
             decoding="async"
             onerror="this.onerror=null;this.src='{{ $imageErrorFallback }}';"
@@ -33,7 +35,7 @@
         <p class="product-desc">{{ $productDescription }}</p>
         <div class="product-bottom">
             <span class="price">KES {{ number_format((float) $product->price, 2) }}</span>
-            <a class="view-btn" href="{{ route('product.show', $product) }}">View</a>
+            <a class="view-btn" href="{{ route('product.show', $product) }}">View {{ \App\Support\ProductSeo::model($product) }}</a>
         </div>
     </div>
 </article>

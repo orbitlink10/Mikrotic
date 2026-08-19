@@ -65,6 +65,12 @@
     $initialSubcategories = $categories->firstWhere('id', (int) $selectedCategoryId)?->children ?? collect();
     $showInlineCategoryCreation = $categories->isEmpty() && ! $isEditingProduct;
     $primaryImage = $productToEdit?->images?->firstWhere('is_primary', true) ?? $productToEdit?->images?->first();
+    $productSeoFieldsReady = \App\Models\Product::seoFieldsReady();
+    $productFaqItems = old('faq_items', $productToEdit?->faq_items ?? [
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+    ]);
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'products'])
@@ -331,6 +337,80 @@
                         <textarea class="rich-editor-input" name="description" hidden>{{ old('description', $productToEdit?->description) }}</textarea>
                     </div>
                 </div>
+
+                @if($productSeoFieldsReady)
+                    <details class="admin-product-optional-panel">
+                        <summary>SEO, Specs and FAQs</summary>
+                        <div class="admin-product-optional-body">
+                            <label class="admin-product-label" for="seo_title">SEO title</label>
+                            <input class="admin-product-input" id="seo_title" type="text" name="seo_title" value="{{ old('seo_title', $productToEdit?->seo_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="canonical_url">Canonical URL override</label>
+                            <input class="admin-product-input" id="canonical_url" type="url" name="canonical_url" value="{{ old('canonical_url', $productToEdit?->canonical_url) }}" placeholder="Leave empty to use the product URL">
+
+                            <label class="admin-product-label" for="robots">Indexing</label>
+                            <select class="admin-product-input admin-product-select" id="robots" name="robots">
+                                <option value="">Use default</option>
+                                <option value="index,follow" @selected(old('robots', $productToEdit?->robots) === 'index,follow')>Index, follow</option>
+                                <option value="noindex,follow" @selected(old('robots', $productToEdit?->robots) === 'noindex,follow')>Noindex, follow</option>
+                            </select>
+
+                            <label class="admin-product-label" for="og_title">Open Graph title</label>
+                            <input class="admin-product-input" id="og_title" type="text" name="og_title" value="{{ old('og_title', $productToEdit?->og_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="og_description">Open Graph description</label>
+                            <textarea class="admin-product-input admin-product-textarea" id="og_description" name="og_description" rows="3">{{ old('og_description', $productToEdit?->og_description) }}</textarea>
+
+                            <label class="admin-product-label" for="og_image">Open Graph image URL</label>
+                            <input class="admin-product-input" id="og_image" type="url" name="og_image" value="{{ old('og_image', $productToEdit?->og_image) }}">
+
+                            <div class="admin-form-grid">
+                                <div>
+                                    <label class="admin-product-label" for="model_number">Model number</label>
+                                    <input class="admin-product-input" id="model_number" type="text" name="model_number" value="{{ old('model_number', $productToEdit?->model_number) }}">
+                                </div>
+                                <div>
+                                    <label class="admin-product-label" for="brand">Brand</label>
+                                    <input class="admin-product-input" id="brand" type="text" name="brand" value="{{ old('brand', $productToEdit?->brand) }}" placeholder="MikroTik">
+                                </div>
+                            </div>
+
+                            <label class="admin-product-label" for="key_use">Key use</label>
+                            <input class="admin-product-input" id="key_use" type="text" name="key_use" value="{{ old('key_use', $productToEdit?->key_use) }}" placeholder="Routing for homes, offices or ISP deployments">
+
+                            @foreach([
+                                'key_specifications' => 'Key specifications',
+                                'technical_specifications' => 'Technical specifications',
+                                'use_cases' => 'Use cases',
+                                'recommended_applications' => 'Recommended applications',
+                                'whats_in_box' => 'What is in the box',
+                            ] as $field => $label)
+                                <label class="admin-product-label" for="{{ $field }}">{{ $label }}</label>
+                                <textarea class="admin-product-input admin-product-textarea" id="{{ $field }}" name="{{ $field }}" rows="4" placeholder="One item per line">{{ old($field, $productToEdit?->{$field}) }}</textarea>
+                            @endforeach
+
+                            @foreach([
+                                'choose_another_model' => 'When to choose another model',
+                                'compatibility' => 'Compatibility',
+                                'power_requirements' => 'Power requirements',
+                                'warranty_info' => 'Warranty information',
+                                'delivery_info' => 'Delivery information',
+                                'payment_info' => 'Payment information',
+                            ] as $field => $label)
+                                <label class="admin-product-label" for="{{ $field }}">{{ $label }}</label>
+                                <textarea class="admin-product-input admin-product-textarea" id="{{ $field }}" name="{{ $field }}" rows="3">{{ old($field, $productToEdit?->{$field}) }}</textarea>
+                            @endforeach
+
+                            <div class="admin-product-field">
+                                <span class="admin-product-label">Product FAQs</span>
+                                @foreach($productFaqItems as $index => $faqItem)
+                                    <input class="admin-product-input" type="text" name="faq_items[{{ $index }}][question]" value="{{ $faqItem['question'] ?? '' }}" placeholder="Question">
+                                    <textarea class="admin-product-input admin-product-textarea" name="faq_items[{{ $index }}][answer]" rows="2" placeholder="Answer">{{ $faqItem['answer'] ?? '' }}</textarea>
+                                @endforeach
+                            </div>
+                        </div>
+                    </details>
+                @endif
 
                 <details class="admin-product-optional-panel">
                     <summary>Product Image</summary>

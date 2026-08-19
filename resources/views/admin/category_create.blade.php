@@ -13,6 +13,12 @@
         $selectedParentId = old('parent_id', $categoryToEdit->parent_id);
     }
     $showOptionalCategorySettings = filled($selectedParentId) || $errors->has('image') || filled($categoryToEdit?->image_url);
+    $categorySeoFieldsReady = $categorySeoFieldsReady ?? false;
+    $categoryFaqItems = old('faq_items', $categoryToEdit?->faq_items ?? [
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+    ]);
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'categories'])
@@ -193,6 +199,49 @@
                         <textarea class="rich-editor-input" name="description" hidden>{{ old('description', $categoryToEdit?->description) }}</textarea>
                     </div>
                 </div>
+
+                @if($categorySeoFieldsReady)
+                    <details class="admin-product-optional-panel">
+                        <summary>SEO Settings</summary>
+                        <div class="admin-product-optional-body">
+                            <label class="admin-product-label" for="seo_title">SEO title</label>
+                            <input class="admin-product-input" id="seo_title" type="text" name="seo_title" value="{{ old('seo_title', $categoryToEdit?->seo_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="canonical_url">Canonical URL override</label>
+                            <input class="admin-product-input" id="canonical_url" type="url" name="canonical_url" value="{{ old('canonical_url', $categoryToEdit?->canonical_url) }}" placeholder="Leave empty to use the category URL">
+
+                            <label class="admin-product-label" for="robots">Indexing</label>
+                            <select class="admin-product-input admin-product-select" id="robots" name="robots">
+                                <option value="" @selected(old('robots', $categoryToEdit?->robots) === null)>Use default</option>
+                                <option value="index,follow" @selected(old('robots', $categoryToEdit?->robots) === 'index,follow')>Index, follow</option>
+                                <option value="noindex,follow" @selected(old('robots', $categoryToEdit?->robots) === 'noindex,follow')>Noindex, follow</option>
+                            </select>
+
+                            <label class="admin-product-label" for="og_title">Open Graph title</label>
+                            <input class="admin-product-input" id="og_title" type="text" name="og_title" value="{{ old('og_title', $categoryToEdit?->og_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="og_description">Open Graph description</label>
+                            <textarea class="admin-product-input admin-product-textarea" id="og_description" name="og_description" rows="3">{{ old('og_description', $categoryToEdit?->og_description) }}</textarea>
+
+                            <label class="admin-product-label" for="og_image">Open Graph image URL</label>
+                            <input class="admin-product-input" id="og_image" type="url" name="og_image" value="{{ old('og_image', $categoryToEdit?->og_image) }}">
+
+                            <label class="admin-product-label" for="intro">Category intro</label>
+                            <textarea class="admin-product-input admin-product-textarea" id="intro" name="intro" rows="3">{{ old('intro', $categoryToEdit?->intro) }}</textarea>
+
+                            <label class="admin-product-label" for="seo_content">Category SEO content</label>
+                            <textarea class="admin-product-input admin-product-textarea" id="seo_content" name="seo_content" rows="6">{{ old('seo_content', $categoryToEdit?->seo_content) }}</textarea>
+
+                            <div class="admin-product-field">
+                                <span class="admin-product-label">Category FAQs</span>
+                                @foreach($categoryFaqItems as $index => $faqItem)
+                                    <input class="admin-product-input" type="text" name="faq_items[{{ $index }}][question]" value="{{ $faqItem['question'] ?? '' }}" placeholder="Question">
+                                    <textarea class="admin-product-input admin-product-textarea" name="faq_items[{{ $index }}][answer]" rows="2" placeholder="Answer">{{ $faqItem['answer'] ?? '' }}</textarea>
+                                @endforeach
+                            </div>
+                        </div>
+                    </details>
+                @endif
 
                 <details class="admin-product-optional-panel" {{ $showOptionalCategorySettings ? 'open' : '' }}>
                     <summary>Parent Category and Image (Optional)</summary>

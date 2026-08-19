@@ -2,15 +2,16 @@
 
 @php
     $catalogTitle = $currentCategory
-        ? $currentCategory->name . ' | Mikrotik Kenya'
-        : 'Mikrotik Kenya';
-    $catalogMetaDescription = $currentCategory?->meta_description
-        ?: ($currentCategory ? \App\Support\ProductContent::excerpt($currentCategory->description, 160) : 'Browse products from our multi-vendor marketplace.');
+        ? \App\Support\SeoMetadata::categoryTitle($currentCategory, $products->currentPage())
+        : \App\Support\SeoMetadata::homepageTitle($products->currentPage());
+    $catalogMetaDescription = $currentCategory
+        ? \App\Support\SeoMetadata::categoryDescription($currentCategory)
+        : \App\Support\SeoMetadata::homepageDescription();
     $categoryDescriptionHtml = $currentCategory
-        ? \App\Support\ProductContent::sanitizeRichText($currentCategory->description)
+        ? \App\Support\ProductContent::sanitizeRichText($currentCategory->seo_content ?: $currentCategory->description)
         : null;
     $categorySummary = $currentCategory
-        ? ($currentCategory->meta_description ?: \App\Support\ProductContent::excerpt($currentCategory->description, 240))
+        ? ($currentCategory->intro ?: $currentCategory->meta_description ?: \App\Support\ProductContent::excerpt($currentCategory->description, 240))
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
     $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
@@ -19,8 +20,14 @@
         ? ['page' => $products->currentPage()]
         : [];
     $catalogCanonicalUrl = $currentCategory
-        ? \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery)
+        ? (\App\Support\SeoMetadata::canonicalOverride($currentCategory) ?: \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery))
         : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
+    $categoryFaqItems = $isRouterAuthorityPage
+        ? $routerFaqItems
+        : (is_array($currentCategory?->faq_items) ? $currentCategory->faq_items : []);
+    $faqSchema = ($showHomepageSections || ($currentCategory && $categoryFaqItems !== []))
+        ? \App\Support\StructuredData::faq($showHomepageSections ? $homepageContent->faqItems() : $categoryFaqItems)
+        : null;
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -47,8 +54,20 @@ SVG,
 @section('title', $catalogTitle)
 @section('meta_description', $catalogMetaDescription)
 @section('canonical_url', $catalogCanonicalUrl)
+@section('og_title', $catalogTitle)
+@section('og_description', $catalogMetaDescription)
+@if($currentCategory && $currentCategory->image_url)
+    @section('og_image', $currentCategory->image_url)
+@endif
 @if($search !== '')
     @section('robots', 'noindex,follow')
+@elseif($currentCategory && \App\Support\SeoMetadata::robots($currentCategory))
+    @section('robots', \App\Support\SeoMetadata::robots($currentCategory))
+@endif
+@if($faqSchema)
+    @push('head')
+        <script type="application/ld+json">@json($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @endpush
 @endif
 
 @section('content')
@@ -86,7 +105,7 @@ SVG,
             <section class="panel category-content-panel {{ $currentCategory->image_url ? 'category-content-panel--with-image' : '' }}">
                 @if($currentCategory->image_url)
                     <div class="category-content-media">
-                        <img src="{{ $currentCategory->image_url }}" alt="{{ $currentCategory->name }}">
+                        <img src="{{ $currentCategory->image_url }}" alt="{{ $currentCategory->name }}" width="640" height="480" loading="lazy" decoding="async">
                     </div>
                 @endif
 
@@ -111,6 +130,81 @@ SVG,
                     <p>{{ $homepageContent->hero_description }}</p>
                 </div>
             </div>
+
+            @if($featuredCategories->isNotEmpty())
+                <nav class="category-hub-links" aria-label="Featured MikroTik categories">
+                    @foreach($featuredCategories as $featuredCategory)
+                        <a href="{{ route('category.show', $featuredCategory) }}">{{ $featuredCategory->name }}</a>
+                    @endforeach
+                </nav>
+            @endif
+        @endif
+
+        @if($usedCategoryFallback)
+            <section class="panel category-fallback-note">
+                <p>Showing relevant MikroTik products from the wider catalogue while this category is being organized.</p>
+            </section>
+        @endif
+
+        @if($isRouterAuthorityPage)
+            <section class="panel router-price-panel">
+                <div class="router-price-head">
+                    <div>
+                        <p class="catalog-search-eyebrow">Current catalogue pricing</p>
+                        <h2>MikroTik router price list in Kenya</h2>
+                    </div>
+                    <p>Prices and availability are loaded from product records, so this table updates when the catalogue is updated.</p>
+                </div>
+
+                <div class="table-wrap router-price-table-wrap">
+                    <table class="router-price-table">
+                        <thead>
+                        <tr>
+                            <th>MikroTik Model</th>
+                            <th>Current Price</th>
+                            <th>Key Use</th>
+                            <th>Availability</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @forelse($routerPriceTableProducts as $routerProduct)
+                            <tr>
+                                <td><a href="{{ route('product.show', $routerProduct) }}">{{ \App\Support\ProductSeo::model($routerProduct) }}</a></td>
+                                <td>KSh {{ number_format((float) $routerProduct->price, 2) }}</td>
+                                <td>{{ \App\Support\ProductSeo::keyUse($routerProduct) }}</td>
+                                <td>{{ $routerProduct->stock > 0 ? 'In stock' : 'Out of stock' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4">Router prices will appear here when router products are assigned to this category.</td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel router-guide-panel">
+                <div class="router-guide-grid">
+                    <div>
+                        <h2>How to choose a MikroTik router</h2>
+                        <ul>
+                            <li>Choose enough Ethernet ports for your WAN, LAN and future expansion.</li>
+                            <li>Check whether you need SFP or SFP+ uplinks for fibre or switch aggregation.</li>
+                            <li>Match CPU and throughput needs to your firewall, VPN, queue and routing workload.</li>
+                            <li>Use PoE-capable models when powering access points or outdoor radios from the router.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2>Home, office and ISP selection guide</h2>
+                        <ul>
+                            <li>Home and small office: compact RouterOS devices with stable Ethernet and optional Wi-Fi.</li>
+                            <li>Growing offices: routers with more CPU headroom, VLAN support and reliable failover options.</li>
+                            <li>ISP and enterprise: CCR, RB5009 or rackmount models for throughput, routing tables and uplinks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
         @endif
 
         @if($showRouterProductRows)
@@ -126,7 +220,9 @@ SVG,
                 @forelse($products as $product)
                     @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
                 @empty
-                    <p class="empty">No products found.</p>
+                    @unless($currentCategory && ($categoryDescriptionHtml || $isRouterAuthorityPage))
+                        <p class="empty">No products found.</p>
+                    @endunless
                 @endforelse
             </section>
 
@@ -260,6 +356,42 @@ SVG,
                         </div>
                     </div>
                 </div>
+            </section>
+        </section>
+    @endif
+
+    @if($currentCategory && $categoryFaqItems !== [])
+        <section class="home-extra-sections home-extra-sections--full-width">
+            <section class="home-section home-section--faq">
+                <div class="home-section-head">
+                    <h2>{{ $currentCategory->name }} FAQs</h2>
+                </div>
+
+                <div class="faq-list">
+                    @foreach($categoryFaqItems as $item)
+                        @if(!empty($item['question']) && !empty($item['answer']))
+                            <details class="faq-item" @if($loop->first) open @endif>
+                                <summary>{{ $item['question'] }}</summary>
+                                <p>{{ $item['answer'] }}</p>
+                            </details>
+                        @endif
+                    @endforeach
+                </div>
+            </section>
+        </section>
+    @endif
+
+    @if($currentCategory && $relatedCategories->isNotEmpty())
+        <section class="home-extra-sections home-extra-sections--full-width">
+            <section class="home-section related-category-section">
+                <div class="home-section-head">
+                    <h2>Related MikroTik categories</h2>
+                </div>
+                <nav class="category-hub-links" aria-label="Related MikroTik categories">
+                    @foreach($relatedCategories as $relatedCategory)
+                        <a href="{{ route('category.show', $relatedCategory) }}">{{ $relatedCategory->name }}</a>
+                    @endforeach
+                </nav>
             </section>
         </section>
     @endif

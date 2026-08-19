@@ -11,11 +11,11 @@ use App\Models\ProductImage;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Vendor;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Tests\TestCase;
 
 class AdminProductManagementTest extends TestCase
@@ -105,7 +105,7 @@ class AdminProductManagementTest extends TestCase
             'phone' => '0700000000',
         ]);
 
-        $longDescription = '<p>' . str_repeat('A', 6005) . '</p>';
+        $longDescription = '<p>'.str_repeat('A', 6005).'</p>';
         $image = UploadedFile::fake()->create('category.jpg', 64, 'image/jpeg');
 
         $response = $this->actingAs($admin)->post('/admin/categories', [
@@ -646,7 +646,7 @@ class AdminProductManagementTest extends TestCase
             ->assertOk()
             ->assertSee(route('pages.show', ['page' => $page->slug]), false);
 
-        $this->get('/pages/' . $page->slug)
+        $this->get('/pages/'.$page->slug)
             ->assertOk()
             ->assertSee('Preview Page')
             ->assertSee('Preview Section')
@@ -963,8 +963,8 @@ class AdminProductManagementTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('Starlink Kenya | High-Speed Satellite Internet Across Kenya');
-        $response->assertSee('Starlink Kenya offers high-speed satellite internet with affordable packages, hardware, and monthly plans. Stay connected anywhere in Kenya today.');
+        $response->assertSee('MikroTik Kenya | Routers, Switches &amp; Access Points', false);
+        $response->assertSee('Shop MikroTik routers, switches, access points and networking equipment in Kenya with current prices, availability and delivery options.');
     }
 
     public function test_admin_homepage_update_shows_clear_error_when_table_is_missing(): void

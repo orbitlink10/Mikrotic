@@ -8,6 +8,12 @@
 @php
     $pageToEdit = $pageToEdit ?? null;
     $isEditingPage = $pageToEdit instanceof \App\Models\Page;
+    $pageSeoFieldsReady = \App\Models\Page::seoFieldsReady();
+    $pageFaqItems = old('faq_items', $pageToEdit?->faq_items ?? [
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+        ['question' => '', 'answer' => ''],
+    ]);
 @endphp
 <div class="admin-shell">
     @include('admin.partials.sidebar', ['activeAdminNav' => 'pages'])
@@ -226,6 +232,43 @@
                         <textarea class="rich-editor-input" name="body" hidden @disabled(! $pagesStorageReady)>{{ old('body', $pageToEdit?->body) }}</textarea>
                     </div>
                 </div>
+
+                @if($pageSeoFieldsReady)
+                    <details class="admin-product-optional-panel">
+                        <summary>SEO Settings and FAQs</summary>
+                        <div class="admin-product-optional-body">
+                            <label class="admin-product-label" for="seo_title">SEO title override</label>
+                            <input class="admin-product-input" id="seo_title" type="text" name="seo_title" value="{{ old('seo_title', $pageToEdit?->seo_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="canonical_url">Canonical URL override</label>
+                            <input class="admin-product-input" id="canonical_url" type="url" name="canonical_url" value="{{ old('canonical_url', $pageToEdit?->canonical_url) }}" placeholder="Leave empty to use the page URL">
+
+                            <label class="admin-product-label" for="robots">Indexing</label>
+                            <select class="admin-product-input admin-product-select" id="robots" name="robots">
+                                <option value="">Use default</option>
+                                <option value="index,follow" @selected(old('robots', $pageToEdit?->robots) === 'index,follow')>Index, follow</option>
+                                <option value="noindex,follow" @selected(old('robots', $pageToEdit?->robots) === 'noindex,follow')>Noindex, follow</option>
+                            </select>
+
+                            <label class="admin-product-label" for="og_title">Open Graph title</label>
+                            <input class="admin-product-input" id="og_title" type="text" name="og_title" value="{{ old('og_title', $pageToEdit?->og_title) }}" maxlength="180">
+
+                            <label class="admin-product-label" for="og_description">Open Graph description</label>
+                            <textarea class="admin-product-input admin-product-textarea" id="og_description" name="og_description" rows="3">{{ old('og_description', $pageToEdit?->og_description) }}</textarea>
+
+                            <label class="admin-product-label" for="og_image">Open Graph image URL</label>
+                            <input class="admin-product-input" id="og_image" type="url" name="og_image" value="{{ old('og_image', $pageToEdit?->og_image) }}">
+
+                            <div class="admin-product-field">
+                                <span class="admin-product-label">Page FAQs</span>
+                                @foreach($pageFaqItems as $index => $faqItem)
+                                    <input class="admin-product-input" type="text" name="faq_items[{{ $index }}][question]" value="{{ $faqItem['question'] ?? '' }}" placeholder="Question">
+                                    <textarea class="admin-product-input admin-product-textarea" name="faq_items[{{ $index }}][answer]" rows="2" placeholder="Answer">{{ $faqItem['answer'] ?? '' }}</textarea>
+                                @endforeach
+                            </div>
+                        </div>
+                    </details>
+                @endif
 
                 <details class="admin-product-optional-panel">
                     <summary>Optional Slug and Image</summary>

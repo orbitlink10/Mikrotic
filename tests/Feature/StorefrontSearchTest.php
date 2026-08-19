@@ -19,7 +19,7 @@ class StorefrontSearchTest extends TestCase
     {
         [$product] = $this->createCatalogProducts();
 
-        $response = $this->get('/?search=' . urlencode('RB5009UPr+S+IN'));
+        $response = $this->get('/?search='.urlencode('RB5009UPr+S+IN'));
 
         $response->assertRedirect(route('product.show', $product));
     }
@@ -82,7 +82,7 @@ class StorefrontSearchTest extends TestCase
         $response->assertSee('RB4011 Business Router');
         $response->assertSee('RouterBOARD options');
         $response->assertSee('Compare MikroTik wired routers for homes, businesses, and ISPs.');
-        $response->assertDontSee('<script', false);
+        $response->assertDontSee('<script>alert(1)</script>', false);
 
         $content = $response->getContent();
         $summaryPosition = strpos($content, 'category-content-summary">Wired router price guide.');
@@ -157,7 +157,7 @@ class StorefrontSearchTest extends TestCase
         [$product] = $this->createCatalogProducts();
         $product->images()->delete();
 
-        $uploadedPath = public_path('uploads/products/' . $product->slug . '.jpg');
+        $uploadedPath = public_path('uploads/products/'.$product->slug.'.jpg');
         File::ensureDirectoryExists(dirname($uploadedPath));
         File::put($uploadedPath, 'test image');
 
@@ -165,7 +165,7 @@ class StorefrontSearchTest extends TestCase
             $response = $this->get('/');
 
             $response->assertOk();
-            $response->assertSee('src="/uploads/products/' . $product->slug . '.jpg"', false);
+            $response->assertSee('src="/uploads/products/'.$product->slug.'.jpg"', false);
             $response->assertDontSee('src="/assets/product-placeholder.svg"', false);
         } finally {
             File::delete($uploadedPath);
@@ -226,13 +226,13 @@ class StorefrontSearchTest extends TestCase
             Product::create([
                 'vendor_id' => $vendor->id,
                 'category_id' => $routerCategory->id,
-                'name' => 'Mikrotik Router Model ' . $index,
-                'slug' => 'mikrotik-router-model-' . $index,
-                'description' => '<p>Router model ' . $index . ' for homes and offices.</p>',
-                'meta_description' => 'Mikrotik router model ' . $index . ' price in Kenya.',
+                'name' => 'Mikrotik Router Model '.$index,
+                'slug' => 'mikrotik-router-model-'.$index,
+                'description' => '<p>Router model '.$index.' for homes and offices.</p>',
+                'meta_description' => 'Mikrotik router model '.$index.' price in Kenya.',
                 'price' => (string) (10000 + $index),
                 'stock' => 5,
-                'sku' => 'ROUTER-' . $index,
+                'sku' => 'ROUTER-'.$index,
                 'status' => 'active',
                 'created_at' => now()->addMinutes($index),
                 'updated_at' => now()->addMinutes($index),

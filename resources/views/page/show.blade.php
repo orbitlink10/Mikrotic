@@ -1,16 +1,43 @@
 @extends('layouts.app')
 
 @php
-    $articleTitle = trim((string) ($page->meta_title ?: $page->title));
+    $articleTitle = \App\Support\SeoMetadata::pageTitle($page);
     $heroSummary = trim((string) $pageMetaDescription);
     $backUrl = url()->previous() !== request()->fullUrl()
         ? url()->previous()
         : route('home');
+    $pageCanonicalUrl = \App\Support\SeoMetadata::canonicalOverride($page)
+        ?: \App\Support\CanonicalUrl::route('pages.show', $page);
+    $fullPageTitle = \Illuminate\Support\Str::contains($articleTitle, config('app.name', 'Mikrotik Kenya'))
+        ? $articleTitle
+        : $articleTitle . ' | ' . config('app.name', 'Mikrotik Kenya');
+    $breadcrumbSchema = \App\Support\StructuredData::breadcrumbs([
+        ['name' => 'Home', 'url' => \App\Support\CanonicalUrl::route('home')],
+        ['name' => $page->title, 'url' => $pageCanonicalUrl],
+    ]);
+    $pageFaqItems = is_array($page->faq_items) ? $page->faq_items : [];
+    $faqSchema = \App\Support\StructuredData::faq($pageFaqItems);
 @endphp
 
-@section('title', $articleTitle . ' | ' . config('app.name', 'Mikrotik Kenya'))
+@section('title', $fullPageTitle)
 @section('meta_description', $pageMetaDescription)
-@section('canonical_url', \App\Support\CanonicalUrl::route('pages.show', $page))
+@section('canonical_url', $pageCanonicalUrl)
+@section('og_type', $page->type === 'post' ? 'article' : 'website')
+@section('og_title', \App\Support\SeoMetadata::openGraphTitle($page, $articleTitle))
+@section('og_description', \App\Support\SeoMetadata::openGraphDescription($page, $pageMetaDescription))
+@if(\App\Support\SeoMetadata::openGraphImage($page, $page->image_url))
+    @section('og_image', \App\Support\SeoMetadata::openGraphImage($page, $page->image_url))
+@endif
+@if(\App\Support\SeoMetadata::robots($page))
+    @section('robots', \App\Support\SeoMetadata::robots($page))
+@endif
+
+@push('head')
+    <script type="application/ld+json">@json($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @if($faqSchema)
+        <script type="application/ld+json">@json($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @endif
+@endpush
 
 @section('content')
 <article class="page-story">
@@ -30,7 +57,7 @@
 
         <div class="page-story-hero-media{{ $page->image_url ? '' : ' is-empty' }}">
             @if($page->image_url)
-                <img src="{{ $page->image_url }}" alt="{{ $page->alt_text ?: $page->title }}">
+                <img src="{{ $page->image_url }}" alt="{{ $page->alt_text ?: $page->title }}" width="900" height="620" loading="eager" decoding="async">
             @else
                 <div class="page-story-hero-placeholder" aria-hidden="true">
                     <span>{{ $page->title }}</span>
@@ -55,11 +82,27 @@
 
         @if($page->image_url)
             <figure class="page-story-feature-image">
-                <img src="{{ $page->image_url }}" alt="{{ $page->alt_text ?: $page->title }}">
+                <img src="{{ $page->image_url }}" alt="{{ $page->alt_text ?: $page->title }}" width="900" height="620" loading="lazy" decoding="async">
             </figure>
         @endif
 
         <div class="page-story-article-copy rich-content">{!! $pageBody !!}</div>
+
+        @if($pageFaqItems !== [])
+            <section class="page-faq-section">
+                <h2>{{ $page->title }} FAQs</h2>
+                <div class="faq-list">
+                    @foreach($pageFaqItems as $item)
+                        @if(!empty($item['question']) && !empty($item['answer']))
+                            <details class="faq-item" @if($loop->first) open @endif>
+                                <summary>{{ $item['question'] }}</summary>
+                                <p>{{ $item['answer'] }}</p>
+                            </details>
+                        @endif
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </section>
 </article>
 @endsection
