@@ -15,6 +15,12 @@
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
     $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
     $showFullWidthProductGrid = $search === '' && !$currentCategory;
+    $catalogCanonicalQuery = $search === '' && $products->currentPage() > 1
+        ? ['page' => $products->currentPage()]
+        : [];
+    $catalogCanonicalUrl = $currentCategory
+        ? \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery)
+        : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -40,6 +46,10 @@ SVG,
 
 @section('title', $catalogTitle)
 @section('meta_description', $catalogMetaDescription)
+@section('canonical_url', $catalogCanonicalUrl)
+@if($search !== '')
+    @section('robots', 'noindex,follow')
+@endif
 
 @section('content')
 <section class="home-layout">

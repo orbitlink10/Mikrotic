@@ -10,6 +10,7 @@
 
 @section('title', $articleTitle . ' | ' . config('app.name', 'Mikrotik Kenya'))
 @section('meta_description', $pageMetaDescription)
+@section('canonical_url', \App\Support\CanonicalUrl::route('pages.show', $page))
 
 @section('content')
 <article class="page-story">

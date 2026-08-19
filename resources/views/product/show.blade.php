@@ -48,6 +48,7 @@
 
 @section('title', $product->name . ' | ' . config('app.name', 'Mikrotik Kenya'))
 @section('meta_description', $productMetaDescription)
+@section('canonical_url', \App\Support\CanonicalUrl::route('product.show', $product))
 
 @section('content')
 <div class="product-page">

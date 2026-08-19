@@ -7,7 +7,13 @@
     <meta name="description" content="@yield('meta_description', 'Browse products from our multi-vendor marketplace.')">
     @php
         $marketCssVersion = @filemtime(public_path('assets/market.css')) ?: time();
+        $canonicalUrl = trim($__env->yieldContent('canonical_url'));
+        $robotsContent = trim($__env->yieldContent('robots'));
     @endphp
+    <link rel="canonical" href="{{ $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() }}">
+    @if($robotsContent !== '')
+        <meta name="robots" content="{{ $robotsContent }}">
+    @endif
     <link rel="stylesheet" href="{{ asset('assets/market.css') }}?v={{ $marketCssVersion }}">
     @stack('head')
 </head>
