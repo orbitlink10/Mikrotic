@@ -35,7 +35,20 @@
         <p class="product-desc">{{ $productDescription }}</p>
         <div class="product-bottom">
             <span class="price">KES {{ number_format((float) $product->price, 2) }}</span>
-            <a class="view-btn" href="{{ route('product.show', $product) }}">View {{ \App\Support\ProductSeo::model($product) }}</a>
+            @if($product->stock > 0)
+                @auth
+                    <form method="post" action="{{ route('cart.add', $product) }}">
+                        @csrf
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="redirect" value="back">
+                        <button type="submit" class="view-btn">Add to Cart</button>
+                    </form>
+                @else
+                    <a class="view-btn" href="{{ route('login') }}">Add to Cart</a>
+                @endauth
+            @else
+                <a class="view-btn" href="{{ route('product.show', $product) }}">View {{ \App\Support\ProductSeo::model($product) }}</a>
+            @endif
         </div>
     </div>
 </article>
