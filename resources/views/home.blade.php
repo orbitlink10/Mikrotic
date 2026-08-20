@@ -316,7 +316,7 @@ SVG,
                             @php($rating = max(1, min(5, (int) $testimonial->rating)))
                             <article class="testimonial-card">
                                 <span class="testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
-                                <div class="testimonial-stars" aria-label="{{ $rating }} out of 5 stars">{{ str_repeat('â˜…', $rating) }}</div>
+                                <div class="testimonial-stars" aria-label="{{ $rating }} out of 5 stars">{{ str_repeat('★', $rating) }}</div>
                                 <p class="testimonial-quote">{{ $testimonial->quote }}</p>
                                 <h3>{{ $testimonial->name }}</h3>
                                 <p class="testimonial-role">{{ $testimonial->role }}</p>

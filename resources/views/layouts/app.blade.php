@@ -17,23 +17,23 @@
         $openGraphType = trim($__env->yieldContent('og_type')) ?: 'website';
         $organizationSchema = \App\Support\StructuredData::organization($homepageBrandContent);
     @endphp
-    <title>{{ $pageTitle }}</title>
-    <meta name="description" content="{{ $pageDescription }}">
-    <link rel="canonical" href="{{ $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() }}">
+    <title>{!! $pageTitle !!}</title>
+    <meta name="description" content="{!! $pageDescription !!}">
+    <link rel="canonical" href="{!! $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() !!}">
     @if($robotsContent !== '')
-        <meta name="robots" content="{{ $robotsContent }}">
+        <meta name="robots" content="{!! $robotsContent !!}">
     @endif
-    <meta property="og:type" content="{{ $openGraphType }}">
+    <meta property="og:type" content="{!! $openGraphType !!}">
     <meta property="og:site_name" content="{{ config('app.name', 'Mikrotik Kenya') }}">
-    <meta property="og:title" content="{{ $openGraphTitle }}">
-    <meta property="og:description" content="{{ $openGraphDescription }}">
-    <meta property="og:url" content="{{ $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() }}">
+    <meta property="og:title" content="{!! $openGraphTitle !!}">
+    <meta property="og:description" content="{!! $openGraphDescription !!}">
+    <meta property="og:url" content="{!! $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() !!}">
     @if($openGraphImage)
         <meta property="og:image" content="{{ \App\Support\CanonicalUrl::absoluteAsset($openGraphImage) }}">
     @endif
     <meta name="twitter:card" content="{{ $openGraphImage ? 'summary_large_image' : 'summary' }}">
-    <meta name="twitter:title" content="{{ $openGraphTitle }}">
-    <meta name="twitter:description" content="{{ $openGraphDescription }}">
+    <meta name="twitter:title" content="{!! $openGraphTitle !!}">
+    <meta name="twitter:description" content="{!! $openGraphDescription !!}">
     @if($openGraphImage)
         <meta name="twitter:image" content="{{ \App\Support\CanonicalUrl::absoluteAsset($openGraphImage) }}">
     @endif
