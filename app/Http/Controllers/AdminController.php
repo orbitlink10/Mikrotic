@@ -527,7 +527,7 @@ class AdminController extends Controller
 
         $payload = [
             'name' => $data['name'],
-            'slug' => $this->uniqueSlug('categories', $data['name'], $category->id),
+            'slug' => $category->slug ?: $this->uniqueSlug('categories', $data['name'], $category->id),
             'parent_id' => $data['parent_id'] ?? null,
             'image_url' => $imagePath,
         ];

@@ -12,7 +12,7 @@ class SeoMetadata
 {
     public static function homepageTitle(int $page = 1): string
     {
-        $title = 'MikroTik Kenya | Routers, Switches & Access Points at Best Prices';
+        $title = 'Mikrotik Kenya | Mikrotik Router Prices in Kenya';
 
         return $page > 1 ? $title.' - Page '.$page : $title;
     }

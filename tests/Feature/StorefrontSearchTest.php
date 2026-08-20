@@ -280,6 +280,94 @@ class StorefrontSearchTest extends TestCase
         $response->assertDontSee('Page 1 of', false);
     }
 
+    public function test_homepage_keeps_router_rows_when_router_category_uses_legacy_slug(): void
+    {
+        $vendorUser = User::factory()->create([
+            'role' => 'vendor',
+            'status' => 'active',
+            'phone' => '0712345678',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $vendorUser->id,
+            'shop_name' => 'Mikrotik Kenya Store',
+            'slug' => 'mikrotik-kenya-store',
+            'description' => 'Network and routing equipment.',
+            'phone' => '0712345678',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        $routerCategory = Category::create([
+            'name' => 'mikrotik router',
+            'slug' => 'mikrotik-router',
+        ]);
+
+        Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $routerCategory->id,
+            'name' => 'Mikrotik Router Model',
+            'slug' => 'mikrotik-router-model',
+            'description' => '<p>Router model for homes and offices.</p>',
+            'meta_description' => 'Mikrotik router model price in Kenya.',
+            'price' => '10000.00',
+            'stock' => 5,
+            'sku' => 'ROUTER-LEGACY',
+            'status' => 'active',
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('products-grid--router-rows', false);
+        $response->assertSee('href="http://localhost/category/mikrotik-router-prices-in-kenya"', false);
+        $response->assertSee('Mikrotik Router Prices in Kenya');
+        $response->assertSee('Mikrotik Router Model');
+    }
+
+    public function test_primary_router_price_url_renders_when_only_legacy_router_category_exists(): void
+    {
+        $vendorUser = User::factory()->create([
+            'role' => 'vendor',
+            'status' => 'active',
+            'phone' => '0712345678',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $vendorUser->id,
+            'shop_name' => 'Mikrotik Kenya Store',
+            'slug' => 'mikrotik-kenya-store',
+            'description' => 'Network and routing equipment.',
+            'phone' => '0712345678',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        $routerCategory = Category::create([
+            'name' => 'mikrotik router',
+            'slug' => 'mikrotik-router',
+        ]);
+
+        Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $routerCategory->id,
+            'name' => 'Mikrotik Router Model',
+            'slug' => 'mikrotik-router-model',
+            'description' => '<p>Router model for homes and offices.</p>',
+            'meta_description' => 'Mikrotik router model price in Kenya.',
+            'price' => '10000.00',
+            'stock' => 5,
+            'sku' => 'ROUTER-LEGACY',
+            'status' => 'active',
+        ]);
+
+        $response = $this->get('/category/mikrotik-router-prices-in-kenya');
+
+        $response->assertOk();
+        $response->assertSee('<link rel="canonical" href="http://localhost/category/mikrotik-router-prices-in-kenya">', false);
+        $response->assertSee('Mikrotik Router Model');
+    }
+
     /**
      * @return array{0: \App\Models\Product, 1: \App\Models\Product}
      */

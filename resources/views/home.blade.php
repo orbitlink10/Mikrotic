@@ -19,12 +19,21 @@
     $catalogCanonicalQuery = $search === '' && $products->currentPage() > 1
         ? ['page' => $products->currentPage()]
         : [];
-    $catalogCanonicalUrl = $currentCategory
-        ? (\App\Support\SeoMetadata::canonicalOverride($currentCategory) ?: \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery))
-        : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
     $categoryFaqItems = $isRouterAuthorityPage
         ? $routerFaqItems
         : (is_array($currentCategory?->faq_items) ? $currentCategory->faq_items : []);
+    $requestedCategorySlug = $currentCategory
+        ? \Illuminate\Support\Str::slug((string) request()->route('category'))
+        : null;
+    $useRouterAuthorityCanonical = $isRouterAuthorityPage
+        && ($currentCategory->slug === \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG
+            || $requestedCategorySlug === \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG);
+    $catalogCanonicalUrl = $currentCategory
+        ? (\App\Support\SeoMetadata::canonicalOverride($currentCategory)
+            ?: ($useRouterAuthorityCanonical
+                ? \App\Support\CanonicalUrl::route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG], $catalogCanonicalQuery)
+                : \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery)))
+        : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
     $faqSchema = ($showHomepageSections || ($currentCategory && $categoryFaqItems !== []))
         ? \App\Support\StructuredData::faq($showHomepageSections ? $homepageContent->faqItems() : $categoryFaqItems)
         : null;
@@ -134,7 +143,16 @@ SVG,
             @if($featuredCategories->isNotEmpty())
                 <nav class="category-hub-links" aria-label="Featured MikroTik categories">
                     @foreach($featuredCategories as $featuredCategory)
-                        <a href="{{ route('category.show', $featuredCategory) }}">{{ $featuredCategory->name }}</a>
+                        @php
+                            $featuredCategoryIsRouterPage = \App\Support\MikrotikSeoCatalog::isRouterAuthorityCategory($featuredCategory);
+                            $featuredCategoryHref = $featuredCategoryIsRouterPage
+                                ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
+                                : route('category.show', $featuredCategory);
+                            $featuredCategoryName = $featuredCategoryIsRouterPage
+                                ? 'Mikrotik Router Prices in Kenya'
+                                : $featuredCategory->name;
+                        @endphp
+                        <a href="{{ $featuredCategoryHref }}">{{ $featuredCategoryName }}</a>
                     @endforeach
                 </nav>
             @endif

@@ -262,13 +262,50 @@ class StorefrontController extends Controller
 
     private function routerPricesCategory(): ?Category
     {
-        return Category::query()
-            ->where(function ($query): void {
+        $routerSlugs = $this->routerAuthoritySlugs();
+
+        $candidates = Category::query()
+            ->where(function (Builder $query) use ($routerSlugs): void {
                 $query->whereRaw('LOWER(name) = ?', [Str::lower(self::ROUTER_PRICES_CATEGORY_NAME)])
-                    ->orWhere('slug', self::ROUTER_PRICES_CATEGORY_SLUG);
+                    ->orWhereIn('slug', $routerSlugs);
             })
             ->with('children')
-            ->first();
+            ->get()
+            ->sortBy(function (Category $category) use ($routerSlugs): int {
+                if ($category->slug === self::ROUTER_PRICES_CATEGORY_SLUG) {
+                    return 0;
+                }
+
+                $position = array_search($category->slug, $routerSlugs, true);
+
+                return $position === false ? 999 : $position + 1;
+            })
+            ->values();
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        return $candidates->first(function (Category $category): bool {
+            return Product::query()
+                ->active()
+                ->whereIn('category_id', $this->catalogCategoryIds($category))
+                ->exists();
+        }) ?: $candidates->first();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function routerAuthoritySlugs(): array
+    {
+        return array_values(array_unique(array_merge(
+            [self::ROUTER_PRICES_CATEGORY_SLUG, MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG],
+            array_keys(array_filter(
+                MikrotikSeoCatalog::legacyCategoryRedirects(),
+                fn (string $target): bool => $target === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG
+            ))
+        )));
     }
 
     /**
@@ -300,9 +337,17 @@ class StorefrontController extends Controller
 
         $category = Category::query()->whereRaw('LOWER(slug) = ?', [Str::lower($requestedSlug)])->first();
 
+        if (! $category && $requestedSlug === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG) {
+            $category = $this->routerPricesCategory();
+        }
+
         abort_unless($category, 404);
 
         if ($category->slug !== $requestedSlug) {
+            if ($requestedSlug === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG && MikrotikSeoCatalog::isRouterAuthorityCategory($category)) {
+                return $category;
+            }
+
             return redirect()->route('category.show', $category, 301);
         }
 
@@ -380,15 +425,18 @@ class StorefrontController extends Controller
     private function featuredCategories()
     {
         $primarySlugs = array_keys(MikrotikSeoCatalog::primaryCategories());
+        $featuredSlugs = array_values(array_unique(array_merge($primarySlugs, $this->routerAuthoritySlugs())));
 
         return Category::query()
-            ->whereIn('slug', $primarySlugs)
+            ->whereIn('slug', $featuredSlugs)
             ->get()
             ->sortBy(function (Category $category) use ($primarySlugs): int {
-                $position = array_search($category->slug, $primarySlugs, true);
+                $targetSlug = MikrotikSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug;
+                $position = array_search($targetSlug, $primarySlugs, true);
 
                 return $position === false ? 999 : $position;
             })
+            ->unique(fn (Category $category): string => MikrotikSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug)
             ->values();
     }
 
