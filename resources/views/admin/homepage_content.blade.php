@@ -2,6 +2,50 @@
 
 @push('head')
     <script src="{{ asset('assets/product-editor.js') }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('[data-featured-product-search]');
+            const clearButton = document.querySelector('[data-featured-product-search-clear]');
+            const picker = document.querySelector('[data-featured-product-picker]');
+
+            if (!searchInput || !picker) {
+                return;
+            }
+
+            const items = picker.querySelectorAll('.admin-product-picker-item');
+            const emptyNotice = picker.querySelector('.admin-product-picker-empty');
+
+            const applyFilter = function () {
+                const query = searchInput.value.trim().toLowerCase();
+                let visible = 0;
+
+                items.forEach(function (item) {
+                    const haystack = item.getAttribute('data-featured-product-name') || '';
+                    const matches = query === '' || haystack.includes(query);
+
+                    item.hidden = !matches;
+
+                    if (matches) {
+                        visible += 1;
+                    }
+                });
+
+                if (emptyNotice) {
+                    emptyNotice.hidden = visible !== 0 || query === '';
+                }
+            };
+
+            searchInput.addEventListener('input', applyFilter);
+
+            if (clearButton) {
+                clearButton.addEventListener('click', function () {
+                    searchInput.value = '';
+                    applyFilter();
+                    searchInput.focus();
+                });
+            }
+        });
+    </script>
 @endpush
 
 @php
@@ -183,9 +227,19 @@
 
                     <div class="admin-settings-field">
                         <span class="admin-settings-label">Products</span>
-                        <div class="admin-product-picker">
+                        <div class="admin-product-search-row">
+                            <input
+                                class="admin-settings-input"
+                                type="search"
+                                placeholder="Search products by name, model or SKU..."
+                                data-featured-product-search
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                            <button type="button" class="admin-outline-action" data-featured-product-search-clear>Clear</button>
+                        </div>
+                        <div class="admin-product-picker" data-featured-product-picker>
                             @forelse($products as $product)
-                                <label class="admin-product-picker-item">
+                                <label class="admin-product-picker-item" data-featured-product-name="{{ Str::lower($product->name) }} {{ Str::lower((string) $product->model_number) }} {{ Str::lower((string) $product->sku) }}">
                                     <input
                                         type="checkbox"
                                         name="featured_product_ids[]"
@@ -198,6 +252,7 @@
                             @empty
                                 <p class="admin-settings-help">No active products are available yet. Add products from the Products menu first.</p>
                             @endforelse
+                            <p class="admin-settings-help admin-product-picker-empty" hidden>No products match your search.</p>
                         </div>
                         <p class="admin-settings-help">Selected products appear in the order they were saved; only the first six are used.</p>
                     </div>

@@ -2068,6 +2068,27 @@ th {
     font-size: 15px;
 }
 
+.admin-product-search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.admin-product-search-row .admin-settings-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-product-search-row .admin-outline-action {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.admin-product-picker-empty {
+    grid-column: 1 / -1;
+    padding: 10px 4px;
+}
+
 .admin-product-picker {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
