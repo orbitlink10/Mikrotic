@@ -425,6 +425,25 @@
             </div>
         </section>
     @endif
+
+    @if($product->stock > 0)
+        <div class="product-sticky-bar" data-product-sticky-bar>
+            <span class="product-sticky-price">KSh {{ number_format($currentPrice, 2) }}</span>
+            @auth
+                <form class="product-sticky-form" method="post" action="{{ route('cart.add', $product) }}">
+                    @csrf
+                    <input type="hidden" name="quantity" value="1">
+                    <input type="hidden" name="redirect" value="back">
+                    <button type="submit" class="product-sticky-cta">Add to Cart</button>
+                </form>
+            @else
+                <a class="product-sticky-cta" href="{{ route('login') }}">Add to Cart</a>
+            @endauth
+            @if($whatsAppUrl)
+                <a class="product-sticky-whatsapp" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            @endif
+        </div>
+    @endif
 </div>
 
 <script>

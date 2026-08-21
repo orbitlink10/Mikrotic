@@ -977,8 +977,8 @@ class AdminProductManagementTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('MikroTik Kenya | Routers, Switches &amp; Access Points', false);
-        $response->assertSee('Shop MikroTik routers, switches, access points and networking equipment in Kenya with current prices, availability and delivery options.');
+        $response->assertSee('MikroTik Kenya – Routers, Switches &amp; Networking Equipment', false);
+        $response->assertSee('Compare genuine MikroTik routers, switches, access points and wireless systems, with current prices, specifications, stock availability and fast delivery across Kenya.');
     }
 
     public function test_admin_homepage_update_shows_clear_error_when_table_is_missing(): void

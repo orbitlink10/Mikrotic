@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Support\CanonicalUrl;
 use App\Support\MikrotikSeoCatalog;
+use App\Support\SeoMetadata;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -23,6 +24,7 @@ class SitemapController extends Controller
 
         $categoryUrls = Category::query()
             ->whereNotIn('slug', array_keys(MikrotikSeoCatalog::legacyCategoryRedirects()))
+            ->when(SeoMetadata::columnReady('categories', 'robots'), fn ($query) => $query->where(fn ($robotsQuery) => $robotsQuery->whereNull('robots')->orWhere('robots', 'not like', 'noindex%')))
             ->orderBy('updated_at', 'desc')
             ->get()
             ->map(fn (Category $category): array => [
@@ -33,6 +35,7 @@ class SitemapController extends Controller
 
         $productUrls = Product::query()
             ->active()
+            ->when(SeoMetadata::columnReady('products', 'robots'), fn ($query) => $query->where(fn ($robotsQuery) => $robotsQuery->whereNull('robots')->orWhere('robots', 'not like', 'noindex%')))
             ->orderBy('updated_at', 'desc')
             ->get()
             ->map(fn (Product $product): array => [
@@ -42,11 +45,19 @@ class SitemapController extends Controller
             ]);
 
         $pageUrls = Page::query()
+            ->when(SeoMetadata::columnReady('pages', 'robots'), fn ($query) => $query->where(fn ($robotsQuery) => $robotsQuery->whereNull('robots')->orWhere('robots', 'not like', 'noindex%')))
             ->orderBy('updated_at', 'desc')
             ->get()
             ->map(fn (Page $page): array => [
                 'loc' => CanonicalUrl::route('pages.show', $page),
                 'lastmod' => optional($page->updated_at)->toDateString(),
+                'priority' => '0.6',
+            ]);
+
+        $comparisonUrls = collect(MikrotikSeoCatalog::resolvableComparisonSlugs())
+            ->map(fn (string $slug): array => [
+                'loc' => CanonicalUrl::route('comparison.show', $slug),
+                'lastmod' => null,
                 'priority' => '0.6',
             ]);
 
@@ -60,7 +71,7 @@ class SitemapController extends Controller
             }
         }
 
-        $urls = $urls->merge($categoryUrls)->merge($productUrls)->merge($pageUrls);
+        $urls = $urls->merge($categoryUrls)->merge($productUrls)->merge($pageUrls)->merge($comparisonUrls);
 
         $xml = view('sitemap', ['urls' => $urls])->render();
 

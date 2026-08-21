@@ -27,7 +27,7 @@ class SeoCanonicalTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('<title>Mikrotik Kenya | Mikrotik Router Prices in Kenya</title>', false);
+        $response->assertSee('<title>MikroTik Kenya | Routers, Switches &amp; Networking Equipment</title>', false);
         $response->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/">', false);
     }
 

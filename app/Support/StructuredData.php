@@ -93,7 +93,6 @@ class StructuredData
             'name' => config('business.name', config('app.name', 'Mikrotik Kenya')),
             'url' => CanonicalUrl::normalize('/'),
         ];
-
         if (config('business.legal_name')) {
             $schema['legalName'] = config('business.legal_name');
         }
@@ -121,6 +120,29 @@ class StructuredData
 
         if (config('business.social_profiles')) {
             $schema['sameAs'] = config('business.social_profiles');
+        }
+
+        return $schema;
+    }
+
+    public static function website(): array
+    {
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => config('app.name', 'Mikrotik Kenya'),
+            'url' => CanonicalUrl::normalize('/'),
+        ];
+
+        if (CanonicalUrl::normalize('/') !== '') {
+            $schema['potentialAction'] = [
+                '@type' => 'SearchAction',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => CanonicalUrl::normalize('/').'?search={search_term_string}',
+                ],
+                'query-input' => 'required name=search_term_string',
+            ];
         }
 
         return $schema;

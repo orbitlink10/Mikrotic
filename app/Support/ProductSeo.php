@@ -37,6 +37,21 @@ class ProductSeo
         return trim($model) !== '' ? trim($model) : $product->sku;
     }
 
+    public static function typeLabel(Product $product): string
+    {
+        return match (MikrotikSeoCatalog::productIntentSlug($product)) {
+            MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG => 'Router',
+            'mikrotik-switches' => 'Switch',
+            'mikrotik-access-points' => 'Access Point',
+            'mikrotik-wireless' => 'Wireless System',
+            'mikrotik-lte-5g' => 'LTE Router',
+            'mikrotik-sfp-modules' => 'SFP Module',
+            'mikrotik-antennas' => 'Antenna',
+            'routeros' => 'Software',
+            default => 'Networking Equipment',
+        };
+    }
+
     public static function keyUse(Product $product): string
     {
         if ($keyUse = self::columnValue($product, 'key_use')) {

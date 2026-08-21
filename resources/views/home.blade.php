@@ -37,6 +37,33 @@
     $faqSchema = ($showHomepageSections || ($currentCategory && $categoryFaqItems !== []))
         ? \App\Support\StructuredData::faq($showHomepageSections ? $homepageContent->faqItems() : $categoryFaqItems)
         : null;
+    $breadcrumbSchema = null;
+    if ($currentCategory) {
+        $breadcrumbItems = [
+            ['name' => 'Home', 'url' => \App\Support\CanonicalUrl::route('home')],
+        ];
+        if ($currentCategory->parent_id && $currentCategory->parent) {
+            $breadcrumbItems[] = [
+                'name' => \App\Support\MikrotikSeoCatalog::navLabel($currentCategory->parent),
+                'url' => \App\Support\CanonicalUrl::route('category.show', $currentCategory->parent),
+            ];
+        }
+        $breadcrumbItems[] = [
+            'name' => \App\Support\MikrotikSeoCatalog::navLabel($currentCategory),
+            'url' => $catalogCanonicalUrl,
+        ];
+        $breadcrumbSchema = \App\Support\StructuredData::breadcrumbs($breadcrumbItems);
+    }
+    $routerPricesCategoryUrl = null;
+    $routerPricesIntro = null;
+    if ($showHomepageSections && $homepageProductCategory) {
+        $routerPricesCategoryUrl = route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]);
+        $routerPricesIntro = trim((string) $homepageProductCategory->meta_description)
+            ?: \App\Support\ProductContent::excerpt((string) $homepageProductCategory->description, 220);
+        $routerPricesIntro = $routerPricesIntro !== ''
+            ? $routerPricesIntro
+            : 'Compare current MikroTik router prices, models and availability for homes, offices and ISP networks across Kenya.';
+    }
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
         <<<'SVG'
@@ -78,6 +105,11 @@ SVG,
         <script type="application/ld+json">@json($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
     @endpush
 @endif
+@if($breadcrumbSchema)
+    @push('head')
+        <script type="application/ld+json">@json($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    @endpush
+@endif
 
 @section('content')
 <section class="home-layout">
@@ -111,6 +143,16 @@ SVG,
                 </p>
             </section>
         @elseif($currentCategory)
+            <nav class="product-breadcrumbs" aria-label="Breadcrumb">
+                <a href="{{ route('home') }}">Home</a>
+                @if($currentCategory->parent_id && $currentCategory->parent)
+                    <span>/</span>
+                    <a href="{{ route('category.show', $currentCategory->parent) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($currentCategory->parent) }}</a>
+                @endif
+                <span>/</span>
+                <span>{{ \App\Support\MikrotikSeoCatalog::navLabel($currentCategory) }}</span>
+            </nav>
+
             <section class="panel category-content-panel {{ $currentCategory->image_url ? 'category-content-panel--with-image' : '' }}">
                 @if($currentCategory->image_url)
                     <div class="category-content-media">
@@ -141,20 +183,24 @@ SVG,
             </div>
 
             @if($featuredCategories->isNotEmpty())
-                <nav class="category-hub-links" aria-label="Featured MikroTik categories">
-                    @foreach($featuredCategories as $featuredCategory)
-                        @php
-                            $featuredCategoryIsRouterPage = \App\Support\MikrotikSeoCatalog::isRouterAuthorityCategory($featuredCategory);
-                            $featuredCategoryHref = $featuredCategoryIsRouterPage
-                                ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
-                                : route('category.show', $featuredCategory);
-                            $featuredCategoryName = $featuredCategoryIsRouterPage
-                                ? 'MikroTik Router Prices in Kenya'
-                                : $featuredCategory->name;
-                        @endphp
-                        <a href="{{ $featuredCategoryHref }}">{{ $featuredCategoryName }}</a>
-                    @endforeach
-                </nav>
+                <section class="home-category-section" aria-label="Shop by category">
+                    <h2>Shop by Category</h2>
+                    <div class="home-category-grid">
+                        @foreach($featuredCategories as $featuredCategory)
+                            @php
+                                $featuredCategoryIsRouterPage = \App\Support\MikrotikSeoCatalog::isRouterAuthorityCategory($featuredCategory);
+                                $featuredCategoryHref = $featuredCategoryIsRouterPage
+                                    ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
+                                    : route('category.show', $featuredCategory);
+                                $featuredCategoryName = \App\Support\MikrotikSeoCatalog::navLabel($featuredCategory);
+                            @endphp
+                            <a class="home-category-card" href="{{ $featuredCategoryHref }}">
+                                <span class="home-category-card-name">{{ $featuredCategoryName }}</span>
+                                <span class="home-category-card-cta" aria-hidden="true">Shop now &rarr;</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
             @endif
         @endif
 
@@ -226,6 +272,12 @@ SVG,
         @endif
 
         @if($showFeaturedProductRows)
+            <div class="featured-rows-head">
+                <h2>{{ $homepageProductCategory ? 'Shop MikroTik Routers' : 'Popular MikroTik Products' }}</h2>
+                @if($homepageProductCategory)
+                    <a class="featured-rows-link" href="{{ route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]) }}">View all &rarr;</a>
+                @endif
+            </div>
             <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory?->name ?? 'Featured products' }}">
                 @foreach($homepageFeaturedProducts as $product)
                     @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
@@ -298,6 +350,31 @@ SVG,
 
     @if($showHomepageSections)
         <section class="home-extra-sections home-extra-sections--full-width">
+            @if($routerPricesCategoryUrl)
+                <section class="home-section home-section--router-prices">
+                    <div class="home-section-head">
+                        <p class="home-section-kicker">Current catalogue pricing</p>
+                        <h2>MikroTik Router Prices in Kenya</h2>
+                        <p>{{ $routerPricesIntro }}</p>
+                        <a class="home-section-cta" href="{{ $routerPricesCategoryUrl }}">View current MikroTik router prices</a>
+                    </div>
+                </section>
+            @endif
+
+            @if($homepageComparisonLinks !== [])
+                <section class="home-section home-section--guides">
+                    <div class="home-section-head">
+                        <h2>MikroTik Buying Guides &amp; Comparisons</h2>
+                        <p>Compare popular MikroTik models side by side before choosing your router or switch.</p>
+                    </div>
+                    <nav class="category-hub-links" aria-label="MikroTik buying guides and comparisons">
+                        @foreach($homepageComparisonLinks as $comparisonLink)
+                            <a href="{{ $comparisonLink['url'] }}">{{ $comparisonLink['label'] }}</a>
+                        @endforeach
+                    </nav>
+                </section>
+            @endif
+
             <section class="home-section home-section--why-choose">
                 <div class="home-section-head">
                     <h2>{{ $homepageContent->whyChooseTitle() }}</h2>

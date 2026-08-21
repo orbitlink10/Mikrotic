@@ -276,7 +276,28 @@ class StorefrontController extends Controller
             'routerPriceTableProducts' => $routerPriceTableProducts,
             'routerFaqItems' => MikrotikSeoCatalog::routerFaqItems(),
             'relatedCategories' => $this->relatedCategories($currentCategory),
+            'homepageComparisonLinks' => $search === '' && ! $currentCategory
+                ? $this->homepageComparisonLinks()
+                : [],
         ]);
+    }
+
+    /**
+     * @return array<int, array{url: string, label: string}>
+     */
+    private function homepageComparisonLinks(): array
+    {
+        $labels = MikrotikSeoCatalog::comparisonPages();
+        $links = [];
+
+        foreach (MikrotikSeoCatalog::resolvableComparisonSlugs() as $slug) {
+            $links[] = [
+                'url' => route('comparison.show', $slug),
+                'label' => $labels[$slug] ?? $slug,
+            ];
+        }
+
+        return $links;
     }
 
     private function routerPricesCategory(): ?Category

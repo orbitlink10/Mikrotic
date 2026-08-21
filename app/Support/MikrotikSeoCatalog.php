@@ -68,6 +68,112 @@ class MikrotikSeoCatalog
     /**
      * @return array<string, string>
      */
+    public static function categoryTitles(): array
+    {
+        return [
+            self::ROUTER_AUTHORITY_SLUG => 'MikroTik Router Prices in Kenya | Buy MikroTik Routers',
+            'mikrotik-switches' => 'MikroTik Switch Prices in Kenya | MikroTik Switches',
+            'mikrotik-access-points' => 'MikroTik Access Point Prices in Kenya',
+            'mikrotik-wireless' => 'MikroTik Wireless Systems in Kenya | Point to Point & Outdoor',
+            'mikrotik-lte-5g' => 'MikroTik LTE & 5G Routers in Kenya',
+            'mikrotik-sfp-modules' => 'MikroTik SFP & SFP+ Modules in Kenya',
+            'mikrotik-antennas' => 'MikroTik Antennas in Kenya',
+            'mikrotik-accessories' => 'MikroTik Accessories in Kenya',
+            'routeros' => 'RouterOS in Kenya | MikroTik',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function comparisonPages(): array
+    {
+        return [
+            'rb760igs-vs-rb750gr3' => 'RB760iGS vs RB750Gr3',
+            'rb4011-vs-rb5009' => 'RB4011 vs RB5009',
+            'l009uigs-rm-vs-l009uigs-2haxd-in' => 'L009UiGS-RM vs L009UiGS-2HaxD-IN',
+            'ccr2004-vs-ccr2116' => 'CCR2004 vs CCR2116',
+        ];
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function comparisonProducts(): array
+    {
+        return [
+            'rb760igs-vs-rb750gr3' => ['RB760iGS', 'RB750Gr3'],
+            'rb4011-vs-rb5009' => ['RB4011', 'RB5009'],
+            'l009uigs-rm-vs-l009uigs-2haxd-in' => ['L009UiGS-RM', 'L009UiGS-2HaxD-IN'],
+            'ccr2004-vs-ccr2116' => ['CCR2004', 'CCR2116'],
+        ];
+    }
+
+    /**
+     * Comparison slugs whose two products currently exist in the active catalogue.
+     *
+     * @return array<int, string>
+     */
+    public static function resolvableComparisonSlugs(): array
+    {
+        $comparisons = self::comparisonProducts();
+        if ($comparisons === []) {
+            return [];
+        }
+
+        $products = Product::query()->active()->get(['id', 'name', 'slug', 'sku']);
+        $resolvable = [];
+
+        foreach ($comparisons as $slug => [$left, $right]) {
+            if (self::findMatchingProduct($products, $left) && self::findMatchingProduct($products, $right)) {
+                $resolvable[] = $slug;
+            }
+        }
+
+        return $resolvable;
+    }
+
+    /**
+     * Clean navigation label for a category (no keyword-stuffed suffixes).
+     */
+    public static function navLabel(Category $category): string
+    {
+        $slug = Str::slug($category->slug);
+
+        if ($slug === self::ROUTER_AUTHORITY_SLUG || self::isRouterAuthorityCategory($category)) {
+            return 'MikroTik Routers';
+        }
+
+        if ($mapped = self::primaryCategories()[$slug]['name'] ?? null) {
+            return $mapped;
+        }
+
+        $name = trim((string) $category->name);
+        $name = preg_replace('/\s*[-–|:]\s*price(s)?\s*in\s*kenya\s*$/iu', '', $name) ?? $name;
+        $name = preg_replace('/\s*price(s)?\s*in\s*kenya\s*$/iu', '', $name) ?? $name;
+        $name = preg_replace('/\s*for\s*sale\s*in\s*kenya\s*$/iu', '', $name) ?? $name;
+
+        return $name !== '' ? $name : $category->name;
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Product>  $products
+     */
+    private static function findMatchingProduct($products, string $needle): bool
+    {
+        $needleSlug = str($needle)->lower()->replace('+', '-')->replace('_', '-')->slug()->toString();
+        $needleLower = Str::lower($needle);
+
+        return $products->contains(
+            fn (Product $product): bool => Str::contains(Str::lower($product->name), $needleLower)
+                || Str::contains(Str::lower((string) $product->sku), $needleLower)
+                || Str::contains(Str::lower((string) $product->slug), $needleSlug)
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public static function legacyCategoryRedirects(): array
     {
         return [

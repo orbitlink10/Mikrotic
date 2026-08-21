@@ -12,26 +12,28 @@ class SeoMetadata
 {
     public static function homepageTitle(int $page = 1): string
     {
-        $title = 'Mikrotik Kenya | Mikrotik Router Prices in Kenya';
+        $title = 'MikroTik Kenya | Routers, Switches & Networking Equipment';
 
         return $page > 1 ? $title.' - Page '.$page : $title;
     }
 
     public static function homepageDescription(): string
     {
-        return 'Shop genuine MikroTik routers, switches, access points and networking equipment in Kenya with current prices, availability and delivery options.';
+        return 'Shop genuine MikroTik routers, switches, access points and networking equipment in Kenya. Compare prices, specifications and availability with fast delivery across Kenya.';
     }
 
     public static function categoryTitle(Category $category, int $page = 1): string
     {
         $categoryName = $category->name;
-        $categoryTitle = Str::contains(Str::lower($categoryName), ['kenya', 'price'])
-            ? $categoryName.' | MikroTik Kenya'
-            : $categoryName.' in Kenya | MikroTik Kenya';
+        $mappedTitle = MikrotikSeoCatalog::categoryTitles()[Str::slug($category->slug)] ?? null;
+        $categoryTitle = $mappedTitle
+            ?: (Str::contains(Str::lower($categoryName), ['kenya', 'price'])
+                ? $categoryName.' | MikroTik Kenya'
+                : $categoryName.' in Kenya | MikroTik Kenya');
 
         $title = self::columnValue($category, 'seo_title')
             ?: (MikrotikSeoCatalog::isRouterAuthorityCategory($category)
-                ? 'MikroTik Router Prices in Kenya | MikroTik Kenya'
+                ? MikrotikSeoCatalog::categoryTitles()[MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]
                 : $categoryTitle);
 
         return $page > 1 ? $title.' - Page '.$page : $title;
@@ -49,8 +51,14 @@ class SeoMetadata
 
     public static function productTitle(Product $product): string
     {
-        return self::columnValue($product, 'seo_title')
-            ?: Str::limit($product->name.' Price in Kenya | MikroTik Kenya', 78, '');
+        if ($customTitle = self::columnValue($product, 'seo_title')) {
+            return $customTitle;
+        }
+
+        $model = ProductSeo::model($product);
+        $typeLabel = ProductSeo::typeLabel($product);
+
+        return Str::limit($model.' Price in Kenya | MikroTik '.$typeLabel, 78, '');
     }
 
     public static function productDescription(Product $product): string

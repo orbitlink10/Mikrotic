@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     @php
         $homepageBrandContent = \App\Models\HomepageContent::current();
         $siteLogoUrl = $homepageBrandContent->siteLogoUrl();
@@ -26,6 +26,10 @@
         }
 
         $headerWhatsAppHref = $headerWhatsAppDigits !== '' ? 'https://wa.me/'.$headerWhatsAppDigits : null;
+        $websiteSchema = \App\Support\StructuredData::website();
+        $menuCategories = \Illuminate\Support\Facades\Schema::hasTable('categories')
+            ? \App\Models\Category::query()->whereNull('parent_id')->with('children')->orderBy('name')->get()
+            : collect();
     @endphp
     <title>{!! $pageTitle !!}</title>
     <meta name="description" content="{!! $pageDescription !!}">
@@ -48,10 +52,12 @@
         <meta name="twitter:image" content="{{ \App\Support\CanonicalUrl::absoluteAsset($openGraphImage) }}">
     @endif
     <script type="application/ld+json">@json($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
+    <script type="application/ld+json">@json($websiteSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
     <link rel="stylesheet" href="{{ asset('assets/market.css') }}?v={{ $marketCssVersion }}">
     @stack('head')
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <header class="top-header">
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
@@ -62,23 +68,77 @@
             @endif
         </a>
 
-        <form class="search-form" method="get" action="{{ route('home') }}">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories">
+        <form class="search-form" method="get" action="{{ route('home') }}" role="search">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories" aria-label="Search products" autocomplete="off">
             <button type="submit">Search</button>
         </form>
 
-        <nav class="top-links top-contact-links" aria-label="Contact">
-            @if($headerPhone && $headerPhoneHref)
-                <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
-            @endif
-            @if($headerWhatsApp && $headerWhatsAppHref)
-                <a class="contact-link contact-link--whatsapp" href="{{ $headerWhatsAppHref }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ $headerWhatsApp }}</a>
-            @endif
-        </nav>
+        <div class="header-actions">
+            <nav class="top-links top-contact-links" aria-label="Contact">
+                @if($headerPhone && $headerPhoneHref)
+                    <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
+                @endif
+                @if($headerWhatsApp && $headerWhatsAppHref)
+                    <a class="contact-link contact-link--whatsapp" href="{{ $headerWhatsAppHref }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ $headerWhatsApp }}</a>
+                @endif
+            </nav>
+
+            <nav class="top-account-links" aria-label="Account">
+                <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation menu">
+                    <span class="menu-toggle-icon" aria-hidden="true"></span>
+                </button>
+            </nav>
+        </div>
     </div>
 </header>
 
-<main class="container">
+<div class="mobile-menu-backdrop" data-menu-backdrop hidden></div>
+<nav id="mobile-menu" class="mobile-menu" aria-label="Main navigation" data-mobile-menu hidden>
+    <div class="mobile-menu-head">
+        <span class="mobile-menu-title">Menu</span>
+        <button type="button" class="mobile-menu-close" data-menu-close aria-label="Close navigation menu">&times;</button>
+    </div>
+    <ul class="mobile-menu-list">
+        <li><a class="mobile-menu-link" href="{{ route('home') }}">Home</a></li>
+        @foreach($menuCategories as $menuCategory)
+            @if($menuCategory->children->isNotEmpty())
+                <li class="mobile-menu-accordion">
+                    <button type="button" class="mobile-menu-link mobile-menu-accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-{{ $menuCategory->id }}">
+                        <span>{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</span>
+                        <span class="mobile-menu-chevron" aria-hidden="true"></span>
+                    </button>
+                    <ul id="mobile-submenu-{{ $menuCategory->id }}" class="mobile-menu-submenu" hidden>
+                        <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuCategory) }}">All {{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+                        @foreach($menuCategory->children as $menuChildCategory)
+                            <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuChildCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuChildCategory) }}</a></li>
+                        @endforeach
+                    </ul>
+                </li>
+            @else
+                <li><a class="mobile-menu-link" href="{{ route('category.show', $menuCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+            @endif
+        @endforeach
+        <li><a class="mobile-menu-link" href="{{ route('pages.show', ['page' => 'contact-us']) }}">Contact Us</a></li>
+        @auth
+            @if(auth()->user()->role === 'admin')
+                <li><a class="mobile-menu-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+            @elseif(auth()->user()->role === 'vendor')
+                <li><a class="mobile-menu-link" href="{{ route('vendor.dashboard') }}">Vendor Dashboard</a></li>
+            @endif
+            <li>
+                <form action="{{ route('logout') }}" method="post">
+                    @csrf
+                    <button type="submit" class="mobile-menu-link mobile-menu-logout">Logout</button>
+                </form>
+            </li>
+        @else
+            <li><a class="mobile-menu-link" href="{{ route('login') }}">Login</a></li>
+            <li><a class="mobile-menu-link" href="{{ route('register') }}">Register</a></li>
+        @endauth
+    </ul>
+</nav>
+
+<main class="container" id="main-content">
     @if(session('success'))
         <div class="alert success">{{ session('success') }}</div>
     @endif
@@ -105,5 +165,67 @@
     </nav>
     <p>&copy; {{ date('Y') }} {{ config('business.name', config('app.name', 'Mikrotik Kenya')) }}</p>
 </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.querySelector('.menu-toggle');
+    var menu = document.querySelector('[data-mobile-menu]');
+    var backdrop = document.querySelector('[data-menu-backdrop]');
+    var closeButton = document.querySelector('[data-menu-close]');
+
+    if (!toggle || !menu) {
+        return;
+    }
+
+    var setMenuState = function (open) {
+        menu.hidden = !open;
+        if (backdrop) {
+            backdrop.hidden = !open;
+        }
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+        document.documentElement.classList.toggle('menu-is-open', open);
+        if (open && closeButton) {
+            closeButton.focus();
+        }
+    };
+
+    toggle.addEventListener('click', function () {
+        setMenuState(menu.hidden);
+    });
+
+    if (closeButton) {
+        closeButton.addEventListener('click', function () {
+            setMenuState(false);
+        });
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', function () {
+            setMenuState(false);
+        });
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !menu.hidden) {
+            setMenuState(false);
+            toggle.focus();
+        }
+    });
+
+    menu.querySelectorAll('.mobile-menu-accordion-toggle').forEach(function (accordionToggle) {
+        accordionToggle.addEventListener('click', function () {
+            var submenu = document.getElementById(accordionToggle.getAttribute('aria-controls') || '');
+            if (!submenu) {
+                return;
+            }
+
+            var isOpen = !submenu.hidden;
+            submenu.hidden = isOpen;
+            accordionToggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        });
+    });
+});
+</script>
 </body>
 </html>

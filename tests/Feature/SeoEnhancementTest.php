@@ -40,7 +40,7 @@ class SeoEnhancementTest extends TestCase
         $response = $this->get('/product/'.$product->slug);
 
         $response->assertOk();
-        $response->assertSee('<title>MikroTik RB5009UPr+S+IN Price in Kenya | MikroTik Kenya</title>', false);
+        $response->assertSee('<title>RB5009UPr+S+IN Price in Kenya | MikroTik Router</title>', false);
         $response->assertSee('"@type":"Product"', false);
         $response->assertSee('"priceCurrency":"KES"', false);
         $response->assertSee('"price":"56000.00"', false);
