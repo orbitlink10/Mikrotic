@@ -5,6 +5,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('[data-featured-product-search]');
+            const searchButton = document.querySelector('[data-featured-product-search-button]');
             const clearButton = document.querySelector('[data-featured-product-search-clear]');
             const picker = document.querySelector('[data-featured-product-picker]');
 
@@ -36,6 +37,17 @@
             };
 
             searchInput.addEventListener('input', applyFilter);
+
+            searchInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    applyFilter();
+                }
+            });
+
+            if (searchButton) {
+                searchButton.addEventListener('click', applyFilter);
+            }
 
             if (clearButton) {
                 clearButton.addEventListener('click', function () {
@@ -235,6 +247,7 @@
                                 data-featured-product-search
                                 @disabled(! $homepageContentStorageReady)
                             >
+                            <button type="button" class="admin-outline-action" data-featured-product-search-button>Search</button>
                             <button type="button" class="admin-outline-action" data-featured-product-search-clear>Clear</button>
                         </div>
                         <div class="admin-product-picker" data-featured-product-picker>

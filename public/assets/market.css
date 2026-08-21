@@ -2115,6 +2115,16 @@ th {
     cursor: pointer;
 }
 
+.admin-product-picker-item[hidden] {
+    display: none;
+}
+
+.admin-product-picker-item > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 .admin-product-picker-item:hover {
     border-color: #9aa7bb;
 }
