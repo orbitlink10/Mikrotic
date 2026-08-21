@@ -772,7 +772,7 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertSee('href="tel:+254700123456"', false);
         $homeResponse->assertSee('Phone +254 700 123 456');
         $homeResponse->assertSee('href="https://wa.me/254711222333"', false);
-        $homeResponse->assertSee('WhatsApp 0711 222 333');
+        $homeResponse->assertSee('aria-label="Chat with us on WhatsApp"', false);
         $homeResponse->assertDontSee('Login');
         $homeResponse->assertDontSee('Register');
         $homeResponse->assertDontSee('Cart (0)');
