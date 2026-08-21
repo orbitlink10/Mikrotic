@@ -80,6 +80,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/pages-content', [AdminController::class, 'homepageContentForm'])->name('pages-content.edit');
     Route::post('/pages-content', [AdminController::class, 'updateHomepageContent'])->name('pages-content.update');
+    Route::post('/featured-products', [AdminController::class, 'updateFeaturedProducts'])->name('featured-products.update');
     Route::get('/testimonials', [AdminController::class, 'testimonialsIndex'])->name('testimonials.index');
     Route::post('/testimonials/settings', [AdminController::class, 'updateTestimonialSettings'])->name('testimonials.settings.update');
     Route::get('/testimonials/create', [AdminController::class, 'createTestimonialForm'])->name('testimonials.create');

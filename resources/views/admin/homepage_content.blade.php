@@ -95,6 +95,56 @@
                 </div>
             @endunless
 
+            <form class="admin-settings-form" method="post" action="{{ route('admin.featured-products.update') }}">
+                @csrf
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Featured Homepage Products</h2>
+                        <p class="admin-settings-help">Choose up to six products to feature as the first product rows on the homepage. Leave all unchecked to show the latest products automatically.</p>
+                    </div>
+
+                    <input type="hidden" name="featured_product_ids" value="">
+
+                    <div class="admin-settings-field">
+                        <span class="admin-settings-label">Products</span>
+                        <div class="admin-product-search-row">
+                            <input
+                                class="admin-settings-input"
+                                type="search"
+                                placeholder="Search products by name, model or SKU..."
+                                data-featured-product-search
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                            <button type="button" class="admin-outline-action" data-featured-product-search-button>Search</button>
+                            <button type="button" class="admin-outline-action" data-featured-product-search-clear>Clear</button>
+                        </div>
+                        <div class="admin-product-picker" data-featured-product-picker>
+                            @forelse($products as $product)
+                                <label class="admin-product-picker-item" data-featured-product-name="{{ Str::lower($product->name) }} {{ Str::lower((string) $product->model_number) }} {{ Str::lower((string) $product->sku) }}">
+                                    <input
+                                        type="checkbox"
+                                        name="featured_product_ids[]"
+                                        value="{{ $product->id }}"
+                                        @checked(in_array($product->id, $selectedFeaturedProductIds, true))
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                    <span>{{ $product->name }}</span>
+                                </label>
+                            @empty
+                                <p class="admin-settings-help">No active products are available yet. Add products from the Products menu first.</p>
+                            @endforelse
+                            <p class="admin-settings-help admin-product-picker-empty" hidden>No products match your search.</p>
+                        </div>
+                        <p class="admin-settings-help">Selected products appear in the order they were saved; only the first six are used.</p>
+                    </div>
+                </section>
+
+                <div class="admin-settings-actions">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Featured Products</button>
+                </div>
+            </form>
+
             <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}" enctype="multipart/form-data">
                 @csrf
 
@@ -226,48 +276,6 @@
                                 </div>
                             </div>
                         @endforeach
-                    </div>
-                </section>
-
-                <section class="admin-settings-group">
-                    <div class="admin-settings-group-head">
-                        <h2 class="admin-settings-group-title">Featured Homepage Products</h2>
-                        <p class="admin-settings-help">Choose up to six products to feature as the first product rows on the homepage. Leave all unchecked to show the latest products automatically.</p>
-                    </div>
-
-                    <input type="hidden" name="featured_product_ids" value="">
-
-                    <div class="admin-settings-field">
-                        <span class="admin-settings-label">Products</span>
-                        <div class="admin-product-search-row">
-                            <input
-                                class="admin-settings-input"
-                                type="search"
-                                placeholder="Search products by name, model or SKU..."
-                                data-featured-product-search
-                                @disabled(! $homepageContentStorageReady)
-                            >
-                            <button type="button" class="admin-outline-action" data-featured-product-search-button>Search</button>
-                            <button type="button" class="admin-outline-action" data-featured-product-search-clear>Clear</button>
-                        </div>
-                        <div class="admin-product-picker" data-featured-product-picker>
-                            @forelse($products as $product)
-                                <label class="admin-product-picker-item" data-featured-product-name="{{ Str::lower($product->name) }} {{ Str::lower((string) $product->model_number) }} {{ Str::lower((string) $product->sku) }}">
-                                    <input
-                                        type="checkbox"
-                                        name="featured_product_ids[]"
-                                        value="{{ $product->id }}"
-                                        @checked(in_array($product->id, $selectedFeaturedProductIds, true))
-                                        @disabled(! $homepageContentStorageReady)
-                                    >
-                                    <span>{{ $product->name }}</span>
-                                </label>
-                            @empty
-                                <p class="admin-settings-help">No active products are available yet. Add products from the Products menu first.</p>
-                            @endforelse
-                            <p class="admin-settings-help admin-product-picker-empty" hidden>No products match your search.</p>
-                        </div>
-                        <p class="admin-settings-help">Selected products appear in the order they were saved; only the first six are used.</p>
                     </div>
                 </section>
 

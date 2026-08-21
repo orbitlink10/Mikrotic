@@ -697,21 +697,9 @@ class AdminController extends Controller
                 ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
         }
 
-        $request->merge([
-            'featured_product_ids' => collect((array) $request->input('featured_product_ids'))
-                ->map(fn ($value): int => (int) $value)
-                ->filter(fn (int $id): bool => $id > 0)
-                ->unique()
-                ->take(6)
-                ->values()
-                ->all(),
-        ]);
-
         $data = $request->validate([
             'hero_title' => ['required', 'string', 'min:4', 'max:180'],
             'hero_description' => ['required', 'string', 'min:12', 'max:500'],
-            'featured_product_ids' => ['nullable', 'array', 'max:6'],
-            'featured_product_ids.*' => ['required', 'integer', 'exists:products,id'],
             'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'why_choose_title' => ['nullable', 'string', 'max:180'],
@@ -779,7 +767,7 @@ class AdminController extends Controller
         $homepageContent->content_body = $request->has('content_body')
             ? ($normalizedContentBody !== '' ? $normalizedContentBody : $baseline->contentBody())
             : $baseline->contentBody();
-        $homepageContent->featured_product_ids = $data['featured_product_ids'] ?? $baseline->featuredProductIds();
+        $homepageContent->featured_product_ids = $baseline->featuredProductIds();
 
         if ($request->hasFile('site_logo')) {
             $directory = public_path('uploads/homepage-content');
@@ -814,6 +802,52 @@ class AdminController extends Controller
         $homepageContent->save();
 
         return redirect()->route('admin.pages-content.edit')->with('success', 'Homepage content updated successfully.');
+    }
+
+    public function updateFeaturedProducts(Request $request): RedirectResponse
+    {
+        if (! HomepageContent::storageReady()) {
+            return redirect()
+                ->route('admin.pages-content.edit')
+                ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
+        }
+
+        $request->merge([
+            'featured_product_ids' => $this->normalizeFeaturedProductIds($request),
+        ]);
+
+        $data = $request->validate([
+            'featured_product_ids' => ['nullable', 'array', 'max:6'],
+            'featured_product_ids.*' => ['required', 'integer', 'exists:products,id'],
+        ]);
+
+        $homepageContent = HomepageContent::query()->firstOrNew([
+            'site_key' => HomepageContent::DEFAULT_SITE_KEY,
+        ]);
+        $baseline = $homepageContent->exists ? $homepageContent : HomepageContent::current();
+
+        $homepageContent->hero_title = $homepageContent->hero_title ?: $baseline->hero_title;
+        $homepageContent->hero_description = $homepageContent->hero_description ?: $baseline->hero_description;
+        $homepageContent->featured_product_ids = $data['featured_product_ids'] ?? [];
+        $homepageContent->save();
+
+        return redirect()
+            ->route('admin.pages-content.edit')
+            ->with('success', 'Featured homepage products updated successfully.');
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function normalizeFeaturedProductIds(Request $request): array
+    {
+        return collect((array) $request->input('featured_product_ids'))
+            ->map(fn ($value): int => (int) $value)
+            ->filter(fn (int $id): bool => $id > 0)
+            ->unique()
+            ->take(6)
+            ->values()
+            ->all();
     }
 
     public function createTestimonialForm(): View
