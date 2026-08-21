@@ -236,8 +236,9 @@ button.danger {
     border-radius: 12px;
     padding: 14px;
     align-self: start;
-    position: sticky;
-    top: 16px;
+    position: relative;
+    top: auto;
+    z-index: 0;
 }
 
 .category-sidebar h3 {
@@ -429,6 +430,8 @@ button.danger {
     width: 100%;
     min-width: 0;
     justify-self: stretch;
+    position: relative;
+    z-index: 1;
 }
 
 .home-section {
@@ -672,6 +675,22 @@ button.danger {
     gap: 0;
 }
 
+.home-guide-card--scroll-frame {
+    position: relative;
+    overflow: hidden;
+}
+
+.home-guide-card--scroll-frame::after {
+    content: '';
+    position: absolute;
+    left: 44px;
+    right: 44px;
+    bottom: 40px;
+    height: 92px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff 82%);
+}
+
 .home-guide-body {
     border-top: 1px solid #edf2f7;
     padding-top: 28px;
@@ -681,6 +700,28 @@ button.danger {
 .home-guide-body--standalone {
     border-top: 0;
     padding-top: 0;
+}
+
+.home-guide-body--scrollable {
+    max-height: clamp(360px, 54vh, 560px);
+    overflow-y: auto;
+    padding-right: 18px;
+    padding-bottom: 74px;
+    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-width: thin;
+}
+
+.home-guide-body--scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.home-guide-body--scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.home-guide-body--scrollable::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
 }
 
 .home-guide-body p,
@@ -5098,6 +5139,19 @@ textarea.admin-post-builder-input {
         margin-left: 0;
         padding: 22px 18px;
         border-radius: 18px;
+    }
+
+    .home-guide-card--scroll-frame::after {
+        left: 18px;
+        right: 18px;
+        bottom: 22px;
+        height: 72px;
+    }
+
+    .home-guide-body--scrollable {
+        max-height: 430px;
+        padding-right: 10px;
+        padding-bottom: 58px;
     }
 
     .home-guide-body p,

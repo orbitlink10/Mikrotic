@@ -445,8 +445,8 @@ SVG,
             <section class="home-section home-section--guide">
                 <div class="home-guide-shell">
                     <div class="home-guide-border" aria-hidden="true"></div>
-                    <div class="home-guide-card home-guide-card--body-only">
-                        <div class="home-guide-body home-guide-body--standalone rich-content">
+                    <div class="home-guide-card home-guide-card--body-only home-guide-card--scroll-frame">
+                        <div class="home-guide-body home-guide-body--standalone home-guide-body--scrollable rich-content">
                             {!! $homepageContent->contentBody() !!}
                         </div>
                     </div>

@@ -69,7 +69,7 @@
         </a>
 
         <form class="search-form" method="get" action="{{ route('home') }}" role="search">
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories" aria-label="Search products" autocomplete="off">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories" aria-label="Search products" autocomplete="off" required>
             <button type="submit">Search</button>
         </form>
 
@@ -168,6 +168,21 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var searchForm = document.querySelector('.search-form');
+    var searchInput = searchForm ? searchForm.querySelector('input[name="search"]') : null;
+
+    if (searchForm && searchInput) {
+        searchForm.addEventListener('submit', function (event) {
+            if (searchInput.value.trim() === '') {
+                event.preventDefault();
+                searchInput.setCustomValidity('Please enter a product name to search.');
+                searchInput.reportValidity();
+                searchInput.setCustomValidity('');
+                searchInput.focus();
+            }
+        });
+    }
+
     var toggle = document.querySelector('.menu-toggle');
     var menu = document.querySelector('[data-mobile-menu]');
     var backdrop = document.querySelector('[data-menu-backdrop]');

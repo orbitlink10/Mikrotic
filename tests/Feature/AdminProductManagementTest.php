@@ -847,6 +847,7 @@ class AdminProductManagementTest extends TestCase
 
         $homeResponse = $this->get('/');
         $homeResponse->assertOk();
+        $homeResponse->assertSee('home-guide-body--scrollable', false);
         $homeResponse->assertSee('Guide Title From Editor');
         $homeResponse->assertSee('Editable paragraph body.');
         $homeResponse->assertDontSee('Legacy Guide Badge');
