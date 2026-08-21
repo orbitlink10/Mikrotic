@@ -16,6 +16,8 @@ class HomepageContent extends Model
     protected $fillable = [
         'site_key',
         'site_logo_path',
+        'contact_phone',
+        'contact_whatsapp',
         'hero_title',
         'hero_description',
         'hero_image_path',
@@ -65,6 +67,8 @@ class HomepageContent extends Model
         foreach ([
             'site_key',
             'site_logo_path',
+            'contact_phone',
+            'contact_whatsapp',
             'hero_title',
             'hero_description',
             'hero_image_path',
@@ -97,6 +101,8 @@ class HomepageContent extends Model
     {
         return new static([
             'site_key' => static::DEFAULT_SITE_KEY,
+            'contact_phone' => config('business.phone'),
+            'contact_whatsapp' => config('business.whatsapp', config('business.phone')),
             'hero_title' => 'MikroTik Kenya | Routers, Switches & Access Points',
             'hero_description' => 'Shop MikroTik routers, switches, access points and networking equipment in Kenya with current prices, availability and delivery options.',
             'why_choose_title' => 'Why Buy MikroTik Equipment From Us?',
@@ -133,6 +139,16 @@ class HomepageContent extends Model
         }
 
         return asset($this->site_logo_path);
+    }
+
+    public function contactPhone(): ?string
+    {
+        return $this->fallbackNullableText($this->contact_phone, config('business.phone'));
+    }
+
+    public function contactWhatsApp(): ?string
+    {
+        return $this->fallbackNullableText($this->contact_whatsapp, config('business.whatsapp', config('business.phone')));
     }
 
     public function whyChooseTitle(): string

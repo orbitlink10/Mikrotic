@@ -2,6 +2,7 @@
     $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
     $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
     $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
+    $productDisplayName = \App\Support\ProductSeo::displayName($product);
     $image = $productImage?->publicUrl()
         ?: $uploadedProductImage
         ?: $officialProductImage
@@ -12,15 +13,15 @@
     $productDescription = \App\Support\ProductContent::excerpt($product->meta_description ?: $product->description, 132);
     $productDescription = $productDescription !== ''
         ? $productDescription
-        : $product->name . ' is available in Kenya.';
+        : $productDisplayName . ' is available in Kenya.';
 @endphp
 
 <article class="product-card">
-    <a class="product-media-link" href="{{ route('product.show', $product) }}" aria-label="View {{ $product->name }}">
+    <a class="product-media-link" href="{{ route('product.show', $product) }}" aria-label="View {{ $productDisplayName }}">
         <img
             class="product-image"
             src="{{ $image }}"
-            alt="{{ \App\Support\ProductSeo::brand($product) === 'MikroTik' ? 'MikroTik ' . \App\Support\ProductSeo::model($product) : $product->name }}"
+            alt="{{ $productDisplayName }}"
             width="480"
             height="360"
             loading="lazy"
@@ -30,7 +31,7 @@
     </a>
     <div class="product-body">
         <h3 class="product-name">
-            <a href="{{ route('product.show', $product) }}">{{ $product->name }}</a>
+            <a href="{{ route('product.show', $product) }}">{{ $productDisplayName }}</a>
         </h3>
         <p class="product-desc">{{ $productDescription }}</p>
         <div class="product-bottom">

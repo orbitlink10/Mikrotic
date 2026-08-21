@@ -166,6 +166,31 @@ button.danger {
     font-weight: 700;
 }
 
+.top-contact-links {
+    justify-content: flex-end;
+}
+
+.contact-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid #c7dcff;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #0a4588;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.contact-link--whatsapp {
+    border-color: #bbf7d0;
+    background: #ecfdf5;
+    color: #166534;
+}
+
 .container {
     max-width: 1200px;
     margin: 24px auto;
@@ -694,16 +719,17 @@ button.danger {
 
 .product-media-link {
     display: block;
-    background: #eef6ff;
+    background: #f8fbff;
 }
 
 .product-image {
     display: block;
     width: 100%;
     height: 220px;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
-    background: #eef6ff;
+    background: #f8fbff;
+    padding: 14px;
 }
 
 .product-body {
@@ -2091,8 +2117,9 @@ th {
 
 .admin-product-picker {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 10px;
+    align-items: start;
     max-height: 320px;
     overflow: auto;
     border: 1px solid #d7dfeb;
@@ -2103,10 +2130,11 @@ th {
 
 .admin-product-picker-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     border: 1px solid #dbe3ef;
     border-radius: 12px;
+    min-height: 46px;
     padding: 10px 12px;
     background: #f8fafc;
     color: #2e3440;
@@ -2120,6 +2148,7 @@ th {
 }
 
 .admin-product-picker-item > span {
+    flex: 1 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -2130,9 +2159,12 @@ th {
 }
 
 .admin-product-picker-item input[type="checkbox"] {
-    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
     accent-color: var(--brand-orange);
-    flex-shrink: 0;
+    flex: 0 0 18px;
 }
 
 .admin-settings-preview {
@@ -4905,6 +4937,18 @@ textarea.admin-post-builder-input {
         font-size: 13px;
     }
 
+    .top-contact-links .contact-link {
+        border-color: #c7dcff;
+        background: #eff6ff;
+        color: #0a4588;
+    }
+
+    .top-contact-links .contact-link--whatsapp {
+        border-color: #bbf7d0;
+        background: #ecfdf5;
+        color: #166534;
+    }
+
     .container {
         margin: 14px auto;
         padding: 0 12px;
@@ -4963,6 +5007,7 @@ textarea.admin-post-builder-input {
 
     .product-image {
         height: 118px;
+        padding: 8px;
     }
 
     .product-body {

@@ -269,12 +269,12 @@ class StorefrontSearchTest extends TestCase
         $featuredSection = substr($content, $featuredStart, $featuredEnd - $featuredStart);
 
         $this->assertSame(6, substr_count($featuredSection, 'class="product-card"'));
-        $this->assertStringContainsString('Mikrotik Router Model 9', $featuredSection);
-        $this->assertStringContainsString('Mikrotik Router Model 4', $featuredSection);
-        $this->assertStringNotContainsString('Mikrotik Router Model 3', $featuredSection);
-        $response->assertSee('Mikrotik Router Model 3');
-        $response->assertSee('Mikrotik Router Model 1');
-        $response->assertSee('Mikrotik Switch Outside Category');
+        $this->assertStringContainsString('MikroTik Router Model 9', $featuredSection);
+        $this->assertStringContainsString('MikroTik Router Model 4', $featuredSection);
+        $this->assertStringNotContainsString('MikroTik Router Model 3', $featuredSection);
+        $response->assertSee('MikroTik Router Model 3');
+        $response->assertSee('MikroTik Router Model 1');
+        $response->assertSee('MikroTik Switch Outside Category');
         $response->assertSee('KES 10,009.00');
         $response->assertSee('product-desc', false);
         $response->assertDontSee('Page 1 of', false);
@@ -321,8 +321,8 @@ class StorefrontSearchTest extends TestCase
         $response->assertOk();
         $response->assertSee('products-grid--router-rows', false);
         $response->assertSee('href="http://localhost/category/mikrotik-router-prices-in-kenya"', false);
-        $response->assertSee('Mikrotik Router Prices in Kenya');
-        $response->assertSee('Mikrotik Router Model');
+        $response->assertSee('MikroTik Router Prices in Kenya');
+        $response->assertSee('MikroTik Router Model');
     }
 
     public function test_primary_router_price_url_renders_when_only_legacy_router_category_exists(): void
@@ -365,7 +365,7 @@ class StorefrontSearchTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('<link rel="canonical" href="http://localhost/category/mikrotik-router-prices-in-kenya">', false);
-        $response->assertSee('Mikrotik Router Model');
+        $response->assertSee('MikroTik Router Model');
     }
 
     /**

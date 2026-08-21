@@ -14,6 +14,17 @@ class ProductSeo
             ?: (Str::contains(Str::lower($product->name.' '.$product->category?->name), 'mikrotik') ? 'MikroTik' : config('app.name', 'Mikrotik Kenya'));
     }
 
+    public static function displayName(Product $product): string
+    {
+        $name = trim(preg_replace('/\s+/u', ' ', $product->name) ?? $product->name);
+
+        if (self::brand($product) === 'MikroTik') {
+            $name = preg_replace('/\bmikrotik\b/i', 'MikroTik', $name) ?? $name;
+        }
+
+        return $name !== '' ? $name : self::model($product);
+    }
+
     public static function model(Product $product): string
     {
         if ($model = self::columnValue($product, 'model_number')) {

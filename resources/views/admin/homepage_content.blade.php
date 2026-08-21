@@ -121,7 +121,8 @@
                         </div>
                         <div class="admin-product-picker" data-featured-product-picker>
                             @forelse($products as $product)
-                                <label class="admin-product-picker-item" data-featured-product-name="{{ Str::lower($product->name) }} {{ Str::lower((string) $product->model_number) }} {{ Str::lower((string) $product->sku) }}">
+                                @php($productDisplayName = \App\Support\ProductSeo::displayName($product))
+                                <label class="admin-product-picker-item" data-featured-product-name="{{ Str::lower($productDisplayName) }} {{ Str::lower($product->name) }} {{ Str::lower((string) $product->model_number) }} {{ Str::lower((string) $product->sku) }}">
                                     <input
                                         type="checkbox"
                                         name="featured_product_ids[]"
@@ -129,7 +130,7 @@
                                         @checked(in_array($product->id, $selectedFeaturedProductIds, true))
                                         @disabled(! $homepageContentStorageReady)
                                     >
-                                    <span>{{ $product->name }}</span>
+                                    <span>{{ $productDisplayName }}</span>
                                 </label>
                             @empty
                                 <p class="admin-settings-help">No active products are available yet. Add products from the Products menu first.</p>
@@ -215,6 +216,39 @@
                                 <img src="{{ $homepageContent->heroImageUrl() }}" alt="Current homepage hero image">
                             </div>
                         @endif
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Header Contact Details</h2>
+                        <p class="admin-settings-help">Phone and WhatsApp shown in the homepage header.</p>
+                    </div>
+
+                    <div class="admin-settings-subgrid">
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="contact_phone">Phone Number</label>
+                            <input
+                                class="admin-settings-input"
+                                id="contact_phone"
+                                type="text"
+                                name="contact_phone"
+                                value="{{ old('contact_phone', $homepageContent->contactPhone()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="contact_whatsapp">WhatsApp Number</label>
+                            <input
+                                class="admin-settings-input"
+                                id="contact_whatsapp"
+                                type="text"
+                                name="contact_whatsapp"
+                                value="{{ old('contact_whatsapp', $homepageContent->contactWhatsApp()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
                     </div>
                 </section>
 

@@ -700,6 +700,8 @@ class AdminController extends Controller
         $data = $request->validate([
             'hero_title' => ['required', 'string', 'min:4', 'max:180'],
             'hero_description' => ['required', 'string', 'min:12', 'max:500'],
+            'contact_phone' => ['nullable', 'string', 'max:40'],
+            'contact_whatsapp' => ['nullable', 'string', 'max:40'],
             'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'why_choose_title' => ['nullable', 'string', 'max:180'],
@@ -730,6 +732,12 @@ class AdminController extends Controller
 
         $homepageContent->hero_title = $data['hero_title'];
         $homepageContent->hero_description = $data['hero_description'];
+        $homepageContent->contact_phone = $request->has('contact_phone')
+            ? $this->normalizeHomepageText($data['contact_phone'] ?? null, 40)
+            : $baseline->contactPhone();
+        $homepageContent->contact_whatsapp = $request->has('contact_whatsapp')
+            ? $this->normalizeHomepageText($data['contact_whatsapp'] ?? null, 40)
+            : $baseline->contactWhatsApp();
         $homepageContent->why_choose_title = $request->has('why_choose_title')
             ? $this->normalizeHomepageText($data['why_choose_title'] ?? null, 180)
             : $baseline->whyChooseTitle();

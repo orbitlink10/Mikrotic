@@ -149,7 +149,7 @@ SVG,
                                 ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
                                 : route('category.show', $featuredCategory);
                             $featuredCategoryName = $featuredCategoryIsRouterPage
-                                ? 'Mikrotik Router Prices in Kenya'
+                                ? 'MikroTik Router Prices in Kenya'
                                 : $featuredCategory->name;
                         @endphp
                         <a href="{{ $featuredCategoryHref }}">{{ $featuredCategoryName }}</a>

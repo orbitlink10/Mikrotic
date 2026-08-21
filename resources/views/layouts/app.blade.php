@@ -16,6 +16,16 @@
         $openGraphImage = trim($__env->yieldContent('og_image')) ?: $siteLogoUrl;
         $openGraphType = trim($__env->yieldContent('og_type')) ?: 'website';
         $organizationSchema = \App\Support\StructuredData::organization($homepageBrandContent);
+        $headerPhone = $homepageBrandContent->contactPhone();
+        $headerWhatsApp = $homepageBrandContent->contactWhatsApp() ?: $headerPhone;
+        $headerPhoneHref = $headerPhone ? 'tel:'.preg_replace('/[^\d+]+/', '', $headerPhone) : null;
+        $headerWhatsAppDigits = preg_replace('/\D+/', '', (string) $headerWhatsApp);
+
+        if (\Illuminate\Support\Str::startsWith($headerWhatsAppDigits, '0')) {
+            $headerWhatsAppDigits = '254'.ltrim($headerWhatsAppDigits, '0');
+        }
+
+        $headerWhatsAppHref = $headerWhatsAppDigits !== '' ? 'https://wa.me/'.$headerWhatsAppDigits : null;
     @endphp
     <title>{!! $pageTitle !!}</title>
     <meta name="description" content="{!! $pageDescription !!}">
@@ -42,14 +52,6 @@
     @stack('head')
 </head>
 <body>
-@php
-    $cartCount = 0;
-    if (auth()->check()) {
-        $cartCount = \App\Models\CartItem::query()
-            ->whereHas('cart', fn ($q) => $q->where('user_id', auth()->id()))
-            ->sum('quantity');
-    }
-@endphp
 <header class="top-header">
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
@@ -65,26 +67,13 @@
             <button type="submit">Search</button>
         </form>
 
-        <nav class="top-links">
-            @auth
-                <span class="greeting">Hi, {{ auth()->user()->name }}</span>
-                @if(auth()->user()->role === 'vendor')
-                    <a href="{{ route('vendor.dashboard') }}">Vendor</a>
-                @elseif(auth()->user()->role === 'customer')
-                    <a href="{{ route('vendor.apply.form') }}">Sell on Mikrotik Kenya</a>
-                @endif
-                @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.dashboard') }}">Admin</a>
-                @endif
-                <form action="{{ route('logout') }}" method="post">
-                    @csrf
-                    <button type="submit" class="link-btn">Logout</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}">Login</a>
-                <a class="register-link" href="{{ route('register') }}">Register</a>
-            @endauth
-            <a class="cart-link" href="{{ route('cart.index') }}">Cart ({{ $cartCount }})</a>
+        <nav class="top-links top-contact-links" aria-label="Contact">
+            @if($headerPhone && $headerPhoneHref)
+                <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
+            @endif
+            @if($headerWhatsApp && $headerWhatsAppHref)
+                <a class="contact-link contact-link--whatsapp" href="{{ $headerWhatsAppHref }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ $headerWhatsApp }}</a>
+            @endif
         </nav>
     </div>
 </header>

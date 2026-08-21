@@ -102,8 +102,10 @@ class StructuredData
             $schema['logo'] = CanonicalUrl::absoluteAsset($homepageContent->siteLogoUrl());
         }
 
-        if (config('business.phone')) {
-            $schema['telephone'] = config('business.phone');
+        $phone = $homepageContent?->contactPhone() ?: config('business.phone');
+
+        if ($phone) {
+            $schema['telephone'] = $phone;
         }
 
         if (config('business.email')) {

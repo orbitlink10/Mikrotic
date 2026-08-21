@@ -723,6 +723,9 @@ class AdminProductManagementTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Website Logo');
+        $response->assertSee('Header Contact Details');
+        $response->assertSee('Phone Number');
+        $response->assertSee('WhatsApp Number');
         $response->assertSee('Why Choose Section');
         $response->assertDontSee('Testimonials Section');
         $response->assertSee('FAQ Section');
@@ -745,6 +748,8 @@ class AdminProductManagementTest extends TestCase
         $response = $this->actingAs($admin)->post('/admin/pages-content', [
             'hero_title' => 'Starlink Kenya for Homes and Business',
             'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
+            'contact_phone' => '+254 700 123 456',
+            'contact_whatsapp' => '0711 222 333',
             'site_logo' => $logo,
         ]);
 
@@ -754,6 +759,8 @@ class AdminProductManagementTest extends TestCase
         $storedContent = HomepageContent::query()->where('site_key', HomepageContent::DEFAULT_SITE_KEY)->first();
         $this->assertNotNull($storedContent);
         $this->assertSame('Starlink Kenya for Homes and Business', $storedContent->hero_title);
+        $this->assertSame('+254 700 123 456', $storedContent->contact_phone);
+        $this->assertSame('0711 222 333', $storedContent->contact_whatsapp);
         $this->assertNotNull($storedContent->site_logo_path);
         $this->assertFileExists(public_path($storedContent->site_logo_path));
 
@@ -762,6 +769,13 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertSee('Starlink Kenya for Homes and Business');
         $homeResponse->assertSee('Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.');
         $homeResponse->assertSee($storedContent->siteLogoUrl());
+        $homeResponse->assertSee('href="tel:+254700123456"', false);
+        $homeResponse->assertSee('Phone +254 700 123 456');
+        $homeResponse->assertSee('href="https://wa.me/254711222333"', false);
+        $homeResponse->assertSee('WhatsApp 0711 222 333');
+        $homeResponse->assertDontSee('Login');
+        $homeResponse->assertDontSee('Register');
+        $homeResponse->assertDontSee('Cart (0)');
 
         File::delete(public_path($storedContent->site_logo_path));
     }
