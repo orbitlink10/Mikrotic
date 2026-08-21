@@ -189,18 +189,37 @@ class StorefrontController extends Controller
         $homepageProductCategory = $search === '' && ! $currentCategory
             ? $this->routerPricesCategory()
             : null;
-        $homepageRouterProducts = $homepageProductCategory
-            ? Product::query()
+        $featuredProductIds = $search === '' && ! $currentCategory
+            ? HomepageContent::current()->featuredProductIds()
+            : [];
+
+        if ($featuredProductIds !== []) {
+            $homepageFeaturedProducts = Product::query()
+                ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
+                ->active()
+                ->whereIn('id', $featuredProductIds)
+                ->get()
+                ->sortBy(function (Product $product) use ($featuredProductIds): int {
+                    $position = array_search($product->id, $featuredProductIds, true);
+
+                    return $position === false ? PHP_INT_MAX : $position;
+                })
+                ->take(self::ROUTER_PRODUCTS_LIMIT)
+                ->values();
+        } elseif ($homepageProductCategory) {
+            $homepageFeaturedProducts = Product::query()
                 ->with(['vendor', 'category', 'images' => fn ($query) => $query->orderByDesc('is_primary')->orderBy('sort_order')])
                 ->active()
                 ->whereIn('category_id', $this->catalogCategoryIds($homepageProductCategory))
                 ->latest()
                 ->limit(self::ROUTER_PRODUCTS_LIMIT)
-                ->get()
-            : collect();
+                ->get();
+        } else {
+            $homepageFeaturedProducts = collect();
+        }
 
-        if ($homepageRouterProducts->isNotEmpty()) {
-            $productsQuery->whereNotIn('id', $homepageRouterProducts->modelKeys());
+        if ($homepageFeaturedProducts->isNotEmpty()) {
+            $productsQuery->whereNotIn('id', $homepageFeaturedProducts->modelKeys());
         }
 
         $products = $productsQuery->latest()->paginate(24)->withQueryString();
@@ -246,7 +265,7 @@ class StorefrontController extends Controller
             'featuredCategories' => $this->featuredCategories(),
             'homepageContent' => HomepageContent::current(),
             'homepageProductCategory' => $homepageProductCategory,
-            'homepageRouterProducts' => $homepageRouterProducts,
+            'homepageFeaturedProducts' => $homepageFeaturedProducts,
             'products' => $products,
             'search' => $search,
             'selectedCategory' => $selectedCategory,

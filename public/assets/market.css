@@ -2068,6 +2068,42 @@ th {
     font-size: 15px;
 }
 
+.admin-product-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    max-height: 320px;
+    overflow: auto;
+    border: 1px solid #d7dfeb;
+    border-radius: 16px;
+    background: #fff;
+    padding: 12px;
+}
+
+.admin-product-picker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    color: #2e3440;
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.admin-product-picker-item:hover {
+    border-color: #9aa7bb;
+}
+
+.admin-product-picker-item input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--brand-orange);
+    flex-shrink: 0;
+}
+
 .admin-settings-preview {
     display: grid;
     gap: 10px;

@@ -14,7 +14,7 @@
         ? ($currentCategory->intro ?: $currentCategory->meta_description ?: \App\Support\ProductContent::excerpt($currentCategory->description, 240))
         : null;
     $showHomepageSections = $search === '' && !$currentCategory && $products->currentPage() === 1;
-    $showRouterProductRows = $search === '' && !$currentCategory && $homepageProductCategory && $homepageRouterProducts->isNotEmpty();
+    $showFeaturedProductRows = $search === '' && !$currentCategory && $homepageFeaturedProducts->isNotEmpty();
     $showFullWidthProductGrid = $search === '' && !$currentCategory;
     $catalogCanonicalQuery = $search === '' && $products->currentPage() > 1
         ? ['page' => $products->currentPage()]
@@ -225,9 +225,9 @@ SVG,
             </section>
         @endif
 
-        @if($showRouterProductRows)
-            <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory->name }}">
-                @foreach($homepageRouterProducts as $product)
+        @if($showFeaturedProductRows)
+            <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory?->name ?? 'Featured products' }}">
+                @foreach($homepageFeaturedProducts as $product)
                     @include('partials.product-card', ['product' => $product, 'productImageFallback' => $productImageFallback])
                 @endforeach
             </section>

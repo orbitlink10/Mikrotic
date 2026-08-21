@@ -34,12 +34,14 @@ class HomepageContent extends Model
         'content_title',
         'content_intro',
         'content_body',
+        'featured_product_ids',
     ];
 
     protected $casts = [
         'why_choose_items' => 'array',
         'testimonial_items' => 'array',
         'faq_items' => 'array',
+        'featured_product_ids' => 'array',
     ];
 
     public static function current(): self
@@ -81,6 +83,7 @@ class HomepageContent extends Model
             'content_title',
             'content_intro',
             'content_body',
+            'featured_product_ids',
         ] as $column) {
             if (! Schema::hasColumn($table, $column)) {
                 return false;
@@ -207,6 +210,21 @@ class HomepageContent extends Model
         $html = trim((string) $this->content_body);
 
         return $html !== '' ? $html : (string) static::defaultContent()->content_body;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function featuredProductIds(): array
+    {
+        if (! is_array($this->featured_product_ids)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(
+            array_map('intval', $this->featured_product_ids),
+            fn (int $id): bool => $id > 0
+        )));
     }
 
     private function fallbackText(mixed $value, string $default): string

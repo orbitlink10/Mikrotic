@@ -7,6 +7,10 @@
 @php
     $whyChooseItems = old('why_choose_items', $homepageContent->whyChooseItems());
     $faqItems = old('faq_items', $homepageContent->faqItems());
+    $selectedFeaturedProductIds = collect(old('featured_product_ids', $homepageContent->featuredProductIds()))
+        ->map(fn ($id) => (int) $id)
+        ->filter(fn ($id) => $id > 0)
+        ->all();
 @endphp
 
 @section('content')
@@ -166,6 +170,36 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Featured Homepage Products</h2>
+                        <p class="admin-settings-help">Choose up to six products to feature as the first product rows on the homepage. Leave all unchecked to show the latest products automatically.</p>
+                    </div>
+
+                    <input type="hidden" name="featured_product_ids" value="">
+
+                    <div class="admin-settings-field">
+                        <span class="admin-settings-label">Products</span>
+                        <div class="admin-product-picker">
+                            @forelse($products as $product)
+                                <label class="admin-product-picker-item">
+                                    <input
+                                        type="checkbox"
+                                        name="featured_product_ids[]"
+                                        value="{{ $product->id }}"
+                                        @checked(in_array($product->id, $selectedFeaturedProductIds, true))
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                    <span>{{ $product->name }}</span>
+                                </label>
+                            @empty
+                                <p class="admin-settings-help">No active products are available yet. Add products from the Products menu first.</p>
+                            @endforelse
+                        </div>
+                        <p class="admin-settings-help">Selected products appear in the order they were saved; only the first six are used.</p>
                     </div>
                 </section>
 
