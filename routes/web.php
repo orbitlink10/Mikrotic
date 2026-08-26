@@ -20,7 +20,7 @@ Route::get('/category/{category}', [StorefrontController::class, 'showCategory']
 Route::get('/product/{product}', [StorefrontController::class, 'show'])->name('product.show');
 Route::get('/products/{product}', [StorefrontController::class, 'redirectLegacyProduct']);
 Route::get('/categories/{category}', [StorefrontController::class, 'redirectLegacyCategory']);
-Route::get('/pages/{page}', [StorefrontController::class, 'showPage'])->name('pages.show');
+Route::get('/pages/{page}', [StorefrontController::class, 'redirectLegacyPage']);
 Route::get('/{categorySlug}', [StorefrontController::class, 'redirectTopLevelCategory'])
     ->where('categorySlug', implode('|', array_keys(MikrotikSeoCatalog::topLevelCategoryRedirects())));
 Route::get('/uploads/products/{filename}', function (string $filename) {
@@ -113,3 +113,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/vendors', [AdminController::class, 'pendingVendors'])->name('vendors.pending');
     Route::post('/vendors/{vendor}/approve', [AdminController::class, 'approveVendor'])->name('vendors.approve');
 });
+
+Route::get('/{page}', [StorefrontController::class, 'showPage'])
+    ->where('page', '[A-Za-z0-9-]+')
+    ->name('pages.show');

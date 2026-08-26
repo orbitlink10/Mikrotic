@@ -24,6 +24,8 @@ class PageShowPageTest extends TestCase
             'body' => '<p>Reliable rural connectivity.</p><script>alert(1)</script><p>Deployment options across Kenya.</p>',
         ]);
 
+        $this->assertSame('http://localhost/starlink-in-kenya', route('pages.show', ['page' => $page->slug]));
+
         $response = $this->get(route('pages.show', ['page' => $page->slug]));
 
         $response->assertOk();
@@ -38,5 +40,22 @@ class PageShowPageTest extends TestCase
         $response->assertSee('Back');
         $response->assertSee('https://example.com/images/starlink-kenya.jpg', false);
         $response->assertDontSee('<script>alert(1)</script>', false);
+    }
+
+    public function test_legacy_pages_url_redirects_to_root_page_slug(): void
+    {
+        Page::create([
+            'meta_title' => 'Starlink in Kenya',
+            'meta_description' => 'Discover the benefits of Starlink in Kenya.',
+            'title' => 'Starlink in Kenya',
+            'heading_two' => 'Connectivity Guide',
+            'slug' => 'starlink-in-kenya',
+            'type' => 'post',
+            'body' => '<p>Reliable rural connectivity.</p>',
+        ]);
+
+        $this->get('/pages/starlink-in-kenya')
+            ->assertStatus(301)
+            ->assertRedirect('/starlink-in-kenya');
     }
 }

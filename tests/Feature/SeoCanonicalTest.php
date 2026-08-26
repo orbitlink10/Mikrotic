@@ -89,9 +89,13 @@ class SeoCanonicalTest extends TestCase
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/product/mikrotik-rb4011igsrm">', false);
 
-        $this->get('/pages/'.$page->slug)
+        $this->get('/'.$page->slug)
             ->assertOk()
-            ->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/pages/starlink-in-kenya">', false);
+            ->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/starlink-in-kenya">', false);
+
+        $this->get('/pages/'.$page->slug)
+            ->assertStatus(301)
+            ->assertRedirect('/'.$page->slug);
     }
 
     /**

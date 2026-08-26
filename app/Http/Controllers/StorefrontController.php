@@ -87,7 +87,7 @@ class StorefrontController extends Controller
         }
 
         if ($page->slug !== $requestedSlug) {
-            return redirect()->route('pages.show', $page, 301);
+            return redirect()->route('pages.show', ['page' => $page->slug], 301);
         }
 
         return view('page.show', [
@@ -95,6 +95,11 @@ class StorefrontController extends Controller
             'pageBody' => ProductContent::sanitizeRichText($page->body) ?: '<p>No content available.</p>',
             'pageMetaDescription' => SeoMetadata::pageDescription($page, ProductContent::excerpt($page->body, 160)),
         ]);
+    }
+
+    public function redirectLegacyPage(string $page): RedirectResponse
+    {
+        return redirect()->route('pages.show', ['page' => Str::slug($page)], 301);
     }
 
     public function redirectLegacyProduct(string $product): RedirectResponse
