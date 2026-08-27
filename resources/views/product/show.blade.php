@@ -44,7 +44,11 @@
     $availabilityClass = $product->stock > 0 ? 'is-available' : 'is-unavailable';
     $productSeoTitle = \App\Support\SeoMetadata::productTitle($product);
     $productMetaDescription = \App\Support\SeoMetadata::productDescription($product);
-    $summary = trim((string) $productMetaDescription);
+    $productDisplayName = \App\Support\ProductSeo::displayName($product);
+    $summary = trim((string) $product->meta_description);
+    if ($summary === '') {
+        $summary = \App\Support\ProductContent::summary($product->description, 240);
+    }
     $productCanonicalUrl = \App\Support\SeoMetadata::canonicalOverride($product)
         ?: \App\Support\CanonicalUrl::route('product.show', $product);
     $productBrand = \App\Support\ProductSeo::brand($product);
@@ -74,7 +78,7 @@
     if ($product->category) {
         $breadcrumbItems[] = ['name' => $product->category->name, 'url' => \App\Support\CanonicalUrl::route('category.show', $product->category)];
     }
-    $breadcrumbItems[] = ['name' => $product->name, 'url' => $productCanonicalUrl];
+    $breadcrumbItems[] = ['name' => $productDisplayName, 'url' => $productCanonicalUrl];
     $productSchema = \App\Support\StructuredData::product(
         $product,
         $galleryImages->map(fn ($image) => \App\Support\CanonicalUrl::absoluteAsset($image))->all(),
@@ -113,7 +117,7 @@
             <a href="{{ route('category.show', $product->category) }}">{{ $product->category->name }}</a>
         @endif
         <span>/</span>
-        <span>{{ $product->name }}</span>
+        <span>{{ $productDisplayName }}</span>
     </nav>
 
     <section class="product-showcase">
@@ -121,7 +125,7 @@
             <div class="product-gallery-stage">
                 <img
                     src="{{ $primaryImage }}"
-                    alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $product->name }}"
+                    alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $productDisplayName }}"
                     class="product-gallery-main-image"
                     data-product-main-image
                     width="900"
@@ -139,12 +143,12 @@
                             type="button"
                             class="product-gallery-thumb {{ $index === 0 ? 'is-active' : '' }}"
                             data-product-image="{{ $galleryImage }}"
-                            data-product-alt="{{ $product->name }} image {{ $index + 1 }}"
-                            aria-label="View image {{ $index + 1 }} of {{ $product->name }}"
+                            data-product-alt="{{ $productDisplayName }} image {{ $index + 1 }}"
+                            aria-label="View image {{ $index + 1 }} of {{ $productDisplayName }}"
                         >
                             <img
                                 src="{{ $galleryImage }}"
-                                alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $product->name }} thumbnail {{ $index + 1 }}"
+                                alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $productDisplayName }} thumbnail {{ $index + 1 }}"
                                 width="120"
                                 height="90"
                                 loading="lazy"
@@ -169,7 +173,7 @@
                 <span class="product-stock-badge {{ $availabilityClass }}">{{ $availabilityLabel }}</span>
             </div>
 
-            <h1 class="product-page-title">{{ $product->name }}</h1>
+            <h1 class="product-page-title">{{ $productDisplayName }}</h1>
 
             <div class="product-identity-row">
                 <span>Brand: {{ $productBrand }}</span>
@@ -367,7 +371,7 @@
             <div class="product-info-grid">
                 <div class="product-info-item">
                     <span>Product</span>
-                    <strong>{{ $product->name }}</strong>
+                    <strong>{{ $productDisplayName }}</strong>
                 </div>
                 <div class="product-info-item">
                     <span>Category</span>
@@ -479,7 +483,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const defaultProductAlt = @json($product->name);
+    const defaultProductAlt = @json($productDisplayName);
     const gallery = document.querySelector('[data-product-gallery]');
     if (gallery) {
         const mainImage = gallery.querySelector('[data-product-main-image]');

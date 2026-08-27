@@ -15,7 +15,7 @@ class StructuredData
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Product',
-            'name' => $product->name,
+            'name' => ProductSeo::displayName($product),
             'image' => array_values(array_filter($images)),
             'description' => $description,
             'sku' => $product->sku,

@@ -66,7 +66,7 @@ class SeoMetadata
         return self::cleanDescription(
             self::columnValue($product, 'meta_description')
                 ?: ProductContent::excerpt($product->description, 155)
-                ?: 'Buy '.$product->name.' in Kenya. View current price, specifications, availability and delivery options.'
+                ?: 'Buy '.ProductSeo::displayName($product).' in Kenya. View current price, specifications, availability and delivery options.'
         );
     }
 

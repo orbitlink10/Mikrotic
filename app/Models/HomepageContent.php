@@ -125,20 +125,70 @@ class HomepageContent extends Model
 
     public function heroImageUrl(): ?string
     {
-        if (! $this->hero_image_path) {
-            return null;
-        }
-
-        return asset($this->hero_image_path);
+        return $this->existingAssetUrl($this->hero_image_path);
     }
 
     public function siteLogoUrl(): ?string
     {
-        if (! $this->site_logo_path) {
+        $url = $this->existingAssetUrl($this->site_logo_path);
+
+        if ($url) {
+            return $url;
+        }
+
+        return $this->existingAssetUrl($this->findExistingLogoPath());
+    }
+
+    /**
+     * Resolve a stored asset path to a public URL only when the file
+     * actually exists, so broken paths never render broken images.
+     */
+    private function existingAssetUrl(?string $path): ?string
+    {
+        $path = trim((string) $path);
+        if ($path === '') {
             return null;
         }
 
-        return asset($this->site_logo_path);
+        $path = ltrim(str_replace('\\', '/', $path), '/');
+
+        if (str_starts_with($path, 'public/')) {
+            $path = substr($path, 7);
+        }
+
+        $publicFile = public_path($path);
+        if (is_file($publicFile)) {
+            return asset($path);
+        }
+
+        if (str_starts_with($path, 'storage/')) {
+            $storageFile = storage_path('app/public/'.substr($path, 8));
+            if (is_file($storageFile)) {
+                return asset($path);
+            }
+        }
+
+        return null;
+    }
+
+    private function findExistingLogoPath(): ?string
+    {
+        $directory = public_path('uploads/homepage-content');
+
+        if (! is_dir($directory)) {
+            return null;
+        }
+
+        $files = glob($directory.DIRECTORY_SEPARATOR.'*-logo-*') ?: [];
+        sort($files);
+
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                return 'uploads/homepage-content/'.basename($file);
+            }
+        }
+
+        return null;
     }
 
     public function contactPhone(): ?string

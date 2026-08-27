@@ -170,12 +170,13 @@ class SyncMikrotikMedia extends Command
 
         $candidates = array_values(array_unique(array_filter($candidates)));
 
-        $underscoreVariants = [];
+        $variants = [];
         foreach ($candidates as $candidate) {
-            $underscoreVariants[] = str_replace('-', '_', $candidate);
+            $variants[] = str_replace('-', '_', $candidate);
+            $variants[] = strtoupper($candidate);
         }
 
-        return array_values(array_unique(array_merge($underscoreVariants, $candidates)));
+        return array_values(array_unique(array_merge($variants, $candidates)));
     }
 
     /**

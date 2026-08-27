@@ -22,17 +22,20 @@ class ProductSeo
             $name = preg_replace('/\bmikrotik\b/i', 'MikroTik', $name) ?? $name;
         }
 
+        $name = trim(preg_replace('/\s*[–—-]\s*$/u', '', $name)) ?? $name;
+
         return $name !== '' ? $name : self::model($product);
     }
 
     public static function model(Product $product): string
     {
         if ($model = self::columnValue($product, 'model_number')) {
-            return $model;
+            return trim(preg_replace('/\s*[–—-]\s*$/u', '', $model) ?? $model);
         }
 
         $name = trim(preg_replace('/\s+/u', ' ', $product->name) ?? $product->name);
         $model = preg_replace('/^mikrotik\s+/i', '', $name) ?? $name;
+        $model = trim(preg_replace('/\s*[–—-]\s*$/u', '', $model)) ?? $model;
 
         return trim($model) !== '' ? trim($model) : $product->sku;
     }
@@ -165,7 +168,7 @@ class ProductSeo
     public static function whatsInBox(Product $product): array
     {
         return self::linesFromColumn($product, 'whats_in_box')
-            ?: ['MikroTik '.$product->name.' unit', 'Included accessories as supplied by the seller or manufacturer package'];
+            ?: ['MikroTik '.self::displayName($product).' unit', 'Included accessories as supplied by the seller or manufacturer package'];
     }
 
     /**
@@ -178,15 +181,17 @@ class ProductSeo
             return $custom;
         }
 
+        $displayName = self::displayName($product);
+
         return [
             [
-                'question' => 'Is '.$product->name.' available in Kenya?',
+                'question' => 'Is '.$displayName.' available in Kenya?',
                 'answer' => $product->stock > 0
-                    ? $product->name.' is currently listed as available. Stock can change, so confirm availability before placing a large order.'
-                    : $product->name.' is currently listed as out of stock. Contact the seller to confirm the next availability date.',
+                    ? $displayName.' is currently listed as available. Stock can change, so confirm availability before placing a large order.'
+                    : $displayName.' is currently listed as out of stock. Contact the seller to confirm the next availability date.',
             ],
             [
-                'question' => 'What is the current price of '.$product->name.'?',
+                'question' => 'What is the current price of '.$displayName.'?',
                 'answer' => 'The current listed price is KSh '.number_format((float) $product->price, 2).'. Prices are generated from the product catalogue and may change when inventory is updated.',
             ],
         ];

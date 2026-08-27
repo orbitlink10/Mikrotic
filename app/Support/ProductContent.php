@@ -95,6 +95,30 @@ class ProductContent
         return Str::limit(self::plainText($html), $limit, '');
     }
 
+    /**
+     * Visible short-description helper: truncates at a word boundary and
+     * appends an ellipsis so copy is never clipped mid-word.
+     */
+    public static function summary(?string $html, int $limit = 240): string
+    {
+        $text = self::plainText($html);
+        if ($text === '') {
+            return '';
+        }
+
+        if (mb_strlen($text) <= $limit) {
+            return $text;
+        }
+
+        $cut = mb_substr($text, 0, $limit);
+        $lastSpace = mb_strrpos($cut, ' ');
+        $cut = $lastSpace !== false && $lastSpace > (int) ($limit * 0.6)
+            ? mb_substr($cut, 0, $lastSpace)
+            : $cut;
+
+        return rtrim($cut, " \t\n\r\0\x0B,.;:-").'…';
+    }
+
     private static function plainText(?string $text): string
     {
         $plain = preg_replace('/\s+/u', ' ', strip_tags((string) $text)) ?? '';
