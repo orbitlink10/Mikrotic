@@ -753,6 +753,7 @@ class AdminProductManagementTest extends TestCase
             'hero_description' => 'Deploy reliable satellite internet across homes, offices, remote sites, and branch networks from one storefront.',
             'contact_phone' => '+254 700 123 456',
             'contact_whatsapp' => '0711 222 333',
+            'contact_email' => 'sales@mikrotikkenya.co.ke',
             'site_logo' => $logo,
         ]);
 
@@ -764,6 +765,7 @@ class AdminProductManagementTest extends TestCase
         $this->assertSame('Starlink Kenya for Homes and Business', $storedContent->hero_title);
         $this->assertSame('+254 700 123 456', $storedContent->contact_phone);
         $this->assertSame('0711 222 333', $storedContent->contact_whatsapp);
+        $this->assertSame('sales@mikrotikkenya.co.ke', $storedContent->contact_email);
         $this->assertNotNull($storedContent->site_logo_path);
         $this->assertFileExists(public_path($storedContent->site_logo_path));
 
@@ -774,6 +776,8 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertSee($storedContent->siteLogoUrl());
         $homeResponse->assertSee('href="tel:+254700123456"', false);
         $homeResponse->assertSee('Phone +254 700 123 456');
+        $homeResponse->assertSee('href="mailto:sales@mikrotikkenya.co.ke"', false);
+        $homeResponse->assertSee('Email sales@mikrotikkenya.co.ke');
         $homeResponse->assertSee('href="https://wa.me/254711222333"', false);
         $homeResponse->assertSee('aria-label="Chat with us on WhatsApp"', false);
         $homeResponse->assertDontSee('Login');

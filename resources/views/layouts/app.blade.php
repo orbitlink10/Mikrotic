@@ -18,6 +18,7 @@
         $organizationSchema = \App\Support\StructuredData::organization($homepageBrandContent);
         $headerPhone = $homepageBrandContent->contactPhone();
         $headerWhatsApp = $homepageBrandContent->contactWhatsApp() ?: $headerPhone;
+        $headerEmail = $homepageBrandContent->contactEmail();
         $headerPhoneHref = $headerPhone ? 'tel:'.preg_replace('/[^\d+]+/', '', $headerPhone) : null;
         $headerWhatsAppDigits = preg_replace('/\D+/', '', (string) $headerWhatsApp);
 
@@ -77,6 +78,9 @@
             <nav class="top-links top-contact-links" aria-label="Contact">
                 @if($headerPhone && $headerPhoneHref)
                     <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
+                @endif
+                @if($headerEmail)
+                    <a class="contact-link contact-link--email" href="mailto:{{ $headerEmail }}">Email {{ $headerEmail }}</a>
                 @endif
                 @if($headerWhatsApp && $headerWhatsAppHref)
                     <a class="contact-link contact-link--whatsapp" href="{{ $headerWhatsAppHref }}" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp">

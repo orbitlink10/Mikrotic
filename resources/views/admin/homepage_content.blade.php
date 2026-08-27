@@ -222,7 +222,7 @@
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Header Contact Details</h2>
-                        <p class="admin-settings-help">Phone and WhatsApp shown in the homepage header.</p>
+                        <p class="admin-settings-help">Phone, WhatsApp and email shown in the homepage header.</p>
                     </div>
 
                     <div class="admin-settings-subgrid">
@@ -246,6 +246,19 @@
                                 type="text"
                                 name="contact_whatsapp"
                                 value="{{ old('contact_whatsapp', $homepageContent->contactWhatsApp()) }}"
+                                @disabled(! $homepageContentStorageReady)
+                            >
+                        </div>
+
+                        <div class="admin-settings-field">
+                            <label class="admin-settings-label" for="contact_email">Email Address</label>
+                            <input
+                                class="admin-settings-input"
+                                id="contact_email"
+                                type="email"
+                                name="contact_email"
+                                value="{{ old('contact_email', $homepageContent->contactEmail()) }}"
+                                placeholder="sales@example.co.ke"
                                 @disabled(! $homepageContentStorageReady)
                             >
                         </div>

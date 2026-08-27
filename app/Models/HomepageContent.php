@@ -18,6 +18,7 @@ class HomepageContent extends Model
         'site_logo_path',
         'contact_phone',
         'contact_whatsapp',
+        'contact_email',
         'hero_title',
         'hero_description',
         'hero_image_path',
@@ -69,6 +70,7 @@ class HomepageContent extends Model
             'site_logo_path',
             'contact_phone',
             'contact_whatsapp',
+            'contact_email',
             'hero_title',
             'hero_description',
             'hero_image_path',
@@ -103,6 +105,7 @@ class HomepageContent extends Model
             'site_key' => static::DEFAULT_SITE_KEY,
             'contact_phone' => config('business.phone'),
             'contact_whatsapp' => config('business.whatsapp', config('business.phone')),
+            'contact_email' => config('business.email'),
             'hero_title' => 'MikroTik Kenya – Routers, Switches & Networking Equipment',
             'hero_description' => 'Compare genuine MikroTik routers, switches, access points and wireless systems, with current prices, specifications, stock availability and fast delivery across Kenya.',
             'why_choose_title' => 'Why Buy MikroTik Equipment From Us?',
@@ -199,6 +202,11 @@ class HomepageContent extends Model
     public function contactWhatsApp(): ?string
     {
         return $this->fallbackNullableText($this->contact_whatsapp, config('business.whatsapp', config('business.phone')));
+    }
+
+    public function contactEmail(): ?string
+    {
+        return $this->fallbackNullableText($this->contact_email, config('business.email'));
     }
 
     public function whyChooseTitle(): string
