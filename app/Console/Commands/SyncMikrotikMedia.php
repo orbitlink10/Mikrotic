@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Product;
+use App\Support\ProductImageCatalog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -78,9 +79,7 @@ class SyncMikrotikMedia extends Command
      */
     private function fetchOfficialMedia(Product $product): ?array
     {
-        $candidateSlugs = $this->candidateOfficialSlugs($product);
-
-        foreach ($candidateSlugs as $candidateSlug) {
+        foreach ($this->candidateOfficialSlugs($product) as $candidateSlug) {
             $html = $this->fetchProductPage($candidateSlug);
 
             if ($html === null) {
@@ -91,7 +90,7 @@ class SyncMikrotikMedia extends Command
             $videoUrl = $this->extractVideoUrl($html);
 
             if ($gallery === []) {
-                return null;
+                continue;
             }
 
             return [
@@ -101,15 +100,28 @@ class SyncMikrotikMedia extends Command
             ];
         }
 
+        $staticImage = ProductImageCatalog::officialUrlFor($product->name);
+        if ($staticImage) {
+            return [
+                'official_image_url' => $staticImage,
+                'official_gallery_images' => [$staticImage],
+                'official_video_url' => null,
+            ];
+        }
+
         return null;
     }
 
     private function fetchProductPage(string $slug): ?string
     {
-        $response = Http::withHeaders([
-            'User-Agent' => self::USER_AGENT,
-            'Accept' => 'text/html,application/xhtml+xml',
-        ])->timeout(20)->retry(2, 500)->get(self::PRODUCT_PAGE_URL.$slug);
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => self::USER_AGENT,
+                'Accept' => 'text/html,application/xhtml+xml',
+            ])->timeout(20)->retry(2, 500, throw: false)->get(self::PRODUCT_PAGE_URL.$slug);
+        } catch (\Throwable) {
+            return null;
+        }
 
         if (! $response->successful()) {
             return null;
@@ -156,7 +168,14 @@ class SyncMikrotikMedia extends Command
             }
         }
 
-        return array_values(array_unique(array_filter($candidates)));
+        $candidates = array_values(array_unique(array_filter($candidates)));
+
+        $underscoreVariants = [];
+        foreach ($candidates as $candidate) {
+            $underscoreVariants[] = str_replace('-', '_', $candidate);
+        }
+
+        return array_values(array_unique(array_merge($underscoreVariants, $candidates)));
     }
 
     /**
