@@ -1086,6 +1086,13 @@ class AdminController extends Controller
             ]);
         }
 
+        if (Product::officialMediaFieldsReady()) {
+            $rules = array_merge($rules, [
+                'official_image_url' => ['nullable', 'url', 'max:500'],
+                'official_video_url' => ['nullable', 'url', 'max:500'],
+            ]);
+        }
+
         $data = $request->validate($rules);
 
         if (! empty($data['subcategory_id'])) {
@@ -1147,6 +1154,13 @@ class AdminController extends Controller
             ]);
         }
 
+        if (Product::officialMediaFieldsReady()) {
+            $payload = array_merge($payload, [
+                'official_image_url' => $this->cleanOptionalText($data['official_image_url'] ?? null, 500),
+                'official_video_url' => $this->cleanOptionalText($data['official_video_url'] ?? null, 500),
+            ]);
+        }
+
         $product = Product::create($payload);
 
         $this->syncPrimaryProductImage($product, $request->file('image'));
@@ -1185,6 +1199,13 @@ class AdminController extends Controller
                 'warranty_info' => ['nullable', 'string', 'max:1200'],
                 'delivery_info' => ['nullable', 'string', 'max:1200'],
                 'payment_info' => ['nullable', 'string', 'max:1200'],
+            ]);
+        }
+
+        if (Product::officialMediaFieldsReady()) {
+            $rules = array_merge($rules, [
+                'official_image_url' => ['nullable', 'url', 'max:500'],
+                'official_video_url' => ['nullable', 'url', 'max:500'],
             ]);
         }
 
@@ -1238,6 +1259,13 @@ class AdminController extends Controller
                 'warranty_info' => $this->cleanOptionalText($data['warranty_info'] ?? null, 1200),
                 'delivery_info' => $this->cleanOptionalText($data['delivery_info'] ?? null, 1200),
                 'payment_info' => $this->cleanOptionalText($data['payment_info'] ?? null, 1200),
+            ]);
+        }
+
+        if (Product::officialMediaFieldsReady()) {
+            $payload = array_merge($payload, [
+                'official_image_url' => $this->cleanOptionalText($data['official_image_url'] ?? null, 500),
+                'official_video_url' => $this->cleanOptionalText($data['official_video_url'] ?? null, 500),
             ]);
         }
 

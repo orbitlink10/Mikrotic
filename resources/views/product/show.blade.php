@@ -3,7 +3,7 @@
 @php
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
-    $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
+    $officialProductImage = \App\Support\ProductImageCatalog::officialUrls($product)[0] ?? null;
     $descriptionHtml = \App\Support\ProductContent::sanitizeRichText($product->description)
         ?: '<p>No description available.</p>';
     $productMetaDescription = $product->meta_description
@@ -15,9 +15,18 @@
     if ($galleryImages->isEmpty() && $uploadedProductImage) {
         $galleryImages = collect([$uploadedProductImage]);
     }
-    if ($galleryImages->isEmpty()) {
-        $galleryImages = collect([$officialProductImage ?: $productImageFallback]);
+    $officialGalleryImages = \App\Support\ProductImageCatalog::officialUrls($product);
+    foreach ($officialGalleryImages as $officialGalleryImage) {
+        if (! $galleryImages->contains($officialGalleryImage)) {
+            $galleryImages->push($officialGalleryImage);
+        }
     }
+    if ($galleryImages->isEmpty()) {
+        $galleryImages = collect([$productImageFallback]);
+    }
+
+    $productVideoUrl = \App\Support\ProductImageCatalog::officialVideoUrlFor($product);
+    $productVideoEmbedUrl = \App\Support\ProductSeo::youtubeEmbedUrl($productVideoUrl);
 
     $primaryImage = $galleryImages->first();
     $imageErrorFallback = $primaryImage !== $uploadedProductImage && $uploadedProductImage
@@ -330,6 +339,26 @@
 
         <div class="product-tab-panel is-active" data-tab-panel="details" role="tabpanel">
             <div class="rich-content product-description-content">{!! $descriptionHtml !!}</div>
+
+            @if($productVideoEmbedUrl)
+                <div class="product-video-block">
+                    <h3>Product video</h3>
+                    <div class="product-video-frame">
+                        <iframe
+                            src="{{ $productVideoEmbedUrl }}"
+                            title="MikroTik {{ $productModel }} video"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                    @if($productVideoUrl)
+                        <p class="product-video-note">
+                            <a href="{{ $productVideoUrl }}" target="_blank" rel="noopener noreferrer">Watch this video on YouTube</a>
+                        </p>
+                    @endif
+                </div>
+            @endif
         </div>
 
         <div class="product-tab-panel" data-tab-panel="information" role="tabpanel" hidden>

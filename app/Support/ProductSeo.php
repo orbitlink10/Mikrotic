@@ -233,6 +233,31 @@ class ProductSeo
         return $links;
     }
 
+    public static function youtubeVideoId(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+
+        if (preg_match('/(?:youtube\.com|youtube-nocookie\.com)\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/)([A-Za-z0-9_-]{6,})/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        if (preg_match('/youtu\.be\/([A-Za-z0-9_-]{6,})/', $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    public static function youtubeEmbedUrl(?string $url): ?string
+    {
+        $videoId = self::youtubeVideoId($url);
+
+        return $videoId ? 'https://www.youtube-nocookie.com/embed/'.$videoId : null;
+    }
+
     /**
      * @return array<int, array{question: string, answer: string}>
      */

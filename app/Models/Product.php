@@ -46,12 +46,18 @@ class Product extends Model
         'delivery_info',
         'payment_info',
         'faq_items',
+        'official_image_url',
+        'official_gallery_images',
+        'official_video_url',
+        'official_media_synced_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'compare_at_price' => 'decimal:2',
         'faq_items' => 'array',
+        'official_gallery_images' => 'array',
+        'official_media_synced_at' => 'datetime',
     ];
 
     public function getRouteKeyName(): string
@@ -67,6 +73,16 @@ class Product extends Model
             && Schema::hasColumn($table, 'seo_title')
             && Schema::hasColumn($table, 'model_number')
             && Schema::hasColumn($table, 'faq_items');
+    }
+
+    public static function officialMediaFieldsReady(): bool
+    {
+        $table = (new static)->getTable();
+
+        return Schema::hasTable($table)
+            && Schema::hasColumn($table, 'official_image_url')
+            && Schema::hasColumn($table, 'official_gallery_images')
+            && Schema::hasColumn($table, 'official_video_url');
     }
 
     public function vendor(): BelongsTo

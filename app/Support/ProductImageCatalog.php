@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Product;
 use Illuminate\Support\Str;
 
 class ProductImageCatalog
@@ -163,6 +164,43 @@ class ProductImageCatalog
             ?? self::OFFICIAL_IMAGE_SLUGS[Str::slug($key)]
             ?? self::OFFICIAL_IMAGE_SLUGS[Str::slug('mikrotik ' . $key)]
             ?? null;
+    }
+
+    /**
+     * Official gallery images for a product, preferring synced MikroTik media
+     * and falling back to the built-in image map.
+     *
+     * @return array<int, string>
+     */
+    public static function officialUrls(Product $product): array
+    {
+        if (is_array($product->official_gallery_images) && $product->official_gallery_images !== []) {
+            $urls = array_values(array_unique(array_filter(
+                array_map('strval', $product->official_gallery_images),
+                fn (string $url): bool => $url !== ''
+            )));
+
+            if ($urls !== []) {
+                return $urls;
+            }
+        }
+
+        if ($single = trim((string) $product->official_image_url)) {
+            return [$single];
+        }
+
+        if ($static = self::officialUrlFor($product->name)) {
+            return [$static];
+        }
+
+        return [];
+    }
+
+    public static function officialVideoUrlFor(Product $product): ?string
+    {
+        $videoUrl = trim((string) $product->official_video_url);
+
+        return $videoUrl !== '' ? $videoUrl : null;
     }
 
     public static function placeholderUrl(): string

@@ -1,8 +1,8 @@
 @php
     $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
     $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
-    $officialProductImage = \App\Support\ProductImageCatalog::officialUrlFor($product->name);
-    $productDisplayName = \App\Support\ProductSeo::displayName($product);
+    $officialProductImages = \App\Support\ProductImageCatalog::officialUrls($product);
+    $officialProductImage = $officialProductImages[0] ?? null;
     $image = $productImage?->publicUrl()
         ?: $uploadedProductImage
         ?: $officialProductImage

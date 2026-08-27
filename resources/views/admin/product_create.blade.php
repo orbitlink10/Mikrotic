@@ -66,6 +66,7 @@
     $showInlineCategoryCreation = $categories->isEmpty() && ! $isEditingProduct;
     $primaryImage = $productToEdit?->images?->firstWhere('is_primary', true) ?? $productToEdit?->images?->first();
     $productSeoFieldsReady = \App\Models\Product::seoFieldsReady();
+    $productOfficialMediaFieldsReady = \App\Models\Product::officialMediaFieldsReady();
     $productFaqItems = old('faq_items', $productToEdit?->faq_items ?? [
         ['question' => '', 'answer' => ''],
         ['question' => '', 'answer' => ''],
@@ -363,6 +364,15 @@
 
                             <label class="admin-product-label" for="og_image">Open Graph image URL</label>
                             <input class="admin-product-input" id="og_image" type="url" name="og_image" value="{{ old('og_image', $productToEdit?->og_image) }}">
+
+                            @if($productOfficialMediaFieldsReady)
+                                <label class="admin-product-label" for="official_image_url">Official product image URL</label>
+                                <input class="admin-product-input" id="official_image_url" type="url" name="official_image_url" value="{{ old('official_image_url', $productToEdit?->official_image_url) }}" placeholder="https://cdn.mikrotik.com/web-assets/rb_images/...">
+
+                                <label class="admin-product-label" for="official_video_url">Product video URL (YouTube)</label>
+                                <input class="admin-product-input" id="official_video_url" type="url" name="official_video_url" value="{{ old('official_video_url', $productToEdit?->official_video_url) }}" placeholder="https://www.youtube.com/watch?v=...">
+                                <p class="admin-product-note">Leave empty to auto-sync official images, gallery and video from mikrotik.com using <code>php artisan mikrotik:sync-media</code>.</p>
+                            @endif
 
                             <div class="admin-form-grid">
                                 <div>
