@@ -16,9 +16,11 @@
         $galleryImages = collect([$uploadedProductImage]);
     }
     $officialGalleryImages = \App\Support\ProductImageCatalog::officialUrls($product);
+    $galleryImageUrls = $galleryImages->all();
     foreach ($officialGalleryImages as $officialGalleryImage) {
-        if (! $galleryImages->contains($officialGalleryImage)) {
+        if (! in_array($officialGalleryImage, $galleryImageUrls, true)) {
             $galleryImages->push($officialGalleryImage);
+            $galleryImageUrls[] = $officialGalleryImage;
         }
     }
     if ($galleryImages->isEmpty()) {

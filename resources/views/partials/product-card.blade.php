@@ -1,4 +1,5 @@
 @php
+    $productDisplayName = \App\Support\ProductSeo::displayName($product);
     $productImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
     $uploadedProductImage = \App\Support\ProductImageCatalog::uploadedUrlFor($product->name, $product->slug);
     $officialProductImages = \App\Support\ProductImageCatalog::officialUrls($product);

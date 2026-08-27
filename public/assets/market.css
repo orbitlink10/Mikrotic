@@ -5760,6 +5760,13 @@ textarea.admin-post-builder-input {
     }
 }
 
+.admin-product-note {
+    margin: 2px 0 10px;
+    color: #72839b;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
 .product-video-block {
     display: grid;
     gap: 12px;
