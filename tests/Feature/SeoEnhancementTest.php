@@ -152,18 +152,21 @@ class SeoEnhancementTest extends TestCase
         $response->assertHeader('Content-Type', 'application/xml');
         $response->assertSee('https://mikrotikkenya.co.ke/category/mikrotik-switches', false);
         $response->assertSee('https://mikrotikkenya.co.ke/product/'.$product->slug, false);
-        $response->assertSee('https://mikrotikkenya.co.ke/pages/routeros-guide', false);
+        $response->assertSee('https://mikrotikkenya.co.ke/routeros-guide', false);
         $response->assertDontSee('/admin', false);
         $response->assertDontSee('/checkout', false);
     }
 
     public function test_trust_page_fallback_exists_without_inventing_contact_details(): void
     {
-        $response = $this->get('/pages/contact-us');
+        $this->get('/pages/contact-us')
+            ->assertRedirect('/contact-us');
+
+        $response = $this->get('/contact-us');
 
         $response->assertOk();
         $response->assertSee('Contact Mikrotik Kenya');
-        $response->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/pages/contact-us">', false);
+        $response->assertSee('<link rel="canonical" href="https://mikrotikkenya.co.ke/contact-us">', false);
         $response->assertDontSee('Official'.' MikroTik'.' Store');
     }
 

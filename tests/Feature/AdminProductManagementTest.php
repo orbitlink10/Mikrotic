@@ -647,6 +647,9 @@ class AdminProductManagementTest extends TestCase
             ->assertSee(route('pages.show', ['page' => $page->slug]), false);
 
         $this->get('/pages/'.$page->slug)
+            ->assertRedirect(route('pages.show', ['page' => $page->slug]));
+
+        $this->get(route('pages.show', ['page' => $page->slug]))
             ->assertOk()
             ->assertSee('Preview Page')
             ->assertSee('Preview Section')

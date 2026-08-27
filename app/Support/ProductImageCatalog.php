@@ -123,6 +123,8 @@ class ProductImageCatalog
         'mikrotik rb5009ug+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
         'rb5009ug+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
         'mikrotik rb5009upr+s+in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
+        'mikrotik gper' => 'https://cdn.mikrotik.com/web-assets/rb_images/1791_lg.webp',
+        'gper' => 'https://cdn.mikrotik.com/web-assets/rb_images/1791_lg.webp',
     ];
 
     /**
@@ -145,6 +147,8 @@ class ProductImageCatalog
         'rb5009ug-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2065_lg.webp',
         'mikrotik-rb5009upr-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
         'rb5009upr-s-in' => 'https://cdn.mikrotik.com/web-assets/rb_images/2190_lg.webp',
+        'mikrotik-gper' => 'https://cdn.mikrotik.com/web-assets/rb_images/1791_lg.webp',
+        'gper' => 'https://cdn.mikrotik.com/web-assets/rb_images/1791_lg.webp',
     ];
 
     public static function officialUrlFor(?string $productName): ?string
