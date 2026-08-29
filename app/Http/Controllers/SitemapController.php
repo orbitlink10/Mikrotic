@@ -6,8 +6,8 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
 use App\Support\CanonicalUrl;
-use App\Support\MikrotikSeoCatalog;
 use App\Support\SeoMetadata;
+use App\Support\SolarFloodLightSeoCatalog;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -23,7 +23,7 @@ class SitemapController extends Controller
         ]);
 
         $categoryUrls = Category::query()
-            ->whereNotIn('slug', array_keys(MikrotikSeoCatalog::legacyCategoryRedirects()))
+            ->whereNotIn('slug', array_keys(SolarFloodLightSeoCatalog::legacyCategoryRedirects()))
             ->when(SeoMetadata::columnReady('categories', 'robots'), fn ($query) => $query->where(fn ($robotsQuery) => $robotsQuery->whereNull('robots')->orWhere('robots', 'not like', 'noindex%')))
             ->orderBy('updated_at', 'desc')
             ->get()
@@ -54,7 +54,7 @@ class SitemapController extends Controller
                 'priority' => '0.6',
             ]);
 
-        $comparisonUrls = collect(MikrotikSeoCatalog::resolvableComparisonSlugs())
+        $comparisonUrls = collect(SolarFloodLightSeoCatalog::resolvableComparisonSlugs())
             ->map(fn (string $slug): array => [
                 'loc' => CanonicalUrl::route('comparison.show', $slug),
                 'lastmod' => null,

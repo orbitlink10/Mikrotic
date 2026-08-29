@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin - ' . config('app.name', 'Mikrotik Kenya'))</title>
+    <title>@yield('title', 'Admin - ' . config('app.name', 'Solar Flood Lights Kenya'))</title>
     <meta name="description" content="@yield('meta_description', 'Admin management area.')">
     @php
         $marketCssVersion = @filemtime(public_path('assets/market.css')) ?: time();

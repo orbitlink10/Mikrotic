@@ -93,7 +93,7 @@ SVG,
 
 <aside class="admin-sidebar">
     @if($showSidebarBrand)
-        <a class="admin-brand-card admin-brand-logo" href="{{ route('home') }}" aria-label="Go to {{ config('app.name', 'Mikrotik Kenya') }} homepage">
+        <a class="admin-brand-card admin-brand-logo" href="{{ route('home') }}" aria-label="Go to {{ config('app.name', 'Solar Flood Lights Kenya') }} homepage">
             <span class="admin-brand-logo-mark" aria-hidden="true">
                 @if($siteLogoUrl)
                     <img src="{{ $siteLogoUrl }}" alt="">
@@ -108,7 +108,7 @@ SVG,
                 @endif
             </span>
             <span class="admin-brand-logo-text">
-                <span class="admin-brand-logo-name">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+                <span class="admin-brand-logo-name">{{ config('app.name', 'Solar Flood Lights Kenya') }}</span>
                 <span class="admin-brand-logo-kicker">Admin Panel</span>
             </span>
         </a>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $title = $trustPage['title'] . ' | ' . config('app.name', 'Mikrotik Kenya');
+    $title = $trustPage['title'] . ' | ' . config('app.name', 'Solar Flood Lights Kenya');
     $description = \Illuminate\Support\Str::limit($trustPage['summary'], 155, '');
     $businessFields = array_filter([
         'Business name' => config('business.name'),
@@ -33,10 +33,10 @@
     <section class="page-story-article-shell">
         <div class="page-story-article-head">
             <div class="page-story-article-labels">
-                <p class="page-story-article-kicker">{{ config('app.name', 'Mikrotik Kenya') }}</p>
+                <p class="page-story-article-kicker">{{ config('app.name', 'Solar Flood Lights Kenya') }}</p>
                 <p class="page-story-article-subtitle">{{ $trustPage['title'] }}</p>
             </div>
-            <a class="page-story-back" href="{{ route('home') }}">Shop MikroTik Products</a>
+            <a class="page-story-back" href="{{ route('home') }}">Shop Solar Lights</a>
         </div>
 
         <h1 class="page-story-title">{{ $trustPage['heading'] }}</h1>

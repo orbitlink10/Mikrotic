@@ -6,8 +6,8 @@
     @php
         $homepageBrandContent = \App\Models\HomepageContent::current();
         $siteLogoUrl = $homepageBrandContent->siteLogoUrl();
-        $pageTitle = trim($__env->yieldContent('title')) ?: config('app.name', 'Mikrotik Kenya');
-        $pageDescription = trim($__env->yieldContent('meta_description')) ?: 'Browse MikroTik products, networking equipment and current prices in Kenya.';
+        $pageTitle = trim($__env->yieldContent('title')) ?: config('app.name', 'Solar Flood Lights Kenya');
+        $pageDescription = trim($__env->yieldContent('meta_description')) ?: 'Browse solar flood lights, outdoor security lights and current prices in Kenya.';
         $marketCssVersion = @filemtime(public_path('assets/market.css')) ?: time();
         $canonicalUrl = trim($__env->yieldContent('canonical_url'));
         $robotsContent = trim($__env->yieldContent('robots'));
@@ -39,7 +39,7 @@
         <meta name="robots" content="{!! $robotsContent !!}">
     @endif
     <meta property="og:type" content="{!! $openGraphType !!}">
-    <meta property="og:site_name" content="{{ config('app.name', 'Mikrotik Kenya') }}">
+    <meta property="og:site_name" content="{{ config('app.name', 'Solar Flood Lights Kenya') }}">
     <meta property="og:title" content="{!! $openGraphTitle !!}">
     <meta property="og:description" content="{!! $openGraphDescription !!}">
     <meta property="og:url" content="{!! $canonicalUrl !== '' ? $canonicalUrl : \App\Support\CanonicalUrl::current() !!}">
@@ -63,14 +63,14 @@
     <div class="nav-wrap">
         <a href="{{ route('home') }}" class="logo" aria-label="Go to homepage">
             @if($siteLogoUrl)
-                <img class="logo-image" src="{{ $siteLogoUrl }}" alt="{{ config('app.name', 'Mikrotik Kenya') }}">
+                <img class="logo-image" src="{{ $siteLogoUrl }}" alt="{{ config('app.name', 'Solar Flood Lights Kenya') }}">
             @else
-                <span class="logo-main logo-main--single">{{ config('app.name', 'Mikrotik Kenya') }}</span>
+                <span class="logo-main logo-main--single">{{ config('app.name', 'Solar Flood Lights Kenya') }}</span>
             @endif
         </a>
 
         <form class="search-form" method="get" action="{{ route('home') }}" role="search">
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search MikroTik routers, switches and accessories" aria-label="Search products" autocomplete="off" required>
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Search solar flood lights, street lights and accessories" aria-label="Search products" autocomplete="off" required>
             <button type="submit">Search</button>
         </form>
 
@@ -112,18 +112,18 @@
             @if($menuCategory->children->isNotEmpty())
                 <li class="mobile-menu-accordion">
                     <button type="button" class="mobile-menu-link mobile-menu-accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-{{ $menuCategory->id }}">
-                        <span>{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</span>
+                        <span>{{ \App\Support\SolarFloodLightSeoCatalog::navLabel($menuCategory) }}</span>
                         <span class="mobile-menu-chevron" aria-hidden="true"></span>
                     </button>
                     <ul id="mobile-submenu-{{ $menuCategory->id }}" class="mobile-menu-submenu" hidden>
-                        <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuCategory) }}">All {{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+                        <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuCategory) }}">All {{ \App\Support\SolarFloodLightSeoCatalog::navLabel($menuCategory) }}</a></li>
                         @foreach($menuCategory->children as $menuChildCategory)
-                            <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuChildCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuChildCategory) }}</a></li>
+                            <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuChildCategory) }}">{{ \App\Support\SolarFloodLightSeoCatalog::navLabel($menuChildCategory) }}</a></li>
                         @endforeach
                     </ul>
                 </li>
             @else
-                <li><a class="mobile-menu-link" href="{{ route('category.show', $menuCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+                <li><a class="mobile-menu-link" href="{{ route('category.show', $menuCategory) }}">{{ \App\Support\SolarFloodLightSeoCatalog::navLabel($menuCategory) }}</a></li>
             @endif
         @endforeach
         <li><a class="mobile-menu-link" href="{{ route('pages.show', ['page' => 'contact-us']) }}">Contact Us</a></li>
@@ -171,7 +171,7 @@
         <a href="{{ route('pages.show', ['page' => 'privacy-policy']) }}">Privacy Policy</a>
         <a href="{{ route('pages.show', ['page' => 'terms-and-conditions']) }}">Terms and Conditions</a>
     </nav>
-    <p>&copy; {{ date('Y') }} {{ config('business.name', config('app.name', 'Mikrotik Kenya')) }}</p>
+    <p>&copy; {{ date('Y') }} {{ config('business.name', config('app.name', 'Solar Flood Lights Kenya')) }}</p>
 </footer>
 
 <script>

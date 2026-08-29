@@ -66,7 +66,7 @@ class Testimonial extends Model
             [
                 'name' => 'Joan K., Nairobi',
                 'role' => 'Customer',
-                'quote' => 'The installation team arrived on time, explained the ideal mounting position, and got us online the same day. The experience felt professional from start to finish.',
+                'quote' => 'The team helped us choose the right lights for the gate and parking area, then explained the best mounting position before delivery.',
                 'rating' => 5,
                 'sort_order' => 1,
                 'is_active' => true,
@@ -74,7 +74,7 @@ class Testimonial extends Model
             [
                 'name' => 'Samuel O., Meru',
                 'role' => 'Customer',
-                'quote' => 'Our children now attend online classes without interruptions, and video meetings are finally stable. Starlink has made a visible difference in our day-to-day routine.',
+                'quote' => 'The motion sensor lights have made the compound brighter at night without increasing our electricity bill.',
                 'rating' => 5,
                 'sort_order' => 2,
                 'is_active' => true,
@@ -82,7 +82,7 @@ class Testimonial extends Model
             [
                 'name' => 'Victor M., Rongai',
                 'role' => 'Customer',
-                'quote' => 'Uploads that used to take forever now finish quickly, which matters a lot for my content work. For creators working outside strong fiber zones, this is a serious upgrade.',
+                'quote' => 'We needed lighting for a farm store and walkway. The product pages made it easy to compare wattage, price and stock before ordering.',
                 'rating' => 5,
                 'sort_order' => 3,
                 'is_active' => true,

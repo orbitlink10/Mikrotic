@@ -106,22 +106,22 @@ class HomepageContent extends Model
             'contact_phone' => config('business.phone'),
             'contact_whatsapp' => config('business.whatsapp', config('business.phone')),
             'contact_email' => config('business.email'),
-            'hero_title' => 'MikroTik Kenya – Routers, Switches & Networking Equipment',
-            'hero_description' => 'Compare genuine MikroTik routers, switches, access points and wireless systems, with current prices, specifications, stock availability and fast delivery across Kenya.',
-            'why_choose_title' => 'Why Buy MikroTik Equipment From Us?',
-            'why_choose_intro' => 'Compare practical RouterOS hardware for homes, offices, ISPs and enterprise networks from a catalogue built around Kenyan networking needs.',
+            'hero_title' => 'Solar Flood Lights Kenya',
+            'hero_description' => 'Compare solar flood lights, solar street lights, motion sensor lights and installation accessories with current prices, stock availability and delivery options across Kenya.',
+            'why_choose_title' => 'Why Buy Solar Flood Lights From Us?',
+            'why_choose_intro' => 'Compare practical outdoor solar lighting options for homes, farms, schools, shops and commercial security projects in Kenya.',
             'why_choose_items' => self::defaultWhyChooseItems(),
             'testimonials_badge' => 'Testimonials',
             'testimonials_title' => 'Customer Feedback',
             'testimonials_intro' => 'Feedback from customers can be managed from the admin panel when genuine testimonials are available.',
             'testimonial_items' => self::defaultTestimonialItems(),
             'faq_badge' => 'FAQ',
-            'faq_title' => 'MikroTik Buying Questions',
-            'faq_intro' => 'Answers to common questions about MikroTik prices, stock, delivery and product selection in Kenya.',
+            'faq_title' => 'Solar Flood Light Buying Questions',
+            'faq_intro' => 'Answers to common questions about solar flood light prices, stock, delivery and product selection in Kenya.',
             'faq_items' => self::defaultFaqItems(),
-            'content_badge' => 'MikroTik Kenya Guide',
-            'content_title' => 'MikroTik Kenya: RouterOS Hardware for Homes, Offices and ISPs',
-            'content_intro' => 'Explore MikroTik products for routing, switching, wireless access, LTE backup and network management.',
+            'content_badge' => 'Solar Lighting Kenya Guide',
+            'content_title' => 'Solar Flood Lights in Kenya: Outdoor Lighting for Homes and Businesses',
+            'content_intro' => 'Explore solar flood lights for compound lighting, security, farms, streets, gardens and commercial outdoor spaces.',
             'content_body' => self::defaultContentBody(),
         ]);
     }
@@ -368,11 +368,11 @@ class HomepageContent extends Model
     {
         return [
             ['title' => 'Current Catalogue Prices', 'description' => 'Product pages show prices from the store catalogue instead of static SEO copy.'],
-            ['title' => 'RouterOS-Focused Selection', 'description' => 'Browse routers, switches, wireless systems, LTE devices and accessories by practical network use.'],
-            ['title' => 'Product-Level Details', 'description' => 'Review SKU, stock status, category, use cases and technical guidance before purchase.'],
-            ['title' => 'Quotation Friendly', 'description' => 'Business buyers can use product pages as a starting point for larger networking enquiries.'],
-            ['title' => 'Delivery Information', 'description' => 'Delivery options are confirmed during checkout or enquiry based on product availability and destination.'],
-            ['title' => 'Configuration Guidance', 'description' => 'Product pages include RouterOS and compatibility notes where available.'],
+            ['title' => 'Lighting-Focused Selection', 'description' => 'Browse flood lights, street lights, motion sensor models, panels, batteries and mounting accessories by practical outdoor use.'],
+            ['title' => 'Product-Level Details', 'description' => 'Review SKU, stock status, category, wattage, use cases and technical guidance before purchase.'],
+            ['title' => 'Quotation Friendly', 'description' => 'Business buyers can use product pages as a starting point for larger lighting and installation enquiries.'],
+            ['title' => 'Delivery Information', 'description' => 'Delivery options are confirmed during checkout or enquiry based on product availability, order size and destination.'],
+            ['title' => 'Installation Guidance', 'description' => 'Product pages include panel, battery, mounting and application notes where available.'],
         ];
     }
 
@@ -411,8 +411,8 @@ class HomepageContent extends Model
                 'answer' => 'Product prices are generated from the store catalogue and should update when the admin changes a product price.',
             ],
             [
-                'question' => 'Can I compare MikroTik routers before buying?',
-                'answer' => 'Use category pages and product pages to compare price, stock status, SKU, category and recommended applications.',
+                'question' => 'Can I compare solar flood lights before buying?',
+                'answer' => 'Use category pages and product pages to compare price, stock status, SKU, wattage, category and recommended applications.',
             ],
             [
                 'question' => 'Do product pages show stock status?',
@@ -428,18 +428,18 @@ class HomepageContent extends Model
     private static function defaultContentBody(): string
     {
         return implode('', [
-            '<h2>MikroTik networking equipment in Kenya</h2>',
-            '<p>MikroTik routers, switches and wireless systems are used for home internet, office networks, ISP deployments, hotspot management, VPNs, firewalling and fibre uplinks.</p>',
-            '<p>Use the catalogue to compare current prices, stock status, SKUs and product categories before choosing a RouterOS device.</p>',
-            '<h3>Where MikroTik fits best</h3>',
+            '<h2>Solar flood lights in Kenya</h2>',
+            '<p>Solar flood lights are used for home compounds, gates, farms, parking yards, shops, schools, churches, warehouses and outdoor security areas where reliable lighting is needed.</p>',
+            '<p>Use the catalogue to compare current prices, stock status, SKUs, wattage, battery notes and product categories before choosing a solar light.</p>',
+            '<h3>Where solar flood lights fit best</h3>',
             '<ul>',
-            '<li>Homes and small offices that need reliable routing and Wi-Fi management.</li>',
-            '<li>Businesses that need firewall, VPN, VLAN and multi-WAN RouterOS features.</li>',
-            '<li>ISPs and installers building outdoor wireless, fibre and aggregation networks.</li>',
+            '<li>Homes and apartments that need gate, yard, wall or driveway lighting.</li>',
+            '<li>Farms, schools and churches that need off-grid lighting for wider compounds.</li>',
+            '<li>Businesses and installers working on perimeter, parking, CCTV and security-lighting projects.</li>',
             '</ul>',
             '<h3>What to Consider Before Buying</h3>',
-            '<p>Check the number of Ethernet ports, throughput requirements, PoE support, SFP or SFP+ uplinks, wireless bands, LTE or 5G needs, mounting options and RouterOS feature requirements.</p>',
-            '<p>For larger networks, confirm compatibility with your switches, access points, power setup and internet handoff before purchase.</p>',
+            '<p>Check wattage, lumen output, battery capacity, panel size, charging time, weather rating, mounting height, motion sensor needs and expected night runtime.</p>',
+            '<p>For larger installations, confirm pole height, spacing, cable runs, panel exposure and whether a split or all-in-one solar light is better for the site.</p>',
         ]);
     }
 }

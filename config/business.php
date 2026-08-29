@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'name' => env('BUSINESS_NAME', env('APP_NAME', 'Mikrotik Kenya')),
+    'name' => env('BUSINESS_NAME', env('APP_NAME', 'Solar Flood Lights Kenya')),
     'legal_name' => env('BUSINESS_LEGAL_NAME'),
     'phone' => env('BUSINESS_PHONE'),
     'whatsapp' => env('BUSINESS_WHATSAPP', env('BUSINESS_PHONE')),

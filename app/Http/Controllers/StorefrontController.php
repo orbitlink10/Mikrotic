@@ -8,10 +8,10 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Testimonial;
 use App\Support\CanonicalUrl;
-use App\Support\MikrotikSeoCatalog;
 use App\Support\ProductContent;
 use App\Support\ProductSeo;
 use App\Support\SeoMetadata;
+use App\Support\SolarFloodLightSeoCatalog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,9 +20,9 @@ use Illuminate\View\View;
 
 class StorefrontController extends Controller
 {
-    private const ROUTER_PRICES_CATEGORY_NAME = 'Mikrotik Router Prices in Kenya';
+    private const ROUTER_PRICES_CATEGORY_NAME = 'Solar Flood Lights Price in Kenya';
 
-    private const ROUTER_PRICES_CATEGORY_SLUG = 'mikrotik-router-prices-in-kenya';
+    private const ROUTER_PRICES_CATEGORY_SLUG = 'solar-flood-lights-price-in-kenya';
 
     private const ROUTER_PRODUCTS_LIMIT = 6;
 
@@ -124,7 +124,7 @@ class StorefrontController extends Controller
 
     public function redirectTopLevelCategory(string $categorySlug): RedirectResponse
     {
-        $targetSlug = MikrotikSeoCatalog::targetSlugForTopLevel($categorySlug);
+        $targetSlug = SolarFloodLightSeoCatalog::targetSlugForTopLevel($categorySlug);
 
         abort_unless($targetSlug, 404);
 
@@ -230,8 +230,8 @@ class StorefrontController extends Controller
         $products = $productsQuery->latest()->paginate(24)->withQueryString();
         $usedCategoryFallback = false;
 
-        if ($products->total() === 0 && $currentCategory && MikrotikSeoCatalog::isBroadMikrotikCategory($currentCategory)) {
-            $products = MikrotikSeoCatalog::mikrotikProductsQuery()
+        if ($products->total() === 0 && $currentCategory && SolarFloodLightSeoCatalog::isBroadSolarCategory($currentCategory)) {
+            $products = SolarFloodLightSeoCatalog::solarProductsQuery()
                 ->latest()
                 ->paginate(24)
                 ->withQueryString();
@@ -239,7 +239,7 @@ class StorefrontController extends Controller
         }
 
         $routerPriceTableProducts = collect();
-        $isRouterAuthorityPage = $currentCategory && MikrotikSeoCatalog::isRouterAuthorityCategory($currentCategory);
+        $isRouterAuthorityPage = $currentCategory && SolarFloodLightSeoCatalog::isPriceAuthorityCategory($currentCategory);
 
         if ($isRouterAuthorityPage) {
             $routerPriceTableProducts = Product::query()
@@ -251,13 +251,13 @@ class StorefrontController extends Controller
                 ->get();
 
             if ($routerPriceTableProducts->isEmpty()) {
-                $routerPriceTableProducts = MikrotikSeoCatalog::mikrotikProductsQuery()
+                $routerPriceTableProducts = SolarFloodLightSeoCatalog::solarProductsQuery()
                     ->where(function (Builder $query): void {
-                        $query->where('name', 'like', '%router%')
-                            ->orWhere('name', 'like', '%RB%')
-                            ->orWhere('name', 'like', '%CCR%')
-                            ->orWhere('name', 'like', '%hEX%')
-                            ->orWhere('slug', 'like', '%router%');
+                        $query->where('name', 'like', '%flood%')
+                            ->orWhere('name', 'like', '%light%')
+                            ->orWhere('name', 'like', '%solar%')
+                            ->orWhere('slug', 'like', '%flood%')
+                            ->orWhere('slug', 'like', '%solar%');
                     })
                     ->orderBy('name')
                     ->limit(48)
@@ -279,7 +279,7 @@ class StorefrontController extends Controller
             'usedCategoryFallback' => $usedCategoryFallback,
             'isRouterAuthorityPage' => $isRouterAuthorityPage,
             'routerPriceTableProducts' => $routerPriceTableProducts,
-            'routerFaqItems' => MikrotikSeoCatalog::routerFaqItems(),
+            'routerFaqItems' => SolarFloodLightSeoCatalog::priceFaqItems(),
             'relatedCategories' => $this->relatedCategories($currentCategory),
             'homepageComparisonLinks' => $search === '' && ! $currentCategory
                 ? $this->homepageComparisonLinks()
@@ -292,10 +292,10 @@ class StorefrontController extends Controller
      */
     private function homepageComparisonLinks(): array
     {
-        $labels = MikrotikSeoCatalog::comparisonPages();
+        $labels = SolarFloodLightSeoCatalog::comparisonPages();
         $links = [];
 
-        foreach (MikrotikSeoCatalog::resolvableComparisonSlugs() as $slug) {
+        foreach (SolarFloodLightSeoCatalog::resolvableComparisonSlugs() as $slug) {
             $links[] = [
                 'url' => route('comparison.show', $slug),
                 'label' => $labels[$slug] ?? $slug,
@@ -345,10 +345,10 @@ class StorefrontController extends Controller
     private function routerAuthoritySlugs(): array
     {
         return array_values(array_unique(array_merge(
-            [self::ROUTER_PRICES_CATEGORY_SLUG, MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG],
+            [self::ROUTER_PRICES_CATEGORY_SLUG, SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG],
             array_keys(array_filter(
-                MikrotikSeoCatalog::legacyCategoryRedirects(),
-                fn (string $target): bool => $target === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG
+                SolarFloodLightSeoCatalog::legacyCategoryRedirects(),
+                fn (string $target): bool => $target === SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG
             ))
         )));
     }
@@ -370,7 +370,7 @@ class StorefrontController extends Controller
     private function resolveCategory(string $slug, bool $forceRedirect = false): Category|RedirectResponse
     {
         $requestedSlug = Str::slug($slug);
-        $legacyTarget = MikrotikSeoCatalog::targetSlugForLegacy($requestedSlug);
+        $legacyTarget = SolarFloodLightSeoCatalog::targetSlugForLegacy($requestedSlug);
 
         if ($legacyTarget && ($forceRedirect || $legacyTarget !== $requestedSlug)) {
             $targetCategory = Category::query()->where('slug', $legacyTarget)->first();
@@ -382,14 +382,14 @@ class StorefrontController extends Controller
 
         $category = Category::query()->whereRaw('LOWER(slug) = ?', [Str::lower($requestedSlug)])->first();
 
-        if (! $category && $requestedSlug === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG) {
+        if (! $category && $requestedSlug === SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG) {
             $category = $this->routerPricesCategory();
         }
 
         abort_unless($category, 404);
 
         if ($category->slug !== $requestedSlug) {
-            if ($requestedSlug === MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG && MikrotikSeoCatalog::isRouterAuthorityCategory($category)) {
+            if ($requestedSlug === SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG && SolarFloodLightSeoCatalog::isPriceAuthorityCategory($category)) {
                 return $category;
             }
 
@@ -423,12 +423,12 @@ class StorefrontController extends Controller
         $trustPages = [
             'about-us' => [
                 'title' => 'About Us',
-                'heading' => 'About Mikrotik Kenya',
-                'summary' => 'Information about the business behind this MikroTik ecommerce website can be added from the admin content area.',
+                'heading' => 'About Solar Flood Lights Kenya',
+                'summary' => 'Information about the business behind this solar flood lights website can be added from the admin content area.',
             ],
             'contact-us' => [
                 'title' => 'Contact Us',
-                'heading' => 'Contact Mikrotik Kenya',
+                'heading' => 'Contact Solar Flood Lights Kenya',
                 'summary' => 'Use the available contact details below to enquire about products, quotations, delivery and support.',
             ],
             'delivery-policy' => [
@@ -469,25 +469,25 @@ class StorefrontController extends Controller
 
     private function featuredCategories()
     {
-        $primarySlugs = array_keys(MikrotikSeoCatalog::primaryCategories());
+        $primarySlugs = array_keys(SolarFloodLightSeoCatalog::primaryCategories());
         $featuredSlugs = array_values(array_unique(array_merge($primarySlugs, $this->routerAuthoritySlugs())));
 
         return Category::query()
             ->whereIn('slug', $featuredSlugs)
             ->get()
             ->sortBy(function (Category $category) use ($primarySlugs): int {
-                $targetSlug = MikrotikSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug;
+                $targetSlug = SolarFloodLightSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug;
                 $position = array_search($targetSlug, $primarySlugs, true);
 
                 return $position === false ? 999 : $position;
             })
-            ->unique(fn (Category $category): string => MikrotikSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug)
+            ->unique(fn (Category $category): string => SolarFloodLightSeoCatalog::targetSlugForLegacy($category->slug) ?: $category->slug)
             ->values();
     }
 
     private function relatedCategories(?Category $currentCategory)
     {
-        $primarySlugs = array_keys(MikrotikSeoCatalog::primaryCategories());
+        $primarySlugs = array_keys(SolarFloodLightSeoCatalog::primaryCategories());
 
         return Category::query()
             ->whereIn('slug', $primarySlugs)

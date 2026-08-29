@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mikrotik Kenya')
+@section('title', 'Solar Flood Lights Kenya')
 
 @section('content')
 <section class="panel auth-card">

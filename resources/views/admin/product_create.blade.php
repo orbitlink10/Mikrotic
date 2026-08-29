@@ -367,11 +367,11 @@
 
                             @if($productOfficialMediaFieldsReady)
                                 <label class="admin-product-label" for="official_image_url">Official product image URL</label>
-                                <input class="admin-product-input" id="official_image_url" type="url" name="official_image_url" value="{{ old('official_image_url', $productToEdit?->official_image_url) }}" placeholder="https://cdn.mikrotik.com/web-assets/rb_images/...">
+                                <input class="admin-product-input" id="official_image_url" type="url" name="official_image_url" value="{{ old('official_image_url', $productToEdit?->official_image_url) }}" placeholder="https://example.com/solar-flood-light.jpg">
 
                                 <label class="admin-product-label" for="official_video_url">Product video URL (YouTube)</label>
                                 <input class="admin-product-input" id="official_video_url" type="url" name="official_video_url" value="{{ old('official_video_url', $productToEdit?->official_video_url) }}" placeholder="https://www.youtube.com/watch?v=...">
-                                <p class="admin-product-note">Leave empty to auto-sync official images, gallery and video from mikrotik.com using <code>php artisan mikrotik:sync-media</code>.</p>
+                                <p class="admin-product-note">Leave empty when using uploaded product images or seller-provided media.</p>
                             @endif
 
                             <div class="admin-form-grid">
@@ -381,12 +381,12 @@
                                 </div>
                                 <div>
                                     <label class="admin-product-label" for="brand">Brand</label>
-                                    <input class="admin-product-input" id="brand" type="text" name="brand" value="{{ old('brand', $productToEdit?->brand) }}" placeholder="MikroTik">
+                                    <input class="admin-product-input" id="brand" type="text" name="brand" value="{{ old('brand', $productToEdit?->brand) }}" placeholder="SolarMax">
                                 </div>
                             </div>
 
                             <label class="admin-product-label" for="key_use">Key use</label>
-                            <input class="admin-product-input" id="key_use" type="text" name="key_use" value="{{ old('key_use', $productToEdit?->key_use) }}" placeholder="Routing for homes, offices or ISP deployments">
+                            <input class="admin-product-input" id="key_use" type="text" name="key_use" value="{{ old('key_use', $productToEdit?->key_use) }}" placeholder="Outdoor compound, farm or security lighting">
 
                             @foreach([
                                 'key_specifications' => 'Key specifications',
