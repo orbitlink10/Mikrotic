@@ -8,9 +8,9 @@
         : route('home');
     $pageCanonicalUrl = \App\Support\SeoMetadata::canonicalOverride($page)
         ?: \App\Support\CanonicalUrl::route('pages.show', $page);
-    $fullPageTitle = \Illuminate\Support\Str::contains($articleTitle, config('app.name', 'Solar Flood Lights Kenya'))
+    $fullPageTitle = \Illuminate\Support\Str::contains($articleTitle, config('app.name', 'Mikrotik Kenya'))
         ? $articleTitle
-        : $articleTitle . ' | ' . config('app.name', 'Solar Flood Lights Kenya');
+        : $articleTitle . ' | ' . config('app.name', 'Mikrotik Kenya');
     $breadcrumbSchema = \App\Support\StructuredData::breadcrumbs([
         ['name' => 'Home', 'url' => \App\Support\CanonicalUrl::route('home')],
         ['name' => $page->title, 'url' => $pageCanonicalUrl],

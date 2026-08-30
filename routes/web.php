@@ -7,14 +7,14 @@ use App\Http\Controllers\ComparisonController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\VendorController;
-use App\Support\SolarFloodLightSeoCatalog;
+use App\Support\MikrotikSeoCatalog;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->name('home');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/compare/{comparison}', [ComparisonController::class, 'show'])
-    ->where('comparison', implode('|', array_keys(SolarFloodLightSeoCatalog::comparisonPages())))
+    ->where('comparison', 'rb760igs-vs-rb750gr3|rb4011-vs-rb5009|l009uigs-rm-vs-l009uigs-2haxd-in|ccr2004-vs-ccr2116')
     ->name('comparison.show');
 Route::get('/category/{category}', [StorefrontController::class, 'showCategory'])->name('category.show');
 Route::get('/product/{product}', [StorefrontController::class, 'show'])->name('product.show');
@@ -22,7 +22,7 @@ Route::get('/products/{product}', [StorefrontController::class, 'redirectLegacyP
 Route::get('/categories/{category}', [StorefrontController::class, 'redirectLegacyCategory']);
 Route::get('/pages/{page}', [StorefrontController::class, 'redirectLegacyPage']);
 Route::get('/{categorySlug}', [StorefrontController::class, 'redirectTopLevelCategory'])
-    ->where('categorySlug', implode('|', array_keys(SolarFloodLightSeoCatalog::topLevelCategoryRedirects())));
+    ->where('categorySlug', implode('|', array_keys(MikrotikSeoCatalog::topLevelCategoryRedirects())));
 Route::get('/uploads/products/{filename}', function (string $filename) {
     $paths = [
         public_path('uploads/products/'.$filename),

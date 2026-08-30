@@ -26,12 +26,12 @@
         ? \Illuminate\Support\Str::slug((string) request()->route('category'))
         : null;
     $useRouterAuthorityCanonical = $isRouterAuthorityPage
-        && ($currentCategory->slug === \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG
-            || $requestedCategorySlug === \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG);
+        && ($currentCategory->slug === \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG
+            || $requestedCategorySlug === \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG);
     $catalogCanonicalUrl = $currentCategory
         ? (\App\Support\SeoMetadata::canonicalOverride($currentCategory)
             ?: ($useRouterAuthorityCanonical
-                ? \App\Support\CanonicalUrl::route('category.show', ['category' => \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG], $catalogCanonicalQuery)
+                ? \App\Support\CanonicalUrl::route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG], $catalogCanonicalQuery)
                 : \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery)))
         : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
     $faqSchema = ($showHomepageSections || ($currentCategory && $categoryFaqItems !== []))
@@ -44,12 +44,12 @@
         ];
         if ($currentCategory->parent_id && $currentCategory->parent) {
             $breadcrumbItems[] = [
-                'name' => \App\Support\SolarFloodLightSeoCatalog::navLabel($currentCategory->parent),
+                'name' => \App\Support\MikrotikSeoCatalog::navLabel($currentCategory->parent),
                 'url' => \App\Support\CanonicalUrl::route('category.show', $currentCategory->parent),
             ];
         }
         $breadcrumbItems[] = [
-            'name' => \App\Support\SolarFloodLightSeoCatalog::navLabel($currentCategory),
+            'name' => \App\Support\MikrotikSeoCatalog::navLabel($currentCategory),
             'url' => $catalogCanonicalUrl,
         ];
         $breadcrumbSchema = \App\Support\StructuredData::breadcrumbs($breadcrumbItems);
@@ -57,12 +57,12 @@
     $routerPricesCategoryUrl = null;
     $routerPricesIntro = null;
     if ($showHomepageSections && $homepageProductCategory) {
-        $routerPricesCategoryUrl = route('category.show', ['category' => \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG]);
+        $routerPricesCategoryUrl = route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]);
         $routerPricesIntro = trim((string) $homepageProductCategory->meta_description)
             ?: \App\Support\ProductContent::excerpt((string) $homepageProductCategory->description, 220);
         $routerPricesIntro = $routerPricesIntro !== ''
             ? $routerPricesIntro
-            : 'Compare current solar flood light prices, wattage options and availability for homes, compounds, farms and businesses across Kenya.';
+            : 'Compare current MikroTik router prices, models and availability for homes, offices and ISP networks across Kenya.';
     }
     $productImageFallback = \App\Support\ProductImageCatalog::placeholderUrl();
     $whyChooseIcons = [
@@ -147,10 +147,10 @@ SVG,
                 <a href="{{ route('home') }}">Home</a>
                 @if($currentCategory->parent_id && $currentCategory->parent)
                     <span>/</span>
-                    <a href="{{ route('category.show', $currentCategory->parent) }}">{{ \App\Support\SolarFloodLightSeoCatalog::navLabel($currentCategory->parent) }}</a>
+                    <a href="{{ route('category.show', $currentCategory->parent) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($currentCategory->parent) }}</a>
                 @endif
                 <span>/</span>
-                <span>{{ \App\Support\SolarFloodLightSeoCatalog::navLabel($currentCategory) }}</span>
+                <span>{{ \App\Support\MikrotikSeoCatalog::navLabel($currentCategory) }}</span>
             </nav>
 
             <section class="panel category-content-panel {{ $currentCategory->image_url ? 'category-content-panel--with-image' : '' }}">
@@ -188,11 +188,11 @@ SVG,
                     <div class="home-category-grid">
                         @foreach($featuredCategories as $featuredCategory)
                             @php
-                                $featuredCategoryIsRouterPage = \App\Support\SolarFloodLightSeoCatalog::isPriceAuthorityCategory($featuredCategory);
+                                $featuredCategoryIsRouterPage = \App\Support\MikrotikSeoCatalog::isRouterAuthorityCategory($featuredCategory);
                                 $featuredCategoryHref = $featuredCategoryIsRouterPage
-                                    ? route('category.show', ['category' => \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG])
+                                    ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
                                     : route('category.show', $featuredCategory);
-                                $featuredCategoryName = \App\Support\SolarFloodLightSeoCatalog::navLabel($featuredCategory);
+                                $featuredCategoryName = \App\Support\MikrotikSeoCatalog::navLabel($featuredCategory);
                             @endphp
                             <a class="home-category-card" href="{{ $featuredCategoryHref }}">
                                 <span class="home-category-card-name">{{ $featuredCategoryName }}</span>
@@ -206,7 +206,7 @@ SVG,
 
         @if($usedCategoryFallback)
             <section class="panel category-fallback-note">
-                <p>Showing relevant solar lighting products from the wider catalogue while this category is being organized.</p>
+                <p>Showing relevant MikroTik products from the wider catalogue while this category is being organized.</p>
             </section>
         @endif
 
@@ -215,7 +215,7 @@ SVG,
                 <div class="router-price-head">
                     <div>
                         <p class="catalog-search-eyebrow">Current catalogue pricing</p>
-                        <h2>Solar flood light price list in Kenya</h2>
+                        <h2>MikroTik router price list in Kenya</h2>
                     </div>
                     <p>Prices and availability are loaded from product records, so this table updates when the catalogue is updated.</p>
                 </div>
@@ -224,7 +224,7 @@ SVG,
                     <table class="router-price-table">
                         <thead>
                         <tr>
-                            <th>Solar Light Model</th>
+                            <th>MikroTik Model</th>
                             <th>Current Price</th>
                             <th>Key Use</th>
                             <th>Availability</th>
@@ -240,7 +240,7 @@ SVG,
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4">Solar flood light prices will appear here when products are assigned to this category.</td>
+                                <td colspan="4">Router prices will appear here when router products are assigned to this category.</td>
                             </tr>
                         @endforelse
                         </tbody>
@@ -251,20 +251,20 @@ SVG,
             <section class="panel router-guide-panel">
                 <div class="router-guide-grid">
                     <div>
-                        <h2>How to choose a solar flood light</h2>
+                        <h2>How to choose a MikroTik router</h2>
                         <ul>
-                            <li>Choose wattage based on the area size, mounting height and brightness required.</li>
-                            <li>Check battery capacity and expected lighting hours for overnight security use.</li>
-                            <li>Confirm the solar panel size and charging time for cloudy or rainy seasons.</li>
-                            <li>Use motion-sensor models where you need automatic activation and longer runtime.</li>
+                            <li>Choose enough Ethernet ports for your WAN, LAN and future expansion.</li>
+                            <li>Check whether you need SFP or SFP+ uplinks for fibre or switch aggregation.</li>
+                            <li>Match CPU and throughput needs to your firewall, VPN, queue and routing workload.</li>
+                            <li>Use PoE-capable models when powering access points or outdoor radios from the router.</li>
                         </ul>
                     </div>
                     <div>
-                        <h2>Home, farm and business selection guide</h2>
+                        <h2>Home, office and ISP selection guide</h2>
                         <ul>
-                            <li>Homes: 60W to 200W lights are common for gates, yards and perimeter walls.</li>
-                            <li>Farms and shops: use brighter lights or multiple units for wider outdoor coverage.</li>
-                            <li>Roads and institutions: compare all-in-one street lights and pole-mounted split systems.</li>
+                            <li>Home and small office: compact RouterOS devices with stable Ethernet and optional Wi-Fi.</li>
+                            <li>Growing offices: routers with more CPU headroom, VLAN support and reliable failover options.</li>
+                            <li>ISP and enterprise: CCR, RB5009 or rackmount models for throughput, routing tables and uplinks.</li>
                         </ul>
                     </div>
                 </div>
@@ -273,9 +273,9 @@ SVG,
 
         @if($showFeaturedProductRows)
             <div class="featured-rows-head">
-                <h2>{{ $homepageProductCategory ? 'Shop Solar Flood Lights' : 'Popular Solar Lighting Products' }}</h2>
+                <h2>{{ $homepageProductCategory ? 'Shop MikroTik Routers' : 'Popular MikroTik Products' }}</h2>
                 @if($homepageProductCategory)
-                    <a class="featured-rows-link" href="{{ route('category.show', ['category' => \App\Support\SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG]) }}">View all &rarr;</a>
+                    <a class="featured-rows-link" href="{{ route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]) }}">View all &rarr;</a>
                 @endif
             </div>
             <section class="products-grid products-grid--router-rows" aria-label="{{ $homepageProductCategory?->name ?? 'Featured products' }}">
@@ -354,9 +354,9 @@ SVG,
                 <section class="home-section home-section--router-prices">
                     <div class="home-section-head">
                         <p class="home-section-kicker">Current catalogue pricing</p>
-                        <h2>Solar Flood Lights Price in Kenya</h2>
+                        <h2>MikroTik Router Prices in Kenya</h2>
                         <p>{{ $routerPricesIntro }}</p>
-                        <a class="home-section-cta" href="{{ $routerPricesCategoryUrl }}">View current solar flood light prices</a>
+                        <a class="home-section-cta" href="{{ $routerPricesCategoryUrl }}">View current MikroTik router prices</a>
                     </div>
                 </section>
             @endif
@@ -364,10 +364,10 @@ SVG,
             @if($homepageComparisonLinks !== [])
                 <section class="home-section home-section--guides">
                     <div class="home-section-head">
-                        <h2>Solar Lighting Buying Guides &amp; Comparisons</h2>
-                        <p>Compare popular solar flood light options side by side before choosing wattage, battery size or installation type.</p>
+                        <h2>MikroTik Buying Guides &amp; Comparisons</h2>
+                        <p>Compare popular MikroTik models side by side before choosing your router or switch.</p>
                     </div>
-                    <nav class="category-hub-links" aria-label="Solar lighting buying guides and comparisons">
+                    <nav class="category-hub-links" aria-label="MikroTik buying guides and comparisons">
                         @foreach($homepageComparisonLinks as $comparisonLink)
                             <a href="{{ $comparisonLink['url'] }}">{{ $comparisonLink['label'] }}</a>
                         @endforeach
@@ -480,9 +480,9 @@ SVG,
         <section class="home-extra-sections home-extra-sections--full-width">
             <section class="home-section related-category-section">
                 <div class="home-section-head">
-                    <h2>Related solar lighting categories</h2>
+                    <h2>Related MikroTik categories</h2>
                 </div>
-                <nav class="category-hub-links" aria-label="Related solar lighting categories">
+                <nav class="category-hub-links" aria-label="Related MikroTik categories">
                     @foreach($relatedCategories as $relatedCategory)
                         <a href="{{ route('category.show', $relatedCategory) }}">{{ $relatedCategory->name }}</a>
                     @endforeach

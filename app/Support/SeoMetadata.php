@@ -12,28 +12,28 @@ class SeoMetadata
 {
     public static function homepageTitle(int $page = 1): string
     {
-        $title = 'Solar Flood Lights Kenya | Outdoor Security Lights & Solar Lighting';
+        $title = 'MikroTik Kenya | Routers, Switches & Networking Equipment';
 
         return $page > 1 ? $title.' - Page '.$page : $title;
     }
 
     public static function homepageDescription(): string
     {
-        return 'Shop solar flood lights in Kenya for homes, compounds, farms and businesses. Compare prices, wattage, battery capacity, stock availability and delivery options.';
+        return 'Shop genuine MikroTik routers, switches, access points and networking equipment in Kenya. Compare prices, specifications and availability with fast delivery across Kenya.';
     }
 
     public static function categoryTitle(Category $category, int $page = 1): string
     {
         $categoryName = $category->name;
-        $mappedTitle = SolarFloodLightSeoCatalog::categoryTitles()[Str::slug($category->slug)] ?? null;
+        $mappedTitle = MikrotikSeoCatalog::categoryTitles()[Str::slug($category->slug)] ?? null;
         $categoryTitle = $mappedTitle
             ?: (Str::contains(Str::lower($categoryName), ['kenya', 'price'])
-                ? $categoryName.' | Solar Flood Lights Kenya'
-                : $categoryName.' in Kenya | Solar Flood Lights Kenya');
+                ? $categoryName.' | MikroTik Kenya'
+                : $categoryName.' in Kenya | MikroTik Kenya');
 
         $title = self::columnValue($category, 'seo_title')
-            ?: (SolarFloodLightSeoCatalog::isPriceAuthorityCategory($category)
-                ? SolarFloodLightSeoCatalog::categoryTitles()[SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG]
+            ?: (MikrotikSeoCatalog::isRouterAuthorityCategory($category)
+                ? MikrotikSeoCatalog::categoryTitles()[MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG]
                 : $categoryTitle);
 
         return $page > 1 ? $title.' - Page '.$page : $title;
@@ -45,7 +45,7 @@ class SeoMetadata
             self::columnValue($category, 'meta_description')
                 ?: self::columnValue($category, 'intro')
                 ?: ProductContent::excerpt((string) self::columnValue($category, 'description'), 155)
-                ?: 'Shop '.$category->name.' in Kenya with current prices, stock availability and delivery options.'
+                ?: 'Shop '.$category->name.' in Kenya with current prices, product availability and delivery options.'
         );
     }
 
@@ -58,7 +58,7 @@ class SeoMetadata
         $model = ProductSeo::model($product);
         $typeLabel = ProductSeo::typeLabel($product);
 
-        return Str::limit($model.' Price in Kenya | '.$typeLabel, 78, '');
+        return Str::limit($model.' Price in Kenya | MikroTik '.$typeLabel, 78, '');
     }
 
     public static function productDescription(Product $product): string
@@ -66,7 +66,7 @@ class SeoMetadata
         return self::cleanDescription(
             self::columnValue($product, 'meta_description')
                 ?: ProductContent::excerpt($product->description, 155)
-                ?: 'Buy '.ProductSeo::displayName($product).' in Kenya. View current price, wattage, specifications, availability and delivery options.'
+                ?: 'Buy '.ProductSeo::displayName($product).' in Kenya. View current price, specifications, availability and delivery options.'
         );
     }
 

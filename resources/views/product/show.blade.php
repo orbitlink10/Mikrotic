@@ -125,7 +125,7 @@
             <div class="product-gallery-stage">
                 <img
                     src="{{ $primaryImage }}"
-                    alt="{{ $productDisplayName }}"
+                    alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $productDisplayName }}"
                     class="product-gallery-main-image"
                     data-product-main-image
                     width="900"
@@ -148,7 +148,7 @@
                         >
                             <img
                                 src="{{ $galleryImage }}"
-                                alt="{{ $productDisplayName }} thumbnail {{ $index + 1 }}"
+                                alt="{{ $productBrand === 'MikroTik' ? 'MikroTik ' . $productModel : $productDisplayName }} thumbnail {{ $index + 1 }}"
                                 width="120"
                                 height="90"
                                 loading="lazy"
@@ -272,7 +272,7 @@
 
         @if($chooseAnotherModel)
             <article class="product-info-panel">
-                <h2>When should you choose another solar lighting model?</h2>
+                <h2>When should you choose another MikroTik model?</h2>
                 <p>{{ $chooseAnotherModel }}</p>
             </article>
         @endif
@@ -352,7 +352,7 @@
                     <div class="product-video-frame">
                         <iframe
                             src="{{ $productVideoEmbedUrl }}"
-                            title="{{ $productDisplayName }} video"
+                            title="MikroTik {{ $productModel }} video"
                             loading="lazy"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
@@ -431,7 +431,7 @@
     @if(!empty($comparisonLinks))
         <section class="product-tabs-shell product-link-panel">
             <h2>Useful comparisons</h2>
-            <nav class="category-hub-links" aria-label="Solar lighting product comparisons">
+            <nav class="category-hub-links" aria-label="MikroTik product comparisons">
                 @foreach($comparisonLinks as $comparisonLink)
                     <a href="{{ $comparisonLink['url'] }}">{{ $comparisonLink['label'] }}</a>
                 @endforeach
@@ -441,8 +441,8 @@
 
     @if($relatedCategories->isNotEmpty())
         <section class="product-tabs-shell product-link-panel">
-            <h2>Related solar lighting categories</h2>
-            <nav class="category-hub-links" aria-label="Related solar lighting categories">
+            <h2>Related MikroTik categories</h2>
+            <nav class="category-hub-links" aria-label="Related MikroTik categories">
                 @foreach($relatedCategories as $relatedCategory)
                     <a href="{{ route('category.show', $relatedCategory) }}">{{ $relatedCategory->name }}</a>
                 @endforeach

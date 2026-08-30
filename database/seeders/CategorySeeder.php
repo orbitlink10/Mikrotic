@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Support\SolarFloodLightSeoCatalog;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -13,15 +13,21 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (SolarFloodLightSeoCatalog::primaryCategories() as $slug => $attributes) {
+        $categories = [
+            'Phones & Tablets',
+            'TVs & Audio',
+            'Computing',
+            'Home & Office',
+            'Beauty',
+            'Fashion',
+            'Appliances',
+            'Gaming',
+        ];
+
+        foreach ($categories as $name) {
             Category::updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'name' => $attributes['name'],
-                    'meta_description' => $attributes['meta_description'],
-                    'description' => $attributes['description'],
-                    'parent_id' => null,
-                ]
+                ['slug' => Str::slug($name)],
+                ['name' => $name]
             );
         }
     }

@@ -11,13 +11,18 @@ class ProductSeo
     public static function brand(Product $product): string
     {
         return self::columnValue($product, 'brand')
-            ?: config('app.name', 'Solar Flood Lights Kenya');
+            ?: (Str::contains(Str::lower($product->name.' '.$product->category?->name), 'mikrotik') ? 'MikroTik' : config('app.name', 'Mikrotik Kenya'));
     }
 
     public static function displayName(Product $product): string
     {
         $name = trim(preg_replace('/\s+/u', ' ', $product->name) ?? $product->name);
-        $name = trim(preg_replace('/\s*[-\x{2013}\x{2014}]\s*$/u', '', $name)) ?? $name;
+
+        if (self::brand($product) === 'MikroTik') {
+            $name = preg_replace('/\bmikrotik\b/i', 'MikroTik', $name) ?? $name;
+        }
+
+        $name = trim(preg_replace('/\s*[–—-]\s*$/u', '', $name)) ?? $name;
 
         return $name !== '' ? $name : self::model($product);
     }
@@ -25,27 +30,28 @@ class ProductSeo
     public static function model(Product $product): string
     {
         if ($model = self::columnValue($product, 'model_number')) {
-            return trim(preg_replace('/\s*[-\x{2013}\x{2014}]\s*$/u', '', $model) ?? $model);
+            return trim(preg_replace('/\s*[–—-]\s*$/u', '', $model) ?? $model);
         }
 
         $name = trim(preg_replace('/\s+/u', ' ', $product->name) ?? $product->name);
-        $model = trim(preg_replace('/\s*[-\x{2013}\x{2014}]\s*$/u', '', $name)) ?? $name;
+        $model = preg_replace('/^mikrotik\s+/i', '', $name) ?? $name;
+        $model = trim(preg_replace('/\s*[–—-]\s*$/u', '', $model)) ?? $model;
 
         return trim($model) !== '' ? trim($model) : $product->sku;
     }
 
     public static function typeLabel(Product $product): string
     {
-        return match (SolarFloodLightSeoCatalog::productIntentSlug($product)) {
-            SolarFloodLightSeoCatalog::PRICE_AUTHORITY_SLUG => 'Solar Flood Light',
-            'outdoor-solar-flood-lights' => 'Outdoor Solar Flood Light',
-            'motion-sensor-solar-lights' => 'Motion Sensor Solar Light',
-            'solar-street-lights' => 'Solar Street Light',
-            'solar-security-lights' => 'Solar Security Light',
-            'solar-garden-wall-lights' => 'Solar Garden Light',
-            'solar-panels-batteries' => 'Solar Lighting Power Part',
-            'solar-lighting-accessories' => 'Solar Lighting Accessory',
-            default => 'Solar Lighting',
+        return match (MikrotikSeoCatalog::productIntentSlug($product)) {
+            MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG => 'Router',
+            'mikrotik-switches' => 'Switch',
+            'mikrotik-access-points' => 'Access Point',
+            'mikrotik-wireless' => 'Wireless System',
+            'mikrotik-lte-5g' => 'LTE Router',
+            'mikrotik-sfp-modules' => 'SFP Module',
+            'mikrotik-antennas' => 'Antenna',
+            'routeros' => 'Software',
+            default => 'Networking Equipment',
         };
     }
 
@@ -55,15 +61,16 @@ class ProductSeo
             return $keyUse;
         }
 
-        return match (SolarFloodLightSeoCatalog::productIntentSlug($product)) {
-            'outdoor-solar-flood-lights' => 'Outdoor compound, yard and parking-area lighting',
-            'motion-sensor-solar-lights' => 'Automatic security lighting for gates and walkways',
-            'solar-street-lights' => 'Road, estate, school and public-area lighting',
-            'solar-security-lights' => 'Perimeter, CCTV-zone and commercial security lighting',
-            'solar-garden-wall-lights' => 'Pathway, wall, patio and decorative lighting',
-            'solar-panels-batteries' => 'Replacement power components for solar lighting systems',
-            'solar-lighting-accessories' => 'Mounting, cabling and installation support',
-            default => 'Solar-powered outdoor flood lighting',
+        $intent = MikrotikSeoCatalog::productIntentSlug($product);
+
+        return match ($intent) {
+            'mikrotik-switches' => 'Switching, aggregation and network expansion',
+            'mikrotik-access-points' => 'Managed Wi-Fi coverage for homes and offices',
+            'mikrotik-wireless' => 'Outdoor wireless links and ISP deployments',
+            'mikrotik-lte-5g' => 'LTE/5G internet and backup connectivity',
+            'mikrotik-sfp-modules' => 'Fibre uplinks and high-speed interconnects',
+            'routeros' => 'RouterOS routing, firewall and network management',
+            default => 'Routing for homes, offices, ISPs and branch networks',
         };
     }
 
@@ -76,7 +83,7 @@ class ProductSeo
             'Model' => self::model($product),
             'Brand' => self::brand($product),
             'SKU' => $product->sku,
-            'Category' => $product->category?->name ?? 'Solar lighting products',
+            'Category' => $product->category?->name ?? 'MikroTik products',
             'Current price' => 'KSh '.number_format((float) $product->price, 2),
             'Availability' => $product->stock > 0 ? 'In stock' : 'Out of stock',
         ];
@@ -103,15 +110,12 @@ class ProductSeo
             return $custom;
         }
 
-        return match (SolarFloodLightSeoCatalog::productIntentSlug($product)) {
-            'outdoor-solar-flood-lights' => ['Home compounds and yards', 'Parking areas and shop fronts', 'Farm sheds and perimeter spaces'],
-            'motion-sensor-solar-lights' => ['Gate and doorway security', 'Walkways and stair areas', 'Energy-saving night lighting'],
-            'solar-street-lights' => ['Estate roads and driveways', 'Schools, churches and public spaces', 'Parking yards and access roads'],
-            'solar-security-lights' => ['Perimeter walls', 'CCTV blind spots', 'Commercial yards and loading areas'],
-            'solar-garden-wall-lights' => ['Gardens and patios', 'Wall-mounted accent lighting', 'Pathway and balcony lighting'],
-            'solar-panels-batteries' => ['Battery replacement', 'Panel replacement', 'Solar lighting maintenance'],
-            'solar-lighting-accessories' => ['Pole mounting', 'Bracket replacement', 'Cleaner installation runs'],
-            default => ['Compound lighting', 'Outdoor security lighting', 'Off-grid lighting where grid power is unreliable'],
+        return match (MikrotikSeoCatalog::productIntentSlug($product)) {
+            'mikrotik-switches' => ['Office LAN expansion', 'Rack or cabinet switching', 'ISP or branch network aggregation'],
+            'mikrotik-access-points' => ['Indoor Wi-Fi coverage', 'Small office wireless networks', 'Managed RouterOS wireless deployments'],
+            'mikrotik-wireless' => ['Point-to-point wireless links', 'Outdoor broadband distribution', 'Remote site connectivity'],
+            'mikrotik-lte-5g' => ['Backup internet links', 'Remote offices and field sites', 'Mobile broadband where fibre is unavailable'],
+            default => ['Home and small office routing', 'Business internet edge routing', 'ISP customer or branch deployments'],
         };
     }
 
@@ -126,25 +130,25 @@ class ProductSeo
     public static function compatibility(Product $product): string
     {
         return self::columnValue($product, 'compatibility')
-            ?: 'Suitable for outdoor solar lighting installations when the mounting height, panel exposure, battery capacity and weather rating match the site conditions.';
+            ?: 'Works with compatible MikroTik RouterOS networks and standard Ethernet networking equipment. Confirm port, power and mounting requirements before purchase.';
     }
 
     public static function powerRequirements(Product $product): string
     {
         return self::columnValue($product, 'power_requirements')
-            ?: 'Confirm solar panel wattage, battery capacity, charging time and expected lighting hours before purchase, especially for security or commercial lighting.';
+            ?: 'Check the product label or manufacturer datasheet for exact input voltage, PoE support and power adapter requirements.';
     }
 
     public static function warrantyInfo(Product $product): string
     {
         return self::columnValue($product, 'warranty_info')
-            ?: 'Warranty terms depend on the seller, battery type and product condition. Confirm warranty coverage before checkout or quotation approval.';
+            ?: 'Warranty terms depend on the seller and product condition. Confirm warranty coverage before checkout or quotation approval.';
     }
 
     public static function deliveryInfo(Product $product): string
     {
         return self::columnValue($product, 'delivery_info')
-            ?: 'Delivery options and timelines are confirmed during checkout or direct enquiry based on stock location, order size and destination in Kenya.';
+            ?: 'Delivery options and timelines are confirmed during checkout or direct enquiry based on stock location and destination.';
     }
 
     public static function paymentInfo(Product $product): string
@@ -164,7 +168,7 @@ class ProductSeo
     public static function whatsInBox(Product $product): array
     {
         return self::linesFromColumn($product, 'whats_in_box')
-            ?: [self::displayName($product).' unit', 'Included solar panel, battery, remote or mounting accessories as supplied by the seller package'];
+            ?: ['MikroTik '.self::displayName($product).' unit', 'Included accessories as supplied by the seller or manufacturer package'];
     }
 
     /**
@@ -188,7 +192,7 @@ class ProductSeo
             ],
             [
                 'question' => 'What is the current price of '.$displayName.'?',
-                'answer' => 'The current listed price is KSh '.number_format((float) $product->price, 2).'. Prices come from the product catalogue and may change when inventory is updated.',
+                'answer' => 'The current listed price is KSh '.number_format((float) $product->price, 2).'. Prices are generated from the product catalogue and may change when inventory is updated.',
             ],
         ];
     }
@@ -199,10 +203,10 @@ class ProductSeo
     public static function comparisonLinks(Product $product): array
     {
         $pairs = [
-            ['100w', '200w', '100W vs 200W Solar Flood Lights'],
-            ['200w', '300w', '200W vs 300W Solar Flood Lights'],
-            ['motion-sensor', '100w', 'Motion Sensor vs Standard Solar Lights'],
-            ['all-in-one', 'split', 'All-in-One vs Split Solar Lights'],
+            ['rb760igs', 'rb750gr3', 'RB760iGS vs RB750Gr3'],
+            ['rb4011', 'rb5009', 'RB4011 vs RB5009'],
+            ['l009uigs-rm', 'l009uigs-2haxd-in', 'L009UiGS-RM vs L009UiGS-2HaxD-IN'],
+            ['ccr2004', 'ccr2116', 'CCR2004 vs CCR2116'],
         ];
 
         $haystack = Str::lower($product->name.' '.$product->slug.' '.$product->sku);
