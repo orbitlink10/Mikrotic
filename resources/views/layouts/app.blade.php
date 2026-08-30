@@ -29,19 +29,9 @@
         $headerWhatsAppHref = $headerWhatsAppDigits !== '' ? 'https://wa.me/'.$headerWhatsAppDigits : null;
         $websiteSchema = \App\Support\StructuredData::website();
         $primaryNavItems = $homepageBrandContent->navMenuItems();
-
-        if ($primaryNavItems === [] && \Illuminate\Support\Facades\Schema::hasTable('pages')) {
-            $primaryNavItems = \App\Models\Page::query()
-                ->orderByDesc('created_at')
-                ->orderByDesc('id')
-                ->limit(8)
-                ->get()
-                ->map(fn (\App\Models\Page $page): array => [
-                    'label' => $page->title,
-                    'url' => route('pages.show', ['page' => $page->slug]),
-                ])
-                ->all();
-        }
+        $menuCategories = \Illuminate\Support\Facades\Schema::hasTable('categories')
+            ? \App\Models\Category::query()->whereNull('parent_id')->with('children')->orderBy('name')->get()
+            : collect();
     @endphp
     <title>{!! $pageTitle !!}</title>
     <meta name="description" content="{!! $pageDescription !!}">
@@ -110,14 +100,15 @@
         </div>
     </div>
 
-    <nav class="primary-nav" aria-label="Main navigation">
-        <div class="primary-nav-inner">
-            <a class="primary-nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">Home</a>
-            @foreach($primaryNavItems as $navItem)
-                <a class="primary-nav-link" href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a>
-            @endforeach
-        </div>
-    </nav>
+    @if($primaryNavItems !== [])
+        <nav class="primary-nav" aria-label="Main navigation">
+            <div class="primary-nav-inner">
+                @foreach($primaryNavItems as $navItem)
+                    <a class="primary-nav-link" href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a>
+                @endforeach
+            </div>
+        </nav>
+    @endif
 </header>
 
 <div class="mobile-menu-backdrop" data-menu-backdrop hidden></div>
@@ -131,6 +122,25 @@
         @foreach($primaryNavItems as $navItem)
             <li><a class="mobile-menu-link" href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a></li>
         @endforeach
+        @foreach($menuCategories as $menuCategory)
+            @if($menuCategory->children->isNotEmpty())
+                <li class="mobile-menu-accordion">
+                    <button type="button" class="mobile-menu-link mobile-menu-accordion-toggle" aria-expanded="false" aria-controls="mobile-submenu-{{ $menuCategory->id }}">
+                        <span>{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</span>
+                        <span class="mobile-menu-chevron" aria-hidden="true"></span>
+                    </button>
+                    <ul id="mobile-submenu-{{ $menuCategory->id }}" class="mobile-menu-submenu" hidden>
+                        <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuCategory) }}">All {{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+                        @foreach($menuCategory->children as $menuChildCategory)
+                            <li><a class="mobile-menu-sublink" href="{{ route('category.show', $menuChildCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuChildCategory) }}</a></li>
+                        @endforeach
+                    </ul>
+                </li>
+            @else
+                <li><a class="mobile-menu-link" href="{{ route('category.show', $menuCategory) }}">{{ \App\Support\MikrotikSeoCatalog::navLabel($menuCategory) }}</a></li>
+            @endif
+        @endforeach
+        <li><a class="mobile-menu-link" href="{{ route('pages.show', ['page' => 'contact-us']) }}">Contact Us</a></li>
         @auth
             @if(auth()->user()->role === 'admin')
                 <li><a class="mobile-menu-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>

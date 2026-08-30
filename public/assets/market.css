@@ -56,9 +56,11 @@ a {
     margin: 0 auto;
     padding: 0 16px 14px;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
 }
 
 .primary-nav-link {
@@ -73,6 +75,8 @@ a {
     font-size: 14px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
+    flex: 0 0 auto;
 }
 
 .primary-nav-link:hover,

@@ -12,7 +12,7 @@ class StorefrontNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_homepage_navigation_falls_back_to_latest_pages_first(): void
+    public function test_homepage_navigation_does_not_auto_render_latest_pages(): void
     {
         $olderPage = $this->createPage('Older Navigation Article', 'older-navigation-article');
         $olderPage->forceFill([
@@ -29,14 +29,12 @@ class StorefrontNavigationTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('class="primary-nav"', false);
-        $response->assertSeeInOrder([
-            'Newest Navigation Article',
-            'Older Navigation Article',
-        ]);
+        $response->assertDontSee('class="primary-nav"', false);
+        $response->assertDontSee('Newest Navigation Article');
+        $response->assertDontSee('Older Navigation Article');
     }
 
-    public function test_homepage_content_menu_overrides_latest_page_fallback(): void
+    public function test_homepage_content_menu_renders_dashboard_controlled_navbar(): void
     {
         $this->createPage('Fallback Navigation Article', 'fallback-navigation-article');
 
@@ -53,6 +51,7 @@ class StorefrontNavigationTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
+        $response->assertSee('class="primary-nav"', false);
         $response->assertSee('Support Desk');
         $response->assertSee('/category/mikrotik-router-prices-in-kenya', false);
         $response->assertDontSee('Fallback Navigation Article');
@@ -86,6 +85,34 @@ class StorefrontNavigationTest extends TestCase
             ['label' => 'Routers', 'url' => '/category/mikrotik-router-prices-in-kenya'],
             ['label' => 'Contact', 'url' => '/contact-us'],
         ], $homepageContent->navMenuItems());
+    }
+
+    public function test_admin_pages_index_lists_recently_published_pages_first(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $olderPage = $this->createPage('Older Admin Page', 'older-admin-page');
+        $olderPage->forceFill([
+            'created_at' => now()->subDays(2),
+            'updated_at' => now()->subDays(2),
+        ])->save();
+
+        $newerPage = $this->createPage('Newest Admin Page', 'newest-admin-page');
+        $newerPage->forceFill([
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
+        ])->save();
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.index'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Newest Admin Page',
+                'Older Admin Page',
+            ]);
     }
 
     private function createPage(string $title, string $slug): Page
