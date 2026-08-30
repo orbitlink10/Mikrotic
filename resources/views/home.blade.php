@@ -182,26 +182,6 @@ SVG,
                 </div>
             </div>
 
-            @if($featuredCategories->isNotEmpty())
-                <section class="home-category-section" aria-label="Shop by category">
-                    <h2>Shop by Category</h2>
-                    <div class="home-category-grid">
-                        @foreach($featuredCategories as $featuredCategory)
-                            @php
-                                $featuredCategoryIsRouterPage = \App\Support\MikrotikSeoCatalog::isRouterAuthorityCategory($featuredCategory);
-                                $featuredCategoryHref = $featuredCategoryIsRouterPage
-                                    ? route('category.show', ['category' => \App\Support\MikrotikSeoCatalog::ROUTER_AUTHORITY_SLUG])
-                                    : route('category.show', $featuredCategory);
-                                $featuredCategoryName = \App\Support\MikrotikSeoCatalog::navLabel($featuredCategory);
-                            @endphp
-                            <a class="home-category-card" href="{{ $featuredCategoryHref }}">
-                                <span class="home-category-card-name">{{ $featuredCategoryName }}</span>
-                                <span class="home-category-card-cta" aria-hidden="true">Shop now &rarr;</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
         @endif
 
         @if($usedCategoryFallback)

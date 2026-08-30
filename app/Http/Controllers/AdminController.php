@@ -630,7 +630,7 @@ class AdminController extends Controller
 
         return view('admin.pages_index', [
             'pages' => $pagesStorageReady
-                ? Page::query()->latest()->paginate(20)
+                ? Page::query()->orderByDesc('created_at')->orderByDesc('id')->paginate(20)
                 : new LengthAwarePaginator([], 0, 20),
             'pagesStorageReady' => $pagesStorageReady,
         ]);
@@ -703,6 +703,9 @@ class AdminController extends Controller
             'contact_phone' => ['nullable', 'string', 'max:40'],
             'contact_whatsapp' => ['nullable', 'string', 'max:40'],
             'contact_email' => ['nullable', 'email', 'max:190'],
+            'nav_menu_items' => ['nullable', 'array'],
+            'nav_menu_items.*.label' => ['nullable', 'string', 'max:80'],
+            'nav_menu_items.*.url' => ['nullable', 'string', 'max:255'],
             'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'why_choose_title' => ['nullable', 'string', 'max:180'],
@@ -742,6 +745,9 @@ class AdminController extends Controller
         $homepageContent->contact_email = $request->has('contact_email')
             ? $this->normalizeHomepageText($data['contact_email'] ?? null, 190)
             : $baseline->contactEmail();
+        $homepageContent->nav_menu_items = $request->has('nav_menu_items')
+            ? HomepageContent::normalizeNavMenuItems($data['nav_menu_items'] ?? null)
+            : $baseline->navMenuItems();
         $homepageContent->why_choose_title = $request->has('why_choose_title')
             ? $this->normalizeHomepageText($data['why_choose_title'] ?? null, 180)
             : $baseline->whyChooseTitle();

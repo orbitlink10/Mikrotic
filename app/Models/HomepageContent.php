@@ -38,6 +38,7 @@ class HomepageContent extends Model
         'content_intro',
         'content_body',
         'featured_product_ids',
+        'nav_menu_items',
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class HomepageContent extends Model
         'testimonial_items' => 'array',
         'faq_items' => 'array',
         'featured_product_ids' => 'array',
+        'nav_menu_items' => 'array',
     ];
 
     public static function current(): self
@@ -90,6 +92,7 @@ class HomepageContent extends Model
             'content_intro',
             'content_body',
             'featured_product_ids',
+            'nav_menu_items',
         ] as $column) {
             if (! Schema::hasColumn($table, $column)) {
                 return false;
@@ -123,6 +126,7 @@ class HomepageContent extends Model
             'content_title' => 'MikroTik Kenya: RouterOS Hardware for Homes, Offices and ISPs',
             'content_intro' => 'Explore MikroTik products for routing, switching, wireless access, LTE backup and network management.',
             'content_body' => self::defaultContentBody(),
+            'nav_menu_items' => [],
         ]);
     }
 
@@ -299,6 +303,81 @@ class HomepageContent extends Model
             array_map('intval', $this->featured_product_ids),
             fn (int $id): bool => $id > 0
         )));
+    }
+
+    /**
+     * @return array<int, array{label: string, url: string}>
+     */
+    public function navMenuItems(): array
+    {
+        return self::normalizeNavMenuItems($this->nav_menu_items);
+    }
+
+    /**
+     * @return array<int, array{label: string, url: string}>
+     */
+    public static function normalizeNavMenuItems(mixed $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $label = Str::limit(static::plainText($item['label'] ?? ''), 80, '');
+            $url = static::cleanMenuUrl($item['url'] ?? '');
+
+            if ($label === '' || $url === null) {
+                continue;
+            }
+
+            $normalized[] = [
+                'label' => $label,
+                'url' => $url,
+            ];
+
+            if (count($normalized) >= 8) {
+                break;
+            }
+        }
+
+        return $normalized;
+    }
+
+    private static function cleanMenuUrl(mixed $value): ?string
+    {
+        $url = trim((string) $value);
+
+        if ($url === '') {
+            return null;
+        }
+
+        if (str_starts_with($url, '#')) {
+            return Str::limit($url, 255, '');
+        }
+
+        if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
+            return Str::limit($url, 255, '');
+        }
+
+        if (! preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) && ! preg_match('/\s/', $url)) {
+            return '/'.ltrim(Str::limit($url, 254, ''), '/');
+        }
+
+        if (filter_var($url, FILTER_VALIDATE_URL)) {
+            $scheme = parse_url($url, PHP_URL_SCHEME);
+
+            if (in_array($scheme, ['http', 'https'], true)) {
+                return Str::limit($url, 255, '');
+            }
+        }
+
+        return null;
     }
 
     private function fallbackText(mixed $value, string $default): string

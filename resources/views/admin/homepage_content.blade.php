@@ -67,6 +67,21 @@
         ->map(fn ($id) => (int) $id)
         ->filter(fn ($id) => $id > 0)
         ->all();
+    $navMenuItems = collect(old('nav_menu_items', $homepageContent->navMenuItems()))
+        ->map(fn ($item) => is_array($item) ? [
+            'label' => $item['label'] ?? '',
+            'url' => $item['url'] ?? '',
+        ] : [
+            'label' => '',
+            'url' => '',
+        ])
+        ->take(8)
+        ->values()
+        ->all();
+
+    while (count($navMenuItems) < 8) {
+        $navMenuItems[] = ['label' => '', 'url' => ''];
+    }
 @endphp
 
 @section('content')
@@ -262,6 +277,47 @@
                                 @disabled(! $homepageContentStorageReady)
                             >
                         </div>
+                    </div>
+                </section>
+
+                <section class="admin-settings-group">
+                    <div class="admin-settings-group-head">
+                        <h2 class="admin-settings-group-title">Navigation Menu</h2>
+                        <p class="admin-settings-help">Menu links shown in the website navigation bar. Leave all rows blank to show the latest published pages automatically.</p>
+                    </div>
+
+                    <div class="admin-settings-card-grid admin-settings-card-grid--two">
+                        @foreach($navMenuItems as $index => $item)
+                            <div class="admin-settings-repeater-card">
+                                <h3 class="admin-settings-repeater-title">Menu {{ $index + 1 }}</h3>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="nav_menu_items_{{ $index }}_label">Menu Label</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="nav_menu_items_{{ $index }}_label"
+                                        type="text"
+                                        name="nav_menu_items[{{ $index }}][label]"
+                                        value="{{ $item['label'] ?? '' }}"
+                                        placeholder="Routers"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+
+                                <div class="admin-settings-field">
+                                    <label class="admin-settings-label" for="nav_menu_items_{{ $index }}_url">Menu URL</label>
+                                    <input
+                                        class="admin-settings-input"
+                                        id="nav_menu_items_{{ $index }}_url"
+                                        type="text"
+                                        name="nav_menu_items[{{ $index }}][url]"
+                                        value="{{ $item['url'] ?? '' }}"
+                                        placeholder="/category/mikrotik-router-prices-in-kenya"
+                                        @disabled(! $homepageContentStorageReady)
+                                    >
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </section>
 
