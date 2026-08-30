@@ -729,11 +729,18 @@ class AdminProductManagementTest extends TestCase
         $response->assertSee('Header Contact Details');
         $response->assertSee('Phone Number');
         $response->assertSee('WhatsApp Number');
+        $response->assertSee('Navigation Menu');
+        $response->assertSee('Save Navigation Menu');
+        $response->assertSee('Save Hero Section');
+        $response->assertSee('Save Contact Details');
         $response->assertSee('Why Choose Section');
+        $response->assertSee('Save Why Choose Section');
         $response->assertDontSee('Testimonials Section');
         $response->assertSee('FAQ Section');
+        $response->assertSee('Save FAQ Section');
         $response->assertSee('Homepage Guide Content');
         $response->assertSee('Home Page Content');
+        $response->assertSee('Save Homepage Guide');
         $response->assertSee('Only the content written in this editor is shown on the homepage guide section.');
         $response->assertSee('Format');
     }

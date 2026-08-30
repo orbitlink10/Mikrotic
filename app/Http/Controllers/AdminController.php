@@ -697,97 +697,135 @@ class AdminController extends Controller
                 ->with('error', 'Homepage content storage is not ready yet. Run php artisan migrate to create the homepage_contents table.');
         }
 
-        $data = $request->validate([
-            'hero_title' => ['required', 'string', 'min:4', 'max:180'],
-            'hero_description' => ['required', 'string', 'min:12', 'max:500'],
-            'contact_phone' => ['nullable', 'string', 'max:40'],
-            'contact_whatsapp' => ['nullable', 'string', 'max:40'],
-            'contact_email' => ['nullable', 'email', 'max:190'],
-            'nav_menu_items' => ['nullable', 'array'],
-            'nav_menu_items.*.label' => ['nullable', 'string', 'max:80'],
-            'nav_menu_items.*.url' => ['nullable', 'string', 'max:255'],
-            'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'why_choose_title' => ['nullable', 'string', 'max:180'],
-            'why_choose_intro' => ['nullable', 'string', 'max:500'],
-            'why_choose_items' => ['nullable', 'array'],
-            'why_choose_items.*.title' => ['nullable', 'string', 'max:180'],
-            'why_choose_items.*.description' => ['nullable', 'string', 'max:255'],
-            'testimonials_badge' => ['nullable', 'string', 'max:120'],
-            'testimonials_title' => ['nullable', 'string', 'max:180'],
-            'testimonials_intro' => ['nullable', 'string', 'max:500'],
-            'testimonial_items' => ['nullable', 'array'],
-            'testimonial_items.*.quote' => ['nullable', 'string', 'max:1200'],
-            'testimonial_items.*.name' => ['nullable', 'string', 'max:180'],
-            'testimonial_items.*.role' => ['nullable', 'string', 'max:180'],
-            'faq_badge' => ['nullable', 'string', 'max:120'],
-            'faq_title' => ['nullable', 'string', 'max:180'],
-            'faq_intro' => ['nullable', 'string', 'max:500'],
-            'faq_items' => ['nullable', 'array'],
-            'faq_items.*.question' => ['nullable', 'string', 'max:220'],
-            'faq_items.*.answer' => ['nullable', 'string', 'max:1200'],
-            'content_body' => ['nullable', 'string'],
-        ]);
+        $requestedSection = (string) $request->input('section', 'all');
+        $allowedSections = ['all', 'hero', 'contact', 'navigation', 'why_choose', 'faq', 'guide'];
+        $section = in_array($requestedSection, $allowedSections, true) ? $requestedSection : 'all';
+        $rulesBySection = [
+            'hero' => [
+                'hero_title' => ['required', 'string', 'min:4', 'max:180'],
+                'hero_description' => ['required', 'string', 'min:12', 'max:500'],
+                'site_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'hero_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            ],
+            'contact' => [
+                'contact_phone' => ['nullable', 'string', 'max:40'],
+                'contact_whatsapp' => ['nullable', 'string', 'max:40'],
+                'contact_email' => ['nullable', 'email', 'max:190'],
+            ],
+            'navigation' => [
+                'nav_menu_items' => ['nullable', 'array'],
+                'nav_menu_items.*.label' => ['nullable', 'string', 'max:80'],
+                'nav_menu_items.*.url' => ['nullable', 'string', 'max:255'],
+            ],
+            'why_choose' => [
+                'why_choose_title' => ['nullable', 'string', 'max:180'],
+                'why_choose_intro' => ['nullable', 'string', 'max:500'],
+                'why_choose_items' => ['nullable', 'array'],
+                'why_choose_items.*.title' => ['nullable', 'string', 'max:180'],
+                'why_choose_items.*.description' => ['nullable', 'string', 'max:255'],
+            ],
+            'faq' => [
+                'faq_badge' => ['nullable', 'string', 'max:120'],
+                'faq_title' => ['nullable', 'string', 'max:180'],
+                'faq_intro' => ['nullable', 'string', 'max:500'],
+                'faq_items' => ['nullable', 'array'],
+                'faq_items.*.question' => ['nullable', 'string', 'max:220'],
+                'faq_items.*.answer' => ['nullable', 'string', 'max:1200'],
+            ],
+            'guide' => [
+                'content_body' => ['nullable', 'string'],
+            ],
+        ];
+        $rulesBySection['all'] = array_merge(
+            $rulesBySection['hero'],
+            $rulesBySection['contact'],
+            $rulesBySection['navigation'],
+            $rulesBySection['why_choose'],
+            [
+                'testimonials_badge' => ['nullable', 'string', 'max:120'],
+                'testimonials_title' => ['nullable', 'string', 'max:180'],
+                'testimonials_intro' => ['nullable', 'string', 'max:500'],
+                'testimonial_items' => ['nullable', 'array'],
+                'testimonial_items.*.quote' => ['nullable', 'string', 'max:1200'],
+                'testimonial_items.*.name' => ['nullable', 'string', 'max:180'],
+                'testimonial_items.*.role' => ['nullable', 'string', 'max:180'],
+            ],
+            $rulesBySection['faq'],
+            $rulesBySection['guide'],
+        );
+
+        $data = $request->validate(array_merge([
+            'section' => ['nullable', Rule::in($allowedSections)],
+        ], $rulesBySection[$section]));
 
         $homepageContent = HomepageContent::query()->firstOrNew([
             'site_key' => HomepageContent::DEFAULT_SITE_KEY,
         ]);
         $baseline = $homepageContent->exists ? $homepageContent : HomepageContent::current();
 
-        $homepageContent->hero_title = $data['hero_title'];
-        $homepageContent->hero_description = $data['hero_description'];
-        $homepageContent->contact_phone = $request->has('contact_phone')
+        $updatesAll = $section === 'all';
+        $updatesSection = fn (string $name): bool => $updatesAll || $section === $name;
+
+        if ($updatesSection('hero')) {
+            $homepageContent->hero_title = $data['hero_title'];
+            $homepageContent->hero_description = $data['hero_description'];
+        } else {
+            $homepageContent->hero_title = $homepageContent->hero_title ?: $baseline->hero_title;
+            $homepageContent->hero_description = $homepageContent->hero_description ?: $baseline->hero_description;
+        }
+
+        $homepageContent->contact_phone = $updatesSection('contact') && $request->has('contact_phone')
             ? $this->normalizeHomepageText($data['contact_phone'] ?? null, 40)
             : $baseline->contactPhone();
-        $homepageContent->contact_whatsapp = $request->has('contact_whatsapp')
+        $homepageContent->contact_whatsapp = $updatesSection('contact') && $request->has('contact_whatsapp')
             ? $this->normalizeHomepageText($data['contact_whatsapp'] ?? null, 40)
             : $baseline->contactWhatsApp();
-        $homepageContent->contact_email = $request->has('contact_email')
+        $homepageContent->contact_email = $updatesSection('contact') && $request->has('contact_email')
             ? $this->normalizeHomepageText($data['contact_email'] ?? null, 190)
             : $baseline->contactEmail();
-        $homepageContent->nav_menu_items = $request->has('nav_menu_items')
+        $homepageContent->nav_menu_items = $updatesSection('navigation') && $request->has('nav_menu_items')
             ? HomepageContent::normalizeNavMenuItems($data['nav_menu_items'] ?? null)
             : $baseline->navMenuItems();
-        $homepageContent->why_choose_title = $request->has('why_choose_title')
+        $homepageContent->why_choose_title = $updatesSection('why_choose') && $request->has('why_choose_title')
             ? $this->normalizeHomepageText($data['why_choose_title'] ?? null, 180)
             : $baseline->whyChooseTitle();
-        $homepageContent->why_choose_intro = $request->has('why_choose_intro')
+        $homepageContent->why_choose_intro = $updatesSection('why_choose') && $request->has('why_choose_intro')
             ? $this->normalizeHomepageText($data['why_choose_intro'] ?? null, 500)
             : $baseline->whyChooseIntro();
-        $homepageContent->why_choose_items = $request->has('why_choose_items')
+        $homepageContent->why_choose_items = $updatesSection('why_choose') && $request->has('why_choose_items')
             ? ($this->normalizeHomepageItems($data['why_choose_items'] ?? null, ['title', 'description'], ['title' => 180, 'description' => 255]) ?: $baseline->whyChooseItems())
             : $baseline->whyChooseItems();
-        $homepageContent->testimonials_badge = $request->has('testimonials_badge')
+        $homepageContent->testimonials_badge = $updatesAll && $request->has('testimonials_badge')
             ? $this->normalizeHomepageText($data['testimonials_badge'] ?? null, 120)
             : $baseline->testimonialsBadge();
-        $homepageContent->testimonials_title = $request->has('testimonials_title')
+        $homepageContent->testimonials_title = $updatesAll && $request->has('testimonials_title')
             ? $this->normalizeHomepageText($data['testimonials_title'] ?? null, 180)
             : $baseline->testimonialsTitle();
-        $homepageContent->testimonials_intro = $request->has('testimonials_intro')
+        $homepageContent->testimonials_intro = $updatesAll && $request->has('testimonials_intro')
             ? $this->normalizeHomepageText($data['testimonials_intro'] ?? null, 500)
             : $baseline->testimonialsIntro();
-        $homepageContent->testimonial_items = $request->has('testimonial_items')
+        $homepageContent->testimonial_items = $updatesAll && $request->has('testimonial_items')
             ? ($this->normalizeHomepageItems($data['testimonial_items'] ?? null, ['quote', 'name', 'role'], ['quote' => 1200, 'name' => 180, 'role' => 180]) ?: $baseline->testimonialItems())
             : $baseline->testimonialItems();
-        $homepageContent->faq_badge = $request->has('faq_badge')
+        $homepageContent->faq_badge = $updatesSection('faq') && $request->has('faq_badge')
             ? $this->normalizeHomepageText($data['faq_badge'] ?? null, 120)
             : $baseline->faqBadge();
-        $homepageContent->faq_title = $request->has('faq_title')
+        $homepageContent->faq_title = $updatesSection('faq') && $request->has('faq_title')
             ? $this->normalizeHomepageText($data['faq_title'] ?? null, 180)
             : $baseline->faqTitle();
-        $homepageContent->faq_intro = $request->has('faq_intro')
+        $homepageContent->faq_intro = $updatesSection('faq') && $request->has('faq_intro')
             ? $this->normalizeHomepageText($data['faq_intro'] ?? null, 500)
             : $baseline->faqIntro();
-        $homepageContent->faq_items = $request->has('faq_items')
+        $homepageContent->faq_items = $updatesSection('faq') && $request->has('faq_items')
             ? ($this->normalizeHomepageItems($data['faq_items'] ?? null, ['question', 'answer'], ['question' => 220, 'answer' => 1200]) ?: $baseline->faqItems())
             : $baseline->faqItems();
         $normalizedContentBody = ProductContent::sanitizeRichText($data['content_body'] ?? null);
-        $homepageContent->content_body = $request->has('content_body')
+        $homepageContent->content_body = $updatesSection('guide') && $request->has('content_body')
             ? ($normalizedContentBody !== '' ? $normalizedContentBody : $baseline->contentBody())
             : $baseline->contentBody();
         $homepageContent->featured_product_ids = $baseline->featuredProductIds();
 
-        if ($request->hasFile('site_logo')) {
+        if ($updatesSection('hero') && $request->hasFile('site_logo')) {
             $directory = public_path('uploads/homepage-content');
             File::ensureDirectoryExists($directory);
 
@@ -802,7 +840,7 @@ class AdminController extends Controller
             $homepageContent->site_logo_path = 'uploads/homepage-content/'.$filename;
         }
 
-        if ($request->hasFile('hero_image')) {
+        if ($updatesSection('hero') && $request->hasFile('hero_image')) {
             $directory = public_path('uploads/homepage-content');
             File::ensureDirectoryExists($directory);
 
@@ -819,7 +857,18 @@ class AdminController extends Controller
 
         $homepageContent->save();
 
-        return redirect()->route('admin.pages-content.edit')->with('success', 'Homepage content updated successfully.');
+        $messages = [
+            'hero' => 'Hero section updated successfully.',
+            'contact' => 'Header contact details updated successfully.',
+            'navigation' => 'Navigation menu updated successfully.',
+            'why_choose' => 'Why Choose section updated successfully.',
+            'faq' => 'FAQ section updated successfully.',
+            'guide' => 'Homepage guide content updated successfully.',
+        ];
+
+        return redirect()
+            ->route('admin.pages-content.edit')
+            ->with('success', $messages[$section] ?? 'Homepage content updated successfully.');
     }
 
     public function updateFeaturedProducts(Request $request): RedirectResponse

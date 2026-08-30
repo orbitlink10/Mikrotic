@@ -63,11 +63,11 @@ class StorefrontNavigationTest extends TestCase
             'role' => 'admin',
             'status' => 'active',
         ]);
+        $defaultHeroTitle = HomepageContent::current()->hero_title;
 
         $this->actingAs($admin)
             ->post(route('admin.pages-content.update'), [
-                'hero_title' => 'MikroTik Kenya',
-                'hero_description' => 'Networking equipment for Kenya.',
+                'section' => 'navigation',
                 'nav_menu_items' => [
                     ['label' => 'Routers', 'url' => 'category/mikrotik-router-prices-in-kenya'],
                     ['label' => 'Contact', 'url' => '/contact-us'],
@@ -81,6 +81,7 @@ class StorefrontNavigationTest extends TestCase
             ->where('site_key', HomepageContent::DEFAULT_SITE_KEY)
             ->firstOrFail();
 
+        $this->assertSame($defaultHeroTitle, $homepageContent->hero_title);
         $this->assertSame([
             ['label' => 'Routers', 'url' => '/category/mikrotik-router-prices-in-kenya'],
             ['label' => 'Contact', 'url' => '/contact-us'],

@@ -93,6 +93,20 @@
             </nav>
 
             <nav class="top-account-links" aria-label="Account">
+                @auth
+                    @if(auth()->user()->role === 'admin')
+                        <a class="account-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
+                    @elseif(auth()->user()->role === 'vendor')
+                        <a class="account-link" href="{{ route('vendor.dashboard') }}">Vendor Dashboard</a>
+                    @endif
+                    <form class="account-form" action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button type="submit" class="account-link account-link--button account-link--logout">Logout</button>
+                    </form>
+                @else
+                    <a class="account-link" href="{{ route('login') }}">Login</a>
+                    <a class="account-link" href="{{ route('register') }}">Register</a>
+                @endauth
                 <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation menu">
                     <span class="menu-toggle-icon" aria-hidden="true"></span>
                 </button>

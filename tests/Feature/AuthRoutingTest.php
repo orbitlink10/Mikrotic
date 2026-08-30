@@ -77,4 +77,28 @@ class AuthRoutingTest extends TestCase
 
         $this->assertAuthenticated();
     }
+
+    public function test_admin_can_return_from_public_homepage_or_logout_to_login_again(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $homeResponse = $this->actingAs($admin)->get('/');
+
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('Admin Dashboard');
+        $homeResponse->assertSee('Logout');
+        $homeResponse->assertDontSee('Login');
+
+        $this->post(route('logout'))
+            ->assertRedirect(route('home'));
+
+        $this->assertGuest();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Login');
+    }
 }

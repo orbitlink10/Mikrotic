@@ -163,6 +163,7 @@
 
             <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="section" value="hero">
 
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
@@ -234,6 +235,15 @@
                     </div>
                 </section>
 
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Hero Section</button>
+                </div>
+            </form>
+
+            <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}">
+                @csrf
+                <input type="hidden" name="section" value="contact">
+
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Header Contact Details</h2>
@@ -280,10 +290,19 @@
                     </div>
                 </section>
 
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Contact Details</button>
+                </div>
+            </form>
+
+            <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}">
+                @csrf
+                <input type="hidden" name="section" value="navigation">
+
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Navigation Menu</h2>
-                        <p class="admin-settings-help">Menu links shown in the website navigation bar. Leave all rows blank to show the latest published pages automatically.</p>
+                        <p class="admin-settings-help">Menu links shown in the website navigation bar. Leave all rows blank to keep the previous homepage header layout without a menu bar.</p>
                     </div>
 
                     <div class="admin-settings-card-grid admin-settings-card-grid--two">
@@ -320,6 +339,15 @@
                         @endforeach
                     </div>
                 </section>
+
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Navigation Menu</button>
+                </div>
+            </form>
+
+            <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}">
+                @csrf
+                <input type="hidden" name="section" value="why_choose">
 
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
@@ -381,6 +409,15 @@
                         @endforeach
                     </div>
                 </section>
+
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Why Choose Section</button>
+                </div>
+            </form>
+
+            <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}">
+                @csrf
+                <input type="hidden" name="section" value="faq">
 
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
@@ -457,6 +494,15 @@
                     </div>
                 </section>
 
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save FAQ Section</button>
+                </div>
+            </form>
+
+            <form class="admin-settings-form" method="post" action="{{ route('admin.pages-content.update') }}">
+                @csrf
+                <input type="hidden" name="section" value="guide">
+
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">Homepage Guide Content</h2>
@@ -475,8 +521,8 @@
                     </div>
                 </section>
 
-                <div class="admin-settings-actions">
-                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Update Homepage</button>
+                <div class="admin-settings-actions admin-settings-actions--section">
+                    <button type="submit" class="admin-primary-pill" @disabled(! $homepageContentStorageReady)>Save Homepage Guide</button>
                 </div>
             </form>
         </section>

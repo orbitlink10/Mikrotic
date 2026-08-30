@@ -5464,6 +5464,40 @@ textarea.admin-post-builder-input {
     min-width: 0;
 }
 
+.account-form {
+    margin: 0;
+}
+
+.account-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: #0d1c3d;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.account-link:hover {
+    border-color: #c7dcff;
+    background: #eff6ff;
+    color: #0a4588;
+}
+
+.account-link--button {
+    font: inherit;
+}
+
+.account-link--logout {
+    color: var(--danger);
+}
+
 .cart-link {
     display: inline-flex;
     align-items: center;
@@ -5804,6 +5838,11 @@ textarea.admin-post-builder-input {
 @media (max-width: 980px) {
     .menu-toggle {
         display: inline-flex;
+    }
+
+    .top-account-links {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .top-contact-links {
