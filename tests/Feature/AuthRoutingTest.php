@@ -78,7 +78,7 @@ class AuthRoutingTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function test_admin_can_return_from_public_homepage_or_logout_to_login_again(): void
+    public function test_admin_can_return_from_public_homepage_and_logout(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
@@ -99,6 +99,7 @@ class AuthRoutingTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Login');
+            ->assertDontSee('Login')
+            ->assertDontSee('Register');
     }
 }

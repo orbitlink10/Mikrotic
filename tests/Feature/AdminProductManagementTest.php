@@ -783,10 +783,10 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertSee($storedContent->siteLogoUrl());
         $homeResponse->assertSee('href="tel:+254700123456"', false);
         $homeResponse->assertSee('Phone +254 700 123 456');
-        $homeResponse->assertSee('href="mailto:sales@mikrotikkenya.co.ke"', false);
-        $homeResponse->assertSee('Email sales@mikrotikkenya.co.ke');
-        $homeResponse->assertSee('href="https://wa.me/254711222333"', false);
-        $homeResponse->assertSee('aria-label="Chat with us on WhatsApp"', false);
+        $homeResponse->assertDontSee('href="mailto:sales@mikrotikkenya.co.ke"', false);
+        $homeResponse->assertDontSee('Email sales@mikrotikkenya.co.ke');
+        $homeResponse->assertDontSee('href="https://wa.me/254711222333"', false);
+        $homeResponse->assertDontSee('aria-label="Chat with us on WhatsApp"', false);
         $homeResponse->assertDontSee('Login');
         $homeResponse->assertDontSee('Register');
         $homeResponse->assertDontSee('Cart (0)');

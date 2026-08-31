@@ -230,31 +230,6 @@ button.danger {
     text-overflow: ellipsis;
 }
 
-.contact-link--email {
-    border-color: #c7dcff;
-    background: #eff6ff;
-    color: #0a4588;
-}
-
-.contact-link--whatsapp {
-    border-color: #bbf7d0;
-    background: #ecfdf5;
-    color: #166534;
-    padding: 0 12px;
-}
-
-.contact-link-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.contact-link-icon svg {
-    width: 22px;
-    height: 22px;
-    display: block;
-}
-
 .container {
     max-width: 1200px;
     margin: 24px auto;
@@ -5060,12 +5035,6 @@ textarea.admin-post-builder-input {
         color: #0a4588;
     }
 
-    .top-contact-links .contact-link--whatsapp {
-        border-color: #bbf7d0;
-        background: #ecfdf5;
-        color: #166534;
-    }
-
     .container {
         margin: 14px auto;
         padding: 0 12px;
@@ -5462,6 +5431,12 @@ textarea.admin-post-builder-input {
     justify-content: space-between;
     gap: 10px;
     min-width: 0;
+}
+
+@media (min-width: 981px) {
+    .top-account-links--menu-only {
+        display: none;
+    }
 }
 
 .account-form {

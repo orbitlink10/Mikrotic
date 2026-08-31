@@ -17,16 +17,7 @@
         $openGraphType = trim($__env->yieldContent('og_type')) ?: 'website';
         $organizationSchema = \App\Support\StructuredData::organization($homepageBrandContent);
         $headerPhone = $homepageBrandContent->contactPhone();
-        $headerWhatsApp = $homepageBrandContent->contactWhatsApp() ?: $headerPhone;
-        $headerEmail = $homepageBrandContent->contactEmail();
         $headerPhoneHref = $headerPhone ? 'tel:'.preg_replace('/[^\d+]+/', '', $headerPhone) : null;
-        $headerWhatsAppDigits = preg_replace('/\D+/', '', (string) $headerWhatsApp);
-
-        if (\Illuminate\Support\Str::startsWith($headerWhatsAppDigits, '0')) {
-            $headerWhatsAppDigits = '254'.ltrim($headerWhatsAppDigits, '0');
-        }
-
-        $headerWhatsAppHref = $headerWhatsAppDigits !== '' ? 'https://wa.me/'.$headerWhatsAppDigits : null;
         $websiteSchema = \App\Support\StructuredData::website();
         $primaryNavItems = $homepageBrandContent->navMenuItems();
         $menuCategories = \Illuminate\Support\Facades\Schema::hasTable('categories')
@@ -80,19 +71,9 @@
                 @if($headerPhone && $headerPhoneHref)
                     <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
                 @endif
-                @if($headerEmail)
-                    <a class="contact-link contact-link--email" href="mailto:{{ $headerEmail }}">Email {{ $headerEmail }}</a>
-                @endif
-                @if($headerWhatsApp && $headerWhatsAppHref)
-                    <a class="contact-link contact-link--whatsapp" href="{{ $headerWhatsAppHref }}" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp">
-                        <span class="contact-link-icon" aria-hidden="true">
-                            <svg viewBox="0 0 32 32" focusable="false"><path d="M16.004 3C8.832 3 3 8.832 3 16.004c0 2.292.594 4.535 1.725 6.51L3 29l6.664-1.746A12.94 12.94 0 0 0 16.004 29C23.176 29 29 23.168 29 15.996 29 8.832 23.168 3 16.004 3zm0 23.543c-2.083 0-4.124-.56-5.902-1.615l-.424-.251-3.955 1.036 1.056-3.855-.276-.438a10.42 10.42 0 0 1-1.605-5.531c0-5.8 4.722-10.523 10.528-10.523 5.798 0 10.518 4.723 10.518 10.523 0 5.807-4.72 10.654-10.528 10.654zm5.78-7.885c-.317-.159-1.872-.923-2.162-1.028-.29-.106-.501-.159-.712.158-.211.318-.817 1.028-1.002 1.24-.185.211-.37.238-.687.079-.317-.158-1.338-.493-2.549-1.573-.942-.84-1.578-1.878-1.763-2.195-.185-.317-.02-.489.139-.647.142-.142.317-.37.476-.555.158-.185.211-.317.317-.528.105-.211.052-.396-.027-.555-.079-.158-.712-1.715-.975-2.35-.256-.617-.517-.533-.712-.543-.184-.01-.396-.012-.607-.012-.211 0-.555.079-.845.396-.29.317-1.108 1.083-1.108 2.642 0 1.558 1.134 3.064 1.293 3.276.158.211 2.232 3.408 5.408 4.779.755.326 1.345.521 1.805.666.759.241 1.45.207 1.996.126.609-.091 1.872-.765 2.136-1.504.264-.74.264-1.373.185-1.505-.079-.132-.29-.211-.607-.37z" fill="currentColor"/></svg>
-                        </span>
-                    </a>
-                @endif
             </nav>
 
-            <nav class="top-account-links" aria-label="Account">
+            <nav class="top-account-links @guest top-account-links--menu-only @endguest" aria-label="Account">
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <a class="account-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
@@ -103,9 +84,6 @@
                         @csrf
                         <button type="submit" class="account-link account-link--button account-link--logout">Logout</button>
                     </form>
-                @else
-                    <a class="account-link" href="{{ route('login') }}">Login</a>
-                    <a class="account-link" href="{{ route('register') }}">Register</a>
                 @endauth
                 <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation menu">
                     <span class="menu-toggle-icon" aria-hidden="true"></span>
@@ -167,9 +145,6 @@
                     <button type="submit" class="mobile-menu-link mobile-menu-logout">Logout</button>
                 </form>
             </li>
-        @else
-            <li><a class="mobile-menu-link" href="{{ route('login') }}">Login</a></li>
-            <li><a class="mobile-menu-link" href="{{ route('register') }}">Register</a></li>
         @endauth
     </ul>
 </nav>
