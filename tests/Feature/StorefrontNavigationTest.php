@@ -118,6 +118,41 @@ class StorefrontNavigationTest extends TestCase
             ]);
     }
 
+    public function test_admin_pages_index_paginates_after_twenty_pages(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        for ($pageNumber = 1; $pageNumber <= 21; $pageNumber++) {
+            $page = $this->createPage(
+                sprintf('Paginated Admin Page %02d', $pageNumber),
+                sprintf('paginated-admin-page-%02d', $pageNumber)
+            );
+
+            $page->forceFill([
+                'created_at' => now()->subMinutes($pageNumber),
+                'updated_at' => now()->subMinutes($pageNumber),
+            ])->save();
+        }
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.index'))
+            ->assertOk()
+            ->assertSee('Page 1 of 2')
+            ->assertSee('Next')
+            ->assertSee('Paginated Admin Page 01')
+            ->assertDontSee('Paginated Admin Page 21');
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('Page 2 of 2')
+            ->assertSee('Previous')
+            ->assertSee('Paginated Admin Page 21');
+    }
+
     private function createPage(string $title, string $slug): Page
     {
         return Page::create([
