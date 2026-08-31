@@ -207,9 +207,11 @@ button.danger {
 }
 
 .top-contact-links {
-    display: grid;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 8px;
-    justify-items: stretch;
 }
 
 .contact-link {
@@ -5439,10 +5441,6 @@ textarea.admin-post-builder-input {
     }
 }
 
-.account-form {
-    margin: 0;
-}
-
 .account-link {
     display: inline-flex;
     align-items: center;
@@ -5463,14 +5461,6 @@ textarea.admin-post-builder-input {
     border-color: #c7dcff;
     background: #eff6ff;
     color: #0a4588;
-}
-
-.account-link--button {
-    font: inherit;
-}
-
-.account-link--logout {
-    color: var(--danger);
 }
 
 .cart-link {
@@ -5586,8 +5576,7 @@ textarea.admin-post-builder-input {
 }
 
 .mobile-menu-link,
-.mobile-menu-accordion-toggle,
-.mobile-menu-logout {
+.mobile-menu-accordion-toggle {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -5610,11 +5599,6 @@ textarea.admin-post-builder-input {
 }
 
 .mobile-menu-accordion-toggle {
-    font-weight: 700;
-}
-
-.mobile-menu-logout {
-    color: var(--danger);
     font-weight: 700;
 }
 

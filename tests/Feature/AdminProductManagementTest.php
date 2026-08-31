@@ -787,7 +787,7 @@ class AdminProductManagementTest extends TestCase
         $homeResponse->assertDontSee('Email sales@mikrotikkenya.co.ke');
         $homeResponse->assertDontSee('href="https://wa.me/254711222333"', false);
         $homeResponse->assertDontSee('aria-label="Chat with us on WhatsApp"', false);
-        $homeResponse->assertDontSee('Login');
+        $homeResponse->assertSee('Login');
         $homeResponse->assertDontSee('Register');
         $homeResponse->assertDontSee('Cart (0)');
 

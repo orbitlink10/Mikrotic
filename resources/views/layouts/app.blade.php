@@ -67,24 +67,14 @@
         </form>
 
         <div class="header-actions">
-            <nav class="top-links top-contact-links" aria-label="Contact">
+            <nav class="top-links top-contact-links" aria-label="Header actions">
                 @if($headerPhone && $headerPhoneHref)
                     <a class="contact-link contact-link--phone" href="{{ $headerPhoneHref }}">Phone {{ $headerPhone }}</a>
                 @endif
+                <a class="account-link header-login-link" href="{{ route('login') }}">Login</a>
             </nav>
 
-            <nav class="top-account-links @guest top-account-links--menu-only @endguest" aria-label="Account">
-                @auth
-                    @if(auth()->user()->role === 'admin')
-                        <a class="account-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a>
-                    @elseif(auth()->user()->role === 'vendor')
-                        <a class="account-link" href="{{ route('vendor.dashboard') }}">Vendor Dashboard</a>
-                    @endif
-                    <form class="account-form" action="{{ route('logout') }}" method="post">
-                        @csrf
-                        <button type="submit" class="account-link account-link--button account-link--logout">Logout</button>
-                    </form>
-                @endauth
+            <nav class="top-account-links top-account-links--menu-only" aria-label="Account">
                 <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation menu">
                     <span class="menu-toggle-icon" aria-hidden="true"></span>
                 </button>
@@ -133,19 +123,7 @@
             @endif
         @endforeach
         <li><a class="mobile-menu-link" href="{{ route('pages.show', ['page' => 'contact-us']) }}">Contact Us</a></li>
-        @auth
-            @if(auth()->user()->role === 'admin')
-                <li><a class="mobile-menu-link" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
-            @elseif(auth()->user()->role === 'vendor')
-                <li><a class="mobile-menu-link" href="{{ route('vendor.dashboard') }}">Vendor Dashboard</a></li>
-            @endif
-            <li>
-                <form action="{{ route('logout') }}" method="post">
-                    @csrf
-                    <button type="submit" class="mobile-menu-link mobile-menu-logout">Logout</button>
-                </form>
-            </li>
-        @endauth
+        <li><a class="mobile-menu-link" href="{{ route('login') }}">Login</a></li>
     </ul>
 </nav>
 

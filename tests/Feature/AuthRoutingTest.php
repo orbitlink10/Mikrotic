@@ -88,9 +88,9 @@ class AuthRoutingTest extends TestCase
         $homeResponse = $this->actingAs($admin)->get('/');
 
         $homeResponse->assertOk();
-        $homeResponse->assertSee('Admin Dashboard');
-        $homeResponse->assertSee('Logout');
-        $homeResponse->assertDontSee('Login');
+        $homeResponse->assertDontSee('Admin Dashboard');
+        $homeResponse->assertDontSee('Logout');
+        $homeResponse->assertSee('Login');
 
         $this->post(route('logout'))
             ->assertRedirect(route('home'));
@@ -99,7 +99,7 @@ class AuthRoutingTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertDontSee('Login')
+            ->assertSee('Login')
             ->assertDontSee('Register');
     }
 }
