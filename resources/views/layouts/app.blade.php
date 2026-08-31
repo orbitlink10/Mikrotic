@@ -85,6 +85,7 @@
     @if($primaryNavItems !== [])
         <nav class="primary-nav" aria-label="Main navigation">
             <div class="primary-nav-inner">
+                <a class="primary-nav-link" href="{{ route('home') }}">Home</a>
                 @foreach($primaryNavItems as $navItem)
                     <a class="primary-nav-link" href="{{ $navItem['url'] }}">{{ $navItem['label'] }}</a>
                 @endforeach

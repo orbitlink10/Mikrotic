@@ -52,6 +52,8 @@ class StorefrontNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('class="primary-nav"', false);
+        $response->assertSee('<a class="primary-nav-link" href="' . route('home') . '">Home</a>', false);
+        $response->assertSeeInOrder(['Home', 'Support Desk', 'Router Deals']);
         $response->assertSee('Support Desk');
         $response->assertSee('/category/mikrotik-router-prices-in-kenya', false);
         $response->assertDontSee('Fallback Navigation Article');
