@@ -37,12 +37,16 @@
                     </thead>
                     <tbody>
                     @forelse($products as $product)
-                        @php($primaryImage = $product->images->first())
+                        @php
+                            $primaryImage = $product->images->first();
+                            $officialProductImage = \App\Support\ProductImageCatalog::officialUrls($product)[0] ?? null;
+                            $productThumb = $primaryImage?->publicUrl() ?: $officialProductImage;
+                        @endphp
                         <tr>
                             <td>{{ $products->firstItem() + $loop->index }}</td>
                             <td>
-                                @if($primaryImage?->image_url)
-                                    <img class="admin-thumb admin-thumb--product" src="{{ $primaryImage->publicUrl() }}" alt="{{ $product->name }}">
+                                @if($productThumb)
+                                    <img class="admin-thumb admin-thumb--product" src="{{ $productThumb }}" alt="{{ $product->name }}">
                                 @else
                                     <div class="admin-thumb admin-thumb--placeholder admin-thumb--product">No Image</div>
                                 @endif

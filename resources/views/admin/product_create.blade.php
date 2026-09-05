@@ -65,6 +65,8 @@
     $initialSubcategories = $categories->firstWhere('id', (int) $selectedCategoryId)?->children ?? collect();
     $showInlineCategoryCreation = $categories->isEmpty() && ! $isEditingProduct;
     $primaryImage = $productToEdit?->images?->firstWhere('is_primary', true) ?? $productToEdit?->images?->first();
+    $officialProductImage = $productToEdit ? (\App\Support\ProductImageCatalog::officialUrls($productToEdit)[0] ?? null) : null;
+    $productPreviewImage = $primaryImage?->publicUrl() ?: $officialProductImage;
     $productSeoFieldsReady = \App\Models\Product::seoFieldsReady();
     $productOfficialMediaFieldsReady = \App\Models\Product::officialMediaFieldsReady();
     $productFaqItems = old('faq_items', $productToEdit?->faq_items ?? [
@@ -425,9 +427,9 @@
                 <details class="admin-product-optional-panel">
                     <summary>Product Image</summary>
                     <div class="admin-product-optional-body">
-                        @if($primaryImage?->image_url)
+                        @if($productPreviewImage)
                             <div class="admin-settings-preview">
-                                <img src="{{ $primaryImage->publicUrl() }}" alt="{{ $productToEdit?->name }}">
+                                <img src="{{ $productPreviewImage }}" alt="{{ $productToEdit?->name }}">
                             </div>
                         @endif
 

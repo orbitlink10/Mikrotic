@@ -157,6 +157,16 @@
 </footer>
 
 <script>
+window.ZivoChat=window.ZivoChat||{q:[]};
+["open","close","toggle","reset","track"].forEach(function(method){
+    window.ZivoChat[method]=window.ZivoChat[method]||function(){
+        window.ZivoChat.q.push([method].concat([].slice.call(arguments)));
+    };
+});
+</script>
+<script async src="https://zivo.co.ke/zchat/widget/87kzgt7ckpQHwUTsBekQZeZ0pPJSytP7jziTmOYpcEYQzMnX.js"></script>
+
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     var searchForm = document.querySelector('.search-form');
     var searchInput = searchForm ? searchForm.querySelector('input[name="search"]') : null;

@@ -276,6 +276,50 @@ class AdminProductManagementTest extends TestCase
         $response->assertDontSee('Slug');
     }
 
+    public function test_admin_products_index_uses_official_image_when_no_uploaded_image_exists(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'phone' => '0700000000',
+        ]);
+
+        $category = Category::create([
+            'name' => 'Routers',
+            'slug' => 'routers',
+        ]);
+
+        $vendor = Vendor::create([
+            'user_id' => $admin->id,
+            'shop_name' => 'Admin Store',
+            'slug' => 'admin-store',
+            'description' => 'Products managed by admin.',
+            'phone' => '0700000000',
+            'address' => 'Nairobi',
+            'is_approved' => true,
+        ]);
+
+        Product::create([
+            'vendor_id' => $vendor->id,
+            'category_id' => $category->id,
+            'name' => 'MIKROTIK L009UIGS-RM',
+            'slug' => 'mikrotik-l009uigs-rm',
+            'description' => '<p>Official image fallback.</p>',
+            'meta_description' => 'L009 router listing.',
+            'price' => '17000.00',
+            'stock' => 3,
+            'sku' => 'SKU-L009',
+            'status' => 'active',
+            'official_image_url' => 'https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/products');
+
+        $response->assertOk();
+        $response->assertSee('https://cdn.mikrotik.com/web-assets/rb_images/2267_lg.webp', false);
+        $response->assertDontSee('No Image');
+    }
+
     public function test_admin_page_create_page_displays_requested_post_fields(): void
     {
         $admin = User::factory()->create([
