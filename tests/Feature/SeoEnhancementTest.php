@@ -150,6 +150,8 @@ class SeoEnhancementTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'application/xml');
+        $this->assertStringStartsWith('<?xml version="1.0" encoding="UTF-8"?>', $response->getContent());
+        $this->assertNotFalse(simplexml_load_string($response->getContent()));
         $response->assertSee('https://mikrotikkenya.co.ke/category/mikrotik-switches', false);
         $response->assertSee('https://mikrotikkenya.co.ke/product/'.$product->slug, false);
         $response->assertSee('https://mikrotikkenya.co.ke/routeros-guide', false);
