@@ -116,11 +116,11 @@ class HomepageContent extends Model
             'why_choose_items' => self::defaultWhyChooseItems(),
             'testimonials_badge' => 'Testimonials',
             'testimonials_title' => 'Customer Feedback',
-            'testimonials_intro' => 'Feedback from customers can be managed from the admin panel when genuine testimonials are available.',
+            'testimonials_intro' => 'Customer experiences with MikroTik equipment and support.',
             'testimonial_items' => self::defaultTestimonialItems(),
             'faq_badge' => 'FAQ',
             'faq_title' => 'MikroTik Buying Questions',
-            'faq_intro' => 'Answers to common questions about MikroTik prices, stock, delivery and product selection in Kenya.',
+            'faq_intro' => 'Choose MikroTik equipment for your network and find out what to confirm about setup, payment, collection, delivery and warranty before ordering.',
             'faq_items' => self::defaultFaqItems(),
             'content_badge' => 'MikroTik Kenya Guide',
             'content_title' => 'MikroTik Kenya: RouterOS Hardware for Homes, Offices and ISPs',
@@ -446,10 +446,10 @@ class HomepageContent extends Model
     private static function defaultWhyChooseItems(): array
     {
         return [
-            ['title' => 'Current Catalogue Prices', 'description' => 'Product pages show prices from the store catalogue instead of static SEO copy.'],
+            ['title' => 'Compare Prices and Models', 'description' => 'Compare listed prices, model numbers and stock status, then confirm availability before ordering.'],
             ['title' => 'RouterOS-Focused Selection', 'description' => 'Browse routers, switches, wireless systems, LTE devices and accessories by practical network use.'],
-            ['title' => 'Product-Level Details', 'description' => 'Review SKU, stock status, category, use cases and technical guidance before purchase.'],
-            ['title' => 'Quotation Friendly', 'description' => 'Business buyers can use product pages as a starting point for larger networking enquiries.'],
+            ['title' => 'Check Compatibility', 'description' => 'Check Ethernet ports, fibre uplinks, Wi-Fi capability and power requirements for the exact model.'],
+            ['title' => 'Plan Your Network', 'description' => 'Select routers, switches and access points around your user count, coverage needs and budget.'],
             ['title' => 'Delivery Information', 'description' => 'Delivery options are confirmed during checkout or enquiry based on product availability and destination.'],
             ['title' => 'Configuration Guidance', 'description' => 'Product pages include RouterOS and compatibility notes where available.'],
         ];
@@ -460,23 +460,7 @@ class HomepageContent extends Model
      */
     private static function defaultTestimonialItems(): array
     {
-        return [
-            [
-                'quote' => 'Add genuine customer feedback from completed orders or verified support interactions in the admin panel.',
-                'name' => 'Customer feedback',
-                'role' => 'Managed from admin',
-            ],
-            [
-                'quote' => 'Do not publish ratings or reviews unless they come from real customers and can be supported by business records.',
-                'name' => 'Review policy',
-                'role' => 'Verified reviews only',
-            ],
-            [
-                'quote' => 'Use this section for real installation, procurement or support feedback once available.',
-                'name' => 'Trust signals',
-                'role' => 'Real customer proof',
-            ],
-        ];
+        return [];
     }
 
     /**
@@ -486,20 +470,32 @@ class HomepageContent extends Model
     {
         return [
             [
-                'question' => 'Are prices on the website current?',
-                'answer' => 'Product prices are generated from the store catalogue and should update when the admin changes a product price.',
+                'question' => 'How do I choose a MikroTik router, switch or access point?',
+                'answer' => 'Choose a router for routing, firewall and VPN needs, a switch for connecting wired devices, and an access point for Wi-Fi coverage. Compare the exact model against your internet speed, number of users, Ethernet and fibre ports, PoE requirements and budget. Check wireless bands and coverage needs when selecting Wi-Fi equipment.',
             ],
             [
-                'question' => 'Can I compare MikroTik routers before buying?',
-                'answer' => 'Use category pages and product pages to compare price, stock status, SKU, category and recommended applications.',
+                'question' => 'Does every MikroTik router include Wi-Fi?',
+                'answer' => 'No. Some MikroTik routers provide wired connections only, while others include Wi-Fi. Check the full model number and wireless specifications on the product page before ordering. A wired router needs a separate wireless access point if you want to connect phones, laptops or other devices over Wi-Fi.',
             ],
             [
-                'question' => 'Do product pages show stock status?',
-                'answer' => 'Yes. Each product page shows whether the product is currently listed as available or out of stock.',
+                'question' => 'What is included with a MikroTik product?',
+                'answer' => 'Package contents depend on the exact model. Check the product listing and confirm which power supply, PoE injector, mounting brackets and cables are included before ordering. Accessories and setup services should only be treated as included when they are listed in your order or quotation.',
             ],
             [
-                'question' => 'Can businesses request quotations?',
-                'answer' => 'Business quotation availability should be confirmed through the contact details configured by the site owner.',
+                'question' => 'Can I get help with MikroTik configuration or installation?',
+                'answer' => 'Contact MikroTik Kenya with your model, location and network requirements to confirm available configuration or installation support. Ask whether remote setup or an on-site visit is available, what work is covered and what it costs. Confirm any service separately before purchasing equipment.',
+            ],
+            [
+                'question' => 'How do I confirm an order and make payment?',
+                'answer' => 'Contact MikroTik Kenya with the model and quantity you need. Confirm stock, the final price and any delivery or service charges before paying. Use the payment method and official payment details provided for your confirmed order, and keep your receipt or invoice.',
+            ],
+            [
+                'question' => 'Can I collect my order or arrange delivery?',
+                'answer' => 'Confirm collection or delivery arrangements when placing your order. For collection, agree on the location and collection time before travelling. For delivery, provide your destination and confirm availability, charges and the expected dispatch and arrival dates. These details depend on stock and destination.',
+            ],
+            [
+                'question' => 'What warranty applies to MikroTik equipment?',
+                'answer' => 'Warranty coverage depends on the product and the applicable seller or supplier terms. Before purchase, confirm the warranty period, what is covered, any exclusions and how to report a fault or return equipment for assessment. Keep your invoice and product serial number for support enquiries.',
             ],
         ];
     }

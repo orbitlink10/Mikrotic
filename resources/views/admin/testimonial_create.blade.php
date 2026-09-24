@@ -106,7 +106,7 @@
                 </div>
 
                 <div class="admin-product-actions">
-                    <p>Use lower sort orders to show testimonials earlier on the homepage.</p>
+                    <p>Publish only genuine feedback about MikroTik purchases or support that you can trace to a customer record and have permission to display. Keep unverified entries hidden. Lower sort orders appear first.</p>
                     <div class="admin-actions-inline">
                         <a class="admin-secondary-pill" href="{{ route('admin.testimonials.index') }}">Back</a>
                         <button type="submit" class="admin-primary-pill" @disabled(! $testimonialsStorageReady)>{{ $isEditingTestimonial ? 'Update Testimonial' : 'Save Testimonial' }}</button>

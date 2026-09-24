@@ -22,6 +22,7 @@
     $categoryFaqItems = $isRouterAuthorityPage
         ? $routerFaqItems
         : (is_array($currentCategory?->faq_items) ? $currentCategory->faq_items : []);
+    $homepageFaqItems = $showHomepageSections ? $homepageContent->faqItems() : [];
     $requestedCategorySlug = $currentCategory
         ? \Illuminate\Support\Str::slug((string) request()->route('category'))
         : null;
@@ -35,7 +36,7 @@
                 : \App\Support\CanonicalUrl::route('category.show', $currentCategory, $catalogCanonicalQuery)))
         : \App\Support\CanonicalUrl::route('home', [], $catalogCanonicalQuery);
     $faqSchema = ($showHomepageSections || ($currentCategory && $categoryFaqItems !== []))
-        ? \App\Support\StructuredData::faq($showHomepageSections ? $homepageContent->faqItems() : $categoryFaqItems)
+        ? \App\Support\StructuredData::faq($showHomepageSections ? $homepageFaqItems : $categoryFaqItems)
         : null;
     $breadcrumbSchema = null;
     if ($currentCategory) {
@@ -413,7 +414,7 @@ SVG,
                 </div>
 
                 <div class="faq-list">
-                    @foreach($homepageContent->faqItems() as $item)
+                    @foreach($homepageFaqItems as $item)
                         <details class="faq-item" @if($loop->first) open @endif>
                             <summary>{{ $item['question'] }}</summary>
                             <p>{{ $item['answer'] }}</p>

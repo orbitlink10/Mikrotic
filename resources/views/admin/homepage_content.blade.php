@@ -422,7 +422,7 @@
                 <section class="admin-settings-group">
                     <div class="admin-settings-group-head">
                         <h2 class="admin-settings-group-title">FAQ Section</h2>
-                        <p class="admin-settings-help">Frequently asked questions that appear below the testimonial section.</p>
+                        <p class="admin-settings-help">These answers appear on the homepage and in its FAQ structured data. Include only accurate product guidance and confirmed service, payment, delivery and warranty terms.</p>
                     </div>
 
                     <div class="admin-settings-subgrid">

@@ -47,47 +47,12 @@ return new class extends Migration
                         'quote' => $quote,
                         'rating' => 5,
                         'sort_order' => $index + 1,
-                        'is_active' => true,
+                        'is_active' => false,
                         'created_at' => $timestamp,
                         'updated_at' => $timestamp,
                     ];
                 }
             }
-        }
-
-        if ($records === []) {
-            $records = [
-                [
-                    'name' => 'Joan K., Nairobi',
-                    'role' => 'Customer',
-                    'quote' => 'The installation team arrived on time, explained the ideal mounting position, and got us online the same day. The experience felt professional from start to finish.',
-                    'rating' => 5,
-                    'sort_order' => 1,
-                    'is_active' => true,
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ],
-                [
-                    'name' => 'Samuel O., Meru',
-                    'role' => 'Customer',
-                    'quote' => 'Our children now attend online classes without interruptions, and video meetings are finally stable. Starlink has made a visible difference in our day-to-day routine.',
-                    'rating' => 5,
-                    'sort_order' => 2,
-                    'is_active' => true,
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ],
-                [
-                    'name' => 'Victor M., Rongai',
-                    'role' => 'Customer',
-                    'quote' => 'Uploads that used to take forever now finish quickly, which matters a lot for my content work. For creators working outside strong fiber zones, this is a serious upgrade.',
-                    'rating' => 5,
-                    'sort_order' => 3,
-                    'is_active' => true,
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ],
-            ];
         }
 
         if ($records !== []) {
