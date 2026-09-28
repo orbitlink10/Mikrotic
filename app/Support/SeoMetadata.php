@@ -51,6 +51,10 @@ class SeoMetadata
 
     public static function productTitle(Product $product): string
     {
+        if (MikrotikProductTitle::appliesTo($product)) {
+            return MikrotikProductTitle::make($product);
+        }
+
         if ($customTitle = self::columnValue($product, 'seo_title')) {
             return $customTitle;
         }
