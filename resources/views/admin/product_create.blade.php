@@ -341,6 +341,24 @@
                     </div>
                 </div>
 
+                @if($productOfficialMediaFieldsReady)
+                    <section class="admin-product-field" aria-labelledby="product-video-heading">
+                        <h2 id="product-video-heading">Product video (Optional)</h2>
+                        <label class="admin-product-label" for="official_video_url">YouTube video URL</label>
+                        <input class="admin-product-input" id="official_video_url" type="url" name="official_video_url" value="{{ old('official_video_url', $productToEdit?->official_video_url) }}" placeholder="https://www.youtube.com/watch?v=..." aria-describedby="product-video-help">
+                        <p class="admin-product-note" id="product-video-help">Paste a YouTube watch, share, Shorts or embed link. The video appears below the description in Product details. Clear the link to remove it.</p>
+                        @error('official_video_url')
+                            <p class="admin-product-note" role="alert">{{ $message }}</p>
+                        @enderror
+                        @php($videoPreviewUrl = \App\Support\ProductSeo::youtubeEmbedUrl(old('official_video_url', $productToEdit?->official_video_url)))
+                        @if($videoPreviewUrl)
+                            <div class="product-video-frame">
+                                <iframe src="{{ $videoPreviewUrl }}" title="Product video preview" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
                 @if($productSeoFieldsReady)
                     <details class="admin-product-optional-panel">
                         <summary>SEO, Specs and FAQs</summary>
@@ -371,9 +389,6 @@
                                 <label class="admin-product-label" for="official_image_url">Official product image URL</label>
                                 <input class="admin-product-input" id="official_image_url" type="url" name="official_image_url" value="{{ old('official_image_url', $productToEdit?->official_image_url) }}" placeholder="https://cdn.mikrotik.com/web-assets/rb_images/...">
 
-                                <label class="admin-product-label" for="official_video_url">Product video URL (YouTube)</label>
-                                <input class="admin-product-input" id="official_video_url" type="url" name="official_video_url" value="{{ old('official_video_url', $productToEdit?->official_video_url) }}" placeholder="https://www.youtube.com/watch?v=...">
-                                <p class="admin-product-note">Leave empty to auto-sync official images, gallery and video from mikrotik.com using <code>php artisan mikrotik:sync-media</code>.</p>
                             @endif
 
                             <div class="admin-form-grid">

@@ -1148,7 +1148,11 @@ class AdminController extends Controller
         if (Product::officialMediaFieldsReady()) {
             $rules = array_merge($rules, [
                 'official_image_url' => ['nullable', 'url', 'max:500'],
-                'official_video_url' => ['nullable', 'url', 'max:500'],
+                'official_video_url' => ['nullable', 'url', 'max:500', function ($attribute, $value, $fail) {
+                    if (! \App\Support\ProductSeo::youtubeEmbedUrl($value)) {
+                        $fail('Please enter a valid YouTube video link.');
+                    }
+                }],
             ]);
         }
 
@@ -1264,7 +1268,11 @@ class AdminController extends Controller
         if (Product::officialMediaFieldsReady()) {
             $rules = array_merge($rules, [
                 'official_image_url' => ['nullable', 'url', 'max:500'],
-                'official_video_url' => ['nullable', 'url', 'max:500'],
+                'official_video_url' => ['nullable', 'url', 'max:500', function ($attribute, $value, $fail) {
+                    if (! \App\Support\ProductSeo::youtubeEmbedUrl($value)) {
+                        $fail('Please enter a valid YouTube video link.');
+                    }
+                }],
             ]);
         }
 

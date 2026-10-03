@@ -229,6 +229,9 @@ class AdminProductManagementTest extends TestCase
         $response->assertSee('Heading 6');
         $response->assertSee('Strikethrough');
         $response->assertSee('Align center');
+        $response->assertSee('Product video (Optional)');
+        $response->assertSee('YouTube video URL');
+        $response->assertSee('name="official_video_url"', false);
     }
 
     public function test_admin_products_index_renders_working_preview_update_and_delete_actions(): void
