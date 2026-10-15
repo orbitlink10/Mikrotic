@@ -624,6 +624,30 @@ class AdminController extends Controller
         ]);
     }
 
+    public function showOrder(Order $order): View
+    {
+        return view('admin.order_show', [
+            'order' => $order->load(['user', 'items.product']),
+            'statuses' => ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'],
+        ]);
+    }
+
+    public function updateOrder(Request $request, Order $order): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'])],
+            'shipping_name' => ['required', 'string', 'max:255'],
+            'shipping_email' => ['required', 'email', 'max:255'],
+            'shipping_phone' => ['required', 'string', 'max:50'],
+            'shipping_address' => ['required', 'string', 'max:255'],
+            'payment_method' => ['required', 'string', 'max:50'],
+        ]);
+
+        $order->update($validated);
+
+        return redirect()->route('admin.orders.show', $order)->with('success', 'Order updated successfully.');
+    }
+
     public function pagesIndex(): View
     {
         $pagesStorageReady = Page::storageReady();

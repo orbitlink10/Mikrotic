@@ -45,7 +45,7 @@
                         <div><strong>Placed At:</strong> {{ $order->created_at?->format('d/m/Y H:i:s') }}</div>
                         <div><strong>Total:</strong> {{ number_format((float) $order->total_amount, 2) }} KES</div>
                         <div class="admin-order-action">
-                            <button type="button" class="admin-outline-action tone-info">View</button>
+                            <a href="{{ route('admin.orders.show', $order) }}" class="admin-outline-action tone-info">View</a>
                         </div>
                     </div>
                 </article>

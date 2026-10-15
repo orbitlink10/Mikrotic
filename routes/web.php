@@ -109,6 +109,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/pages/{page}', [AdminController::class, 'updatePage'])->name('pages.update');
     Route::delete('/pages/{page}', [AdminController::class, 'destroyPage'])->name('pages.destroy');
     Route::get('/orders', [AdminController::class, 'ordersIndex'])->name('orders.index');
+    Route::get('/orders/{order}', [AdminController::class, 'showOrder'])->name('orders.show');
+    Route::put('/orders/{order}', [AdminController::class, 'updateOrder'])->name('orders.update');
     Route::get('/invoices', [AdminController::class, 'invoicesIndex'])->name('invoices.index');
     Route::get('/vendors', [AdminController::class, 'pendingVendors'])->name('vendors.pending');
     Route::post('/vendors/{vendor}/approve', [AdminController::class, 'approveVendor'])->name('vendors.approve');
